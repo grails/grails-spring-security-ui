@@ -103,29 +103,29 @@
 			<locationURI>DOTGRAILS/1.2.3/projects/spring-security-ui/plugins/spring-security-acl-0.2/src/java</locationURI>
 		</link>
 		<link>
-			<name>spring-security-core-0.4-grails-app-conf</name>
+			<name>spring-security-core-0.4.1-grails-app-conf</name>
 			<type>2</type>
-			<locationURI>DOTGRAILS/1.2.3/projects/spring-security-ui/plugins/spring-security-core-0.4/grails-app/conf</locationURI>
+			<locationURI>DOTGRAILS/1.2.3/projects/grails-spring-security-ui/plugins/spring-security-core-0.4.1/grails-app/conf</locationURI>
 		</link>
 		<link>
-			<name>spring-security-core-0.4-grails-app-services</name>
+			<name>spring-security-core-0.4.1-grails-app-services</name>
 			<type>2</type>
-			<locationURI>DOTGRAILS/1.2.3/projects/spring-security-ui/plugins/spring-security-core-0.4/grails-app/services</locationURI>
+			<locationURI>DOTGRAILS/1.2.3/projects/grails-spring-security-ui/plugins/spring-security-core-0.4.1/grails-app/services</locationURI>
 		</link>
 		<link>
-			<name>spring-security-core-0.4-grails-app-taglib</name>
+			<name>spring-security-core-0.4.1-grails-app-taglib</name>
 			<type>2</type>
-			<locationURI>DOTGRAILS/1.2.3/projects/spring-security-ui/plugins/spring-security-core-0.4/grails-app/taglib</locationURI>
+			<locationURI>DOTGRAILS/1.2.3/projects/grails-spring-security-ui/plugins/spring-security-core-0.4.1/grails-app/taglib</locationURI>
 		</link>
 		<link>
-			<name>spring-security-core-0.4-src-groovy</name>
+			<name>spring-security-core-0.4.1-src-groovy</name>
 			<type>2</type>
-			<locationURI>DOTGRAILS/1.2.3/projects/spring-security-ui/plugins/spring-security-core-0.4/src/groovy</locationURI>
+			<locationURI>DOTGRAILS/1.2.3/projects/grails-spring-security-ui/plugins/spring-security-core-0.4.1/src/groovy</locationURI>
 		</link>
 		<link>
-			<name>spring-security-core-0.4-src-java</name>
+			<name>spring-security-core-0.4.1-src-java</name>
 			<type>2</type>
-			<locationURI>DOTGRAILS/1.2.3/projects/spring-security-ui/plugins/spring-security-core-0.4/src/java</locationURI>
+			<locationURI>DOTGRAILS/1.2.3/projects/grails-spring-security-ui/plugins/spring-security-core-0.4.1/src/java</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
