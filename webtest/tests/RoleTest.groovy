@@ -51,7 +51,7 @@ class RoleTest extends AbstractSecurityWebTest {
 			authority = newName
 			click 'search_submit'
 		}
-		assertContentContains 'No results '
+		assertContentContains 'No results'
 
 		// create
 		get '/role/create'

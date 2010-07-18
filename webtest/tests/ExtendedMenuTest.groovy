@@ -1,4 +1,4 @@
-class DefaultMenuTest extends AbstractSecurityWebTest {
+class ExtendedMenuTest extends AbstractSecurityWebTest {
 
 	void testIndex() {
 		get '/'
@@ -24,11 +24,11 @@ class DefaultMenuTest extends AbstractSecurityWebTest {
 		assertTrue content.contains('Voters')
 		assertTrue content.contains('Authentication Providers')
 
-		assertFalse content.contains('Persistent Logins')
+		assertTrue content.contains('Persistent Logins')
 
-		assertFalse content.contains('ACL')
-		assertFalse content.contains('SID')
-		assertFalse content.contains('OID')
-		assertFalse content.contains('Entry')
+		assertTrue content.contains('ACL')
+		assertTrue content.contains('SID')
+		assertTrue content.contains('OID')
+		assertTrue content.contains('Entry')
 	}
 }

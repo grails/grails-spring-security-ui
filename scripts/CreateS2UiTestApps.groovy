@@ -15,7 +15,7 @@ target(createS2UiTestApp: 'Creates test apps for functional tests') {
 
 	def configFile = new File(basedir, 'testapps.config.groovy')
 	if (!configFile.exists()) {
-		error "$configFile.path not found"
+		die "$configFile.path not found"
 	}
 
 	new ConfigSlurper().parse(configFile.text).each { name, config ->
@@ -24,8 +24,18 @@ target(createS2UiTestApp: 'Creates test apps for functional tests') {
 		createApp()
 		installPlugins()
 		runQuickstart()
-		copySampleFiles([])
-		copyTests()
+		copySampleFiles()
+		copyTests(false)
+
+		echo "\nCreating extended app based on configuration $name: ${config.flatten()}\n"
+		init name + '_ext', config
+		createApp()
+		installPlugins()
+		runQuickstart()
+		copySampleFiles()
+		copyTests(true)
+		runCreatePersistentToken()
+		installAclPlugin()
 	}
 }
 
@@ -33,17 +43,17 @@ private void init(String name, config) {
 
 	pluginVersion = config.pluginVersion
 	if (!pluginVersion) {
-		error "pluginVersion wasn't specified for config '$name'"
+		die "pluginVersion wasn't specified for config '$name'"
 	}
 
 	pluginZip = new File(basedir, "grails-spring-security-ui-${pluginVersion}.zip")
 	if (!pluginZip.exists()) {
-		error "plugin $pluginZip.absolutePath not found"
+		die "plugin $pluginZip.absolutePath not found"
 	}
 
 	grailsHome = config.grailsHome
 	if (!new File(grailsHome).exists()) {
-		error "Grails home $grailsHome not found"
+		die "Grails home $grailsHome not found"
 	}
 
 	projectDir = config.projectDir
@@ -64,11 +74,14 @@ private void createApp() {
 	}
 }
 
-private void copySampleFiles(extraTests) {
+private void copySampleFiles() {
 	ant.unzip src: "$projectfiles.path/testDb.zip", dest: "$testprojectRoot/db"
 	ant.copy file: "$projectfiles.path/DataSource.groovy", todir: "$testprojectRoot/grails-app/conf"
 	ant.copy file: "$projectfiles.path/index.gsp", todir: "$testprojectRoot/grails-app/views"
 	ant.copy file: "$projectfiles.path/User.groovy", todir: "$testprojectRoot/grails-app/domain/com/testapp", overwrite: true
+
+	ant.mkdir dir: "${testprojectRoot}/src/templates/war"
+	ant.copy file: "$projectfiles.path/web.xml", todir: "$testprojectRoot/src/templates/war"
 
 	new File("$testprojectRoot/grails-app/conf/Config.groovy").withWriterAppend {
 		it.writeLine 'grails {'
@@ -81,12 +94,6 @@ private void copySampleFiles(extraTests) {
 		it.writeLine '   }'
 		it.writeLine '}'
 	}
-
-	def tests = ['DefaultMenu', 'User', 'Register', 'RegistrationCode', 'Role', 'SecurityInfo']
-	tests.addAll extraTests
-	new File("$testprojectRoot/grails-app/conf/BuildConfig.groovy").withWriterAppend {
-		it.writeLine 'grails.testing.patterns = ["' + tests.join('", "') + '"]'
-	}
 }
 
 private void installPlugins() {
@@ -95,9 +102,11 @@ private void installPlugins() {
 	ant.copy file: "$projectfiles.path/BuildConfig.groovy", todir: "$testprojectRoot/grails-app/conf"
 
 	ant.mkdir dir: "${testprojectRoot}/plugins"
+
 	callGrails(grailsHome, testprojectRoot, 'dev', 'install-plugin') {
 		ant.arg value: "functional-test ${functionalTestPluginVersion}"
 	}
+
 	callGrails(grailsHome, testprojectRoot, 'dev', 'install-plugin') {
 		ant.arg value: pluginZip.absolutePath
 	}
@@ -109,9 +118,35 @@ private void runQuickstart() {
 	}
 }
 
-private void copyTests() {
+private void copyTests(boolean extraTests) {
+
+	// copy all of the tests but configure which ones to run based on core set plus extraTests
 	ant.copy(todir: "${testprojectRoot}/test/functional") {
 		fileset(dir: "$basedir/webtest/tests")
+	}
+
+	def tests = []
+	if (!extraTests) {
+		tests.addAll 'DefaultMenu', 'DefaultSecurityInfo'
+	}
+	tests.addAll 'User', 'Register', 'RegistrationCode', 'Requestmap', 'Role'
+	if (extraTests) {
+		tests.addAll 'PersistentLogin', 'ExtendedMenu', 'ExtendedSecurityInfo', 'AclClass', 'AclEntry', 'AclObjectIdentity', 'AclSid'
+	}
+	new File("$testprojectRoot/grails-app/conf/BuildConfig.groovy").withWriterAppend {
+		it.writeLine 'grails.testing.patterns = ["' + tests.join('", "') + '"]'
+	}
+}
+
+private void runCreatePersistentToken() {
+	callGrails(grailsHome, testprojectRoot, 'dev', 's2-create-persistent-token') {
+		ant.arg value: 'com.testapp.PersistentToken'
+	}
+}
+
+private void installAclPlugin() {
+	callGrails(grailsHome, testprojectRoot, 'dev', 'install-plugin') {
+		ant.arg value: 'spring-security-acl'
 	}
 }
 
@@ -132,8 +167,8 @@ private void deleteDir(String path) {
 	ant.delete dir: path
 }
 
-private void error(String message) {
-	ant.echo "\nERROR: $message"
+private void die(String message) {
+	ant.echo "\n\nERROR: $message\n\n"
 	exit 1
 }
 

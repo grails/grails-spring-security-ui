@@ -74,9 +74,11 @@ class PersistentLoginController extends AbstractS2UiController {
 		def queryParams = [:]
 
 		for (name in ['username', 'series', 'token']) {
-			if (params[name]) {
+			String param = params[name]
+			if (param) {
+				if (name == 'series') name = 'id' // aliased primary key
+				queryParams[name] = '%' + param.toLowerCase() + '%'
 				hql.append " AND LOWER(pl.$name) LIKE :$name"
-				queryParams[name] = params[name].toLowerCase() + '%'
 			}
 		}
 

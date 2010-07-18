@@ -28,7 +28,7 @@
 						<td valign="top" class="value ${hasErrors(bean: aclObjectIdentity, field: 'aclClass', 'errors')}">
 							<g:select name="aclClass.id" from="${classes}" optionKey="id" optionValue='className'
 							          value="${aclObjectIdentity?.aclClass?.id}"/>
-							${fieldErrors(bean: aclObjectIdentity, field: 'aclClass')}
+							${fieldError(bean: aclObjectIdentity, field: 'aclClass')}
 						</td>
 					</tr>
 

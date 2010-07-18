@@ -91,7 +91,7 @@ class AclClassController extends AbstractS2UiController {
 		for (name in ['className']) {
 			if (params[name]) {
 				hql.append " AND LOWER(c.$name) LIKE :$name"
-				queryParams[name] = params[name].toLowerCase() + '%'
+				queryParams[name] = '%' + params[name].toLowerCase() + '%'
 			}
 		}
 

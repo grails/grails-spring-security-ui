@@ -1,4 +1,4 @@
-class SecurityInfoTest extends AbstractSecurityWebTest {
+class ExtendedSecurityInfoTest extends AbstractSecurityWebTest {
 
 	void testConfig() {
 		get '/securityInfo/config'
@@ -42,7 +42,7 @@ class SecurityInfoTest extends AbstractSecurityWebTest {
 
 	void testLogoutHandler() {
 		get '/securityInfo/logoutHandler'
-		assertContentContains 'org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices'
+		assertContentContains 'org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices'
 		assertContentContains 'org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler'
 	}
 

@@ -11,7 +11,7 @@
 	<s2ui:form width='100%' height='225' elementId='formContainer'
 	      titleCode='default.create.label' titleCodeArgs='[entityName]'>
 
-	<g:form action="save" name='saveForm'>
+	<g:form action="save" name='requestmapCreateForm'>
 		<div class="dialog">
 
 			<br/>
@@ -30,7 +30,7 @@
 
 					<tr class="prop">
 						<td valign="top">
-							<s2ui:submitButton elementId='create' form='saveForm' messageCode='default.button.create.label'/>
+							<s2ui:submitButton elementId='create' form='requestmapCreateForm' messageCode='default.button.create.label'/>
 						</td>
 					</tr>
 

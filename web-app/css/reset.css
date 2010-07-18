@@ -31,7 +31,7 @@ blockquote, q {
 }
 
 /* remove textarea resize at Safari */
-textarea { 
+textarea {
 	resize: none;
 }
 
