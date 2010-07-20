@@ -130,7 +130,7 @@ class RoleController extends AbstractS2UiController {
 		render text: jsonData as JSON, contentType: 'text/plain'
 	}
 
-	private search(String name, boolean nameOnly, int max, int offset) {
+	protected search(String name, boolean nameOnly, int max, int offset) {
 		String hql =
 			"SELECT DISTINCT ${nameOnly ? 'r.authority' : 'r'} " +
 			"FROM ${lookupRoleClassName()} r " +
@@ -139,7 +139,7 @@ class RoleController extends AbstractS2UiController {
 		lookupRoleClass().executeQuery hql, [name: "%${name.toLowerCase()}%"], [max: max, offset: offset]
 	}
 
-	private findById() {
+	protected findById() {
 		def role = lookupRoleClass().get(params.id)
 		if (!role) {
 			flash.error = "${message(code: 'default.not.found.message', args: [message(code: 'role.label', default: 'Role'), params.id])}"

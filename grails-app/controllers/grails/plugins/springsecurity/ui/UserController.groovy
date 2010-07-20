@@ -181,7 +181,7 @@ class UserController extends AbstractS2UiController {
 		render text: jsonData as JSON, contentType: 'text/plain'
 	}
 
-	private void addRoles(user) {
+	protected void addRoles(user) {
 		for (String key in params.keySet()) {
 			if (key.contains('ROLE') && 'on' == params.get(key)) {
 				UserRole.create user, lookupRoleClass().findByAuthority(key), true
@@ -189,7 +189,7 @@ class UserController extends AbstractS2UiController {
 		}
 	}
 
-	private Map buildUserModel(user) {
+	protected Map buildUserModel(user) {
 
 		List roles = sortedRoles()
 		Set userRoleNames = user.authorities*.authority
@@ -207,7 +207,7 @@ class UserController extends AbstractS2UiController {
 		return [user: user, roleMap: granted + notGranted]
 	}
 
-	private findById() {
+	protected findById() {
 		def user = lookupUserClass().get(params.id)
 		if (!user) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
@@ -217,7 +217,7 @@ class UserController extends AbstractS2UiController {
 		user
 	}
 
-	private List sortedRoles() {
+	protected List sortedRoles() {
 		lookupRoleClass().list().sort { it.authority }
 	}
 }

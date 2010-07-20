@@ -136,7 +136,7 @@ class RegistrationCodeController extends AbstractS2UiController {
 		render text: jsonData as JSON, contentType: 'text/plain'
 	}
 
-	private RegistrationCode findById() {
+	protected RegistrationCode findById() {
 		def registrationCode = RegistrationCode.get(params.id)
 		if (!registrationCode) {
 			flash.error = "${message(code: 'default.not.found.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"

@@ -149,7 +149,7 @@ class AclObjectIdentityController extends AbstractS2UiController {
 		render view: 'search', model: model
 	}
 
-	private findById() {
+	protected findById() {
 		def aclObjectIdentity = lookupClass().get(params.id)
 		if (!aclObjectIdentity) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), params.id])}"

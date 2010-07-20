@@ -154,7 +154,7 @@ class AclSidController extends AbstractS2UiController {
 		render text: jsonData as JSON, contentType: 'text/plain'
 	}
 
-	private findById() {
+	protected findById() {
 		def aclSid = lookupClass().get(params.id)
 		if (!aclSid) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'aclSid.label', default: 'AclSid'), params.id])}"

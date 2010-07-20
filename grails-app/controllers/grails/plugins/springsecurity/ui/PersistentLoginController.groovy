@@ -134,7 +134,7 @@ class PersistentLoginController extends AbstractS2UiController {
 		render text: jsonData as JSON, contentType: 'text/plain'
 	}
 
-	private findById() {
+	protected findById() {
 		def persistentLogin = lookupPersistentLoginClass().get(params.id)
 		if (!persistentLogin) {
 			flash.error = "${message(code: 'default.not.found.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), params.id])}"

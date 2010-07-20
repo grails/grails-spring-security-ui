@@ -150,7 +150,7 @@ class AclEntryController extends AbstractS2UiController {
 		render view: 'search', model: model
 	}
 
-	private findById() {
+	protected findById() {
 		def aclEntry = lookupClass().get(params.id)
 		if (!aclEntry) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), params.id])}"

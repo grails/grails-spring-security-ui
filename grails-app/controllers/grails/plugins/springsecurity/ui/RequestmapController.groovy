@@ -117,7 +117,7 @@ class RequestmapController extends AbstractS2UiController {
 		}
 	}
 
-	private findById() {
+	protected findById() {
 		def requestmap = lookupRequestmapClass().get(params.id)
 		if (!requestmap) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
