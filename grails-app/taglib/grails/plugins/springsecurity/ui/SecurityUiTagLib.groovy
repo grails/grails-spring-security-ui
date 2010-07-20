@@ -230,11 +230,11 @@ class SecurityUiTagLib {
 	def initCheckboxes = { attrs ->
 		out << """
 			\$('input:checkbox:not([safari])').checkbox({
-				empty: '${resource(dir: 'images', file: 'empty.png')}',
+				empty: '${resource(dir: 'images', file: 'empty.png', plugin:'spring-security-ui')}',
 				cls: 'jquery-safari-checkbox'
 			});
 			\$('input:radio:not([safari])').checkbox({
-				empty: '${resource(dir: 'images', file: 'empty.png')}',
+				empty: '${resource(dir: 'images', file: 'empty.png', plugin:'spring-security-ui')}',
 				cls: 'jquery-safari-checkbox'
 			});
 		"""
@@ -330,7 +330,7 @@ class SecurityUiTagLib {
 		}
 	}
 
-	private void writeDocumentReady(writer, String javascript) {
+	protected void writeDocumentReady(writer, String javascript) {
 		writer << """
 		<script>
 		\$(document).ready(function() {
@@ -340,7 +340,7 @@ class SecurityUiTagLib {
 		"""
 	}
 
-	private String resolveText(attrs) {
+	protected String resolveText(attrs) {
 		String messageCode = attrs.remove('messageCode')
 		if (messageCode) {
 			return message(code: messageCode)
@@ -349,14 +349,14 @@ class SecurityUiTagLib {
 		return attrs.remove('text')
 	}
 
-	private getRequiredAttribute(attrs, String name, String tagName) {
+	protected getRequiredAttribute(attrs, String name, String tagName) {
 		if (!attrs.containsKey(name)) {
 			throwTagError("Tag [$tagName] is missing required attribute [$name]")
 		}
 		attrs.remove name
 	}
 
-	private void writeRemainingAttributes(writer, attrs) {
+	protected void writeRemainingAttributes(writer, attrs) {
 		writer << attrs.collect { k, v -> """ $k="$v" """ }.join('')
 	}
 }
