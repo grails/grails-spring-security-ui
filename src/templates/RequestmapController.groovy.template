@@ -1,0 +1,4 @@
+${packageDeclaration}
+
+class RequestmapController extends grails.plugins.springsecurity.ui.RequestmapController {
+}

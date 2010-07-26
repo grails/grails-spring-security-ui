@@ -1,0 +1,4 @@
+${packageDeclaration}
+
+class SecurityInfoController extends grails.plugins.springsecurity.ui.SecurityInfoController {
+}
