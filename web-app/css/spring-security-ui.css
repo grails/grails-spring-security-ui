@@ -182,6 +182,8 @@ body {
 	color: #333;
 	background: #fff;
 	min-width: 980px;
+	margin-left: 0px;
+	margin-right: 0px;
 }
 
 ol, ul {

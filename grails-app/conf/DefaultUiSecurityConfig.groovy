@@ -25,6 +25,7 @@ If you made the request, please click <a href="$url">here</a> to finish the regi
 			emailFrom = 'do.not.reply@localhost'
 			emailSubject = 'New Account'
 			defaultRoleNames = ['ROLE_USER']
+			postRegisterUrl = null // use defaultTargetUrl if not set
 		}
 
 		forgotPassword {
@@ -39,6 +40,7 @@ If you did make the request, then click <a href="$url">here</a> to reset your pa
 '''
 			emailFrom = 'do.not.reply@localhost'
 			emailSubject = 'Password Reset'
+			postResetUrl = null // use defaultTargetUrl if not set
 		}
 	}
 }

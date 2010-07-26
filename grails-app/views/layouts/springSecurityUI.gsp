@@ -9,7 +9,7 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-<title><g:layoutTitle default='Grails'/></title>
+<title><g:layoutTitle default='Security Management Console'/></title>
 
 <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css')}"/>
 <link rel="stylesheet" media="screen" href="${resource(dir:'css/smoothness',file:'jquery-ui-1.8.2.custom.css',plugin:'spring-security-ui')}"/>
@@ -18,6 +18,7 @@
 <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'date_input.css')}"/>
 <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.css')}"/>
 <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.slate.css')}"/>
+<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'table.css')}"/>
 <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css')}"/>
 
 <%-- tab icons --%>
@@ -174,6 +175,7 @@
 				<g:javascript src='jquery/jquery.positionBy.js'/>
 				<g:javascript src='jquery/jquery.bgiframe.js'/>
 				<g:javascript src='jquery/jquery.jdMenu.js'/>
+				<g:javascript src='jquery/jquery.dataTables.min.js'/>
 				<g:javascript src='spring-security-ui.js'/>
 				<g:layoutBody/>
 			</div>
@@ -181,7 +183,7 @@
 
 	</div>
 
-<g:render template='/includes/ajaxLogin'/>
+<g:render template='/includes/ajaxLogin' plugin='spring-security-ui'/>
 
 <s2ui:showFlash/>
 

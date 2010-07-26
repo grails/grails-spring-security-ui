@@ -107,7 +107,7 @@ class RegisterController extends AbstractS2UiController {
 		springSecurityService.reauthenticate user.username
 
 		flash.message = message(code: 'spring.security.ui.register.complete')
-		redirect uri: defaultTargetUrl
+		redirect uri: conf.ui.register.postRegisterUrl ?: defaultTargetUrl
 	}
 
 	def forgotPassword = {
@@ -181,7 +181,10 @@ class RegisterController extends AbstractS2UiController {
 		springSecurityService.reauthenticate registrationCode.username
 
 		flash.message = message(code: 'spring.security.ui.resetPassword.success')
-		redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+
+		def conf = SpringSecurityUtils.securityConfig
+		String postResetUrl = conf.ui.register.postResetUrl ?: conf.successHandler.defaultTargetUrl
+		redirect uri: postResetUrl
 	}
 
 	protected String generateLink(String action, linkParams) {

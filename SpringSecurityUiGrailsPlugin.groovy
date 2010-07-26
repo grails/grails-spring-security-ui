@@ -15,13 +15,13 @@
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 
 /**
- * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith, Beverley Talbott</a>
+ * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
 class SpringSecurityUiGrailsPlugin {
 
 	String version = '0.1'
 	String grailsVersion = '1.2.2 > *'
-	Map dependsOn = [springSecurityCore: '0.3 > *',
+	Map dependsOn = [springSecurityCore: '0.4 > *',
 	                 mail: '0.9 > *',
 						  jquery: '1.4.2.5 > *',
 						  jqueryUi: '1.8.2.3 > *',
@@ -31,6 +31,7 @@ class SpringSecurityUiGrailsPlugin {
 		'docs/**',
 		'src/docs/**',
 		'scripts/CreateS2UiTestApps.groovy',
+		'scripts/Fixpdf.groovy',
 		'grails-app/domain/**/Acl*.groovy'
 	]
 

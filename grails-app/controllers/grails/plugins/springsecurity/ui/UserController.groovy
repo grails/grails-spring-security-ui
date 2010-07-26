@@ -184,7 +184,7 @@ class UserController extends AbstractS2UiController {
 	protected void addRoles(user) {
 		for (String key in params.keySet()) {
 			if (key.contains('ROLE') && 'on' == params.get(key)) {
-				UserRole.create user, lookupRoleClass().findByAuthority(key), true
+				lookupUserRoleClass().create user, lookupRoleClass().findByAuthority(key), true
 			}
 		}
 	}

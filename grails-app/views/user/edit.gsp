@@ -1,7 +1,7 @@
 <%@ page import="org.codehaus.groovy.grails.plugins.PluginManagerHolder" %>
 
 <sec:ifNotSwitched>
-	<sec:ifAllGranted roles='ROLE_RUN_AS'>
+	<sec:ifAllGranted roles='ROLE_SWITCH_USER'>
 	<g:if test='${user.username}'>
 	<g:set var='canRunAs' value='${true}'/>
 	</g:if>
@@ -73,7 +73,7 @@ if (isOpenId) {
 	<g:if test='${user?.openIds}'>
 		<ul>
 		<g:each var="openId" in="${user.openIds}">
-		<li>${openId}</li>
+		<li>${openId.url}</li>
 		</g:each>
 		</ul>
 	</g:if>

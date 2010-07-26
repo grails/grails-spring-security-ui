@@ -73,6 +73,7 @@ class RoleController extends AbstractS2UiController {
 		if (!role) return
 
 		try {
+			lookupUserRoleClass().removeAll role
 			springSecurityService.deleteRole(role)
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'role.label', default: 'Role'), params.id])}"
 			redirect action: search

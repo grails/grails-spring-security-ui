@@ -4,7 +4,7 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-<title><g:layoutTitle default='Grails'/></title>
+<title><g:layoutTitle default='User Registration'/></title>
 
 <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css')}"/>
 <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css')}"/>

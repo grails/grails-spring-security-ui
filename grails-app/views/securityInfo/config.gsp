@@ -1,11 +1,19 @@
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<title>Security Configuration</title>
+
+<g:javascript>
+	$(document).ready( function () {
+		$('#config').dataTable();
+	} );
+</g:javascript>
+
 </head>
 
 <body>
 
-<table>
+<div id="configHolder">
+<table id="config" cellpadding="0" cellspacing="0" border="0" class="display">
 	<thead>
 	<tr>
 		<th>Name</th>
@@ -21,4 +29,7 @@
 	</g:each>
 	</tbody>
 </table>
+</div>
+
 </body>
+
