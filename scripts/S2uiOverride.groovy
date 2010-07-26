@@ -45,6 +45,7 @@ controllers = [aclclass: 'AclClass',
                persistentlogin: 'PersistentLogin',
                register: 'Register',
                registrationcode: 'RegistrationCode',
+               requestmap: 'Requestmap',
                role: 'Role',
                securityinfo: 'SecurityInfo',
                user: 'User']
@@ -94,6 +95,8 @@ private void copyFiles() {
 	// copy controller
 	String dir = packageName.replaceAll('\\.', '/')
 	ant.mkdir dir: "$appGrailsApp/controllers/$dir"
+	
+	templateAttributes.packageDeclaration = "package $packageName"
 	generateFile "$templateDir/${controller}Controller.groovy.template",
 	             "$appGrailsApp/controllers/$dir/${controller}Controller.groovy"
 
@@ -106,7 +109,7 @@ private void copyFiles() {
 		}
 	}
 
-	if ('register'.equalsLowerCase(type)) {
+	if ('register'.equalsIgnoreCase(type)) {
 		copyFile "$pluginViewsDir/layouts/register.gsp",
 		         "$appGrailsApp/views/layouts/register.gsp"
 	}
