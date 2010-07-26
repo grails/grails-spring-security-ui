@@ -76,7 +76,8 @@
 		<delete dir='grails-app/conf/hibernate'/>
 		<delete dir='grails-app/conf/spring'/>
 		<delete dir='grails-app/utils'/>
-		<delete dir='src'/>
+		<delete dir='src/groovy'/>
+		<delete dir='src/java'/>
 		<delete dir='test'/>
 		<delete dir='lib'/>
 		<delete dir='web-app/META-INF'/>

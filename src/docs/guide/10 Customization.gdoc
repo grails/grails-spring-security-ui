@@ -1,0 +1,114 @@
+Most aspects of the plugin are configurable.
+
+h4. @s2ui-override@ script
+
+The plugin's controllers and GSPs are easily overridden using the @s2ui-override@ script. The general syntax for running the script is
+
+{code}
+grails s2ui-override <type> <controller-package>
+{code}
+
+The script will copy an empty controller that extends the corresponding plugin controller into your application so you can override individual actions and methods as needed. It also copies the controller's GSPs. The exceptions are 'auth' and 'layout' which only copy GSPs.
+
+The files copied for each type are summarized here:
+
+* aclclass
+** @controller/AclClassController.groovy@
+** @views/aclClass/create.gsp@
+** @views/aclClass/edit.gsp@
+** @views/aclClass/search.gsp@
+
+* aclentry
+** @controller/AclEntryController.groovy@
+** @views/aclEntry/create.gsp@
+** @views/aclEntry/edit.gsp@
+** @views/aclEntry/search.gsp@
+
+* aclobjectidentity
+** @controller/AclObjectIdentityController.groovy@
+** @views/aclObjectIdentity/create.gsp@
+** @views/aclObjectIdentity/edit.gsp@
+** @views/aclObjectIdentity/search.gsp@
+
+* aclsid
+** @controller/AclSidController.groovy@
+** @views/aclSid/create.gsp@
+** @views/aclSid/edit.gsp@
+** @views/aclSid/search.gsp@
+
+* auth
+** @views/login/auth.gsp@
+
+* layout
+** @views/layouts/springSecurityUI.gsp@
+** @views/includes/_ajaxLogin.gsp@
+
+* persistentlogin
+** @controller/PersistentLoginController.groovy@
+** @views/persistentLogin/edit.gsp@
+** @views/persistentLogin/search.gsp@
+
+* register
+** @controller/RegisterController.groovy@
+** @views/register/forgotPassword.gsp@
+** @views/register/index.gsp@
+** @views/register/resetPassword.gsp@
+
+* registrationcode
+** @controller/RegistrationCodeController.groovy@
+** @views/registrationCode/edit.gsp@
+** @views/registrationCode/search.gsp@
+
+* requestmap
+** @controller/RequestmapController.groovy@
+** @views/requestmap/create.gsp@
+** @views/requestmap/edit.gsp@
+** @views/requestmap/search.gsp@
+
+* role
+** @controller/RoleController.groovy@
+** @views/role/create.gsp@
+** @views/role/edit.gsp@
+** @views/role/search.gsp@
+
+* securityinfo
+** @controller/SecurityInfoController.groovy@
+** @views/securityInfo/config.gsp@
+** @views/securityInfo/currentAuth.gsp@
+** @views/securityInfo/filterChain.gsp@
+** @views/securityInfo/logoutHandlers.gsp@
+** @views/securityInfo/mappings.gsp@
+** @views/securityInfo/providers.gsp@
+** @views/securityInfo/usercache.gsp@
+** @views/securityInfo/voters.gsp@
+
+* user
+** @controller/UserController.groovy@
+** @views/user/create.gsp@
+** @views/user/edit.gsp@
+** @views/user/search.gsp@
+
+h4. I18N
+
+Most of the plugin's displayed strings are localized and stored in the plugin's @grails-app/i18n/messages.spring-security-ui.properties@ file. You can override any of these values by putting an override in your application's @grails-app/i18n/messages.properties@ file.
+
+h4. @Config.groovy@ attributes
+
+There are a few configuration options specified in @DefaultUiSecurityConfig.groovy@ that can be overridden in your application's @grails-app/conf/Config.groovy@
+
+* grails.plugins.springsecurity.ui.register.emailBody
+* grails.plugins.springsecurity.ui.register.emailFrom
+* grails.plugins.springsecurity.ui.register.emailSubject
+* grails.plugins.springsecurity.ui.register.defaultRoleNames
+* grails.plugins.springsecurity.ui.register.postRegisterUrl
+* grails.plugins.springsecurity.ui.forgotPassword.emailBody
+* grails.plugins.springsecurity.ui.forgotPassword.emailFrom
+* grails.plugins.springsecurity.ui.forgotPassword.emailSubject
+* grails.plugins.springsecurity.ui.forgotPassword.postResetUrl
+
+See [Section 5|guide:5 User Registration] and [Section 6|guide:6 Forgot Password] for more details on these attributes.
+
+h4. CSS
+
+The plugin defines its CSS styles in @web-app/css/spring-security-ui.css@ and most of the jQuery plugins have corresponding CSS files. These can be overridden by overriding the @springSecurityUI.gsp@ template and including your CSS file(s).
+
