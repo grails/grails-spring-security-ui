@@ -121,7 +121,7 @@ class SecurityUiTagLib {
 		writer << """<a id="${elementId}" """
 		writeRemainingAttributes writer, attrs
 		writer << ">${text}</a>\n"
-		writer << "<input type='submit' id='${elementId}_submit' class='s2ui_hidden_button' />\n"
+		writer << "<input type='submit' value=' ' id='${elementId}_submit' class='s2ui_hidden_button' />\n"
 
 		String javascript = """
 			\$("#${elementId}").button();

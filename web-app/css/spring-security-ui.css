@@ -58,6 +58,8 @@
 	position: absolute;
 	width: 0;
 	z-index: -1000;
+	border: 0;
+	background: white;
 }
 
 .s2ui_error {
