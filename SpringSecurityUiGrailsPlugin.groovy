@@ -19,7 +19,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
  */
 class SpringSecurityUiGrailsPlugin {
 
-	String version = '0.1.1'
+	String version = '0.1.2'
 	String grailsVersion = '1.2.2 > *'
 	Map dependsOn = [springSecurityCore: '0.4 > *',
 	                 mail: '0.9 > *',
