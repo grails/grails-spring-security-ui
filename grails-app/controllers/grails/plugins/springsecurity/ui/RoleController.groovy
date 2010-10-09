@@ -20,6 +20,8 @@ import grails.converters.JSON
 
 import org.springframework.dao.DataIntegrityViolationException
 
+import grails.util.GrailsNameUtils 
+
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
@@ -44,11 +46,16 @@ class RoleController extends AbstractS2UiController {
 		def role = params.name ? lookupRoleClass().findByAuthority(params.name) : null
 		if (!role) role = findById()
 		if (!role) return
-
+		
 		setIfMissing 'max', 10, 100
-		def users = lookupUserRoleClass().findAllByRole(role, params)*.user
-		int userCount = lookupUserRoleClass().countByRole(role)
-
+		
+		def roleClassName = GrailsNameUtils.getShortName(lookupRoleClassName())
+		def userField = GrailsNameUtils.getShortName(lookupUserClassName())
+		userField = (userField) ? "${Character.toLowerCase(userField.charAt(0))}${userField.substring(1)}" : userField
+		
+		def users = lookupUserRoleClass()."findAllBy${roleClassName}"(role, params)*."$userField"
+		int userCount = lookupUserRoleClass()."countBy${roleClassName}"(role)
+		
 		[role: role, users: users, userCount: userCount]
 	}
 
