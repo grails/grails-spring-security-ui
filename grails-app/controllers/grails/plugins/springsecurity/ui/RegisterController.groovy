@@ -89,7 +89,7 @@ class RegisterController extends AbstractS2UiController {
 				return
 			}
 			user.accountLocked = false
-			user.save()
+			user.save(flush:true)
 			def UserRole = lookupUserRoleClass()
 			def Role = lookupRoleClass()
 			for (roleName in conf.ui.register.defaultRoleNames) {
