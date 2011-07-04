@@ -19,7 +19,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
  */
 class SpringSecurityUiGrailsPlugin {
 
-	String version = '0.1.2'
+	String version = '0.1.3'
 	String grailsVersion = '1.2.2 > *'
 	Map dependsOn = [springSecurityCore: '0.4 > *',
 	                 mail: '0.9 > *',
@@ -32,7 +32,8 @@ class SpringSecurityUiGrailsPlugin {
 		'src/docs/**',
 		'scripts/CreateS2UiTestApps.groovy',
 		'scripts/Fixpdf.groovy',
-		'grails-app/domain/**/Acl*.groovy'
+		'grails-app/domain/**/Acl*.groovy',
+		'lib/**'
 	]
 
 	String author = 'Burt Beckwith'

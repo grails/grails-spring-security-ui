@@ -5,7 +5,7 @@ grails.project.docs.output.dir = 'docs' // for backwards-compatibility, the docs
 
 grails.project.dependency.resolution = {
 
-	inherits('global')
+	inherits 'global'
 
 	log 'warn'
 
@@ -14,13 +14,8 @@ grails.project.dependency.resolution = {
 		grailsHome()
 		grailsCentral()
 
-		mavenCentral()
 		mavenRepo 'http://download.java.net/maven/2/'
 	}
 
-	dependencies {
-		test('dumbster:dumbster:1.6') {
-			excludes 'mail', 'activation'
-		}
-	}
+	dependencies {}
 }

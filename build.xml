@@ -79,7 +79,6 @@
 		<delete dir='src/groovy'/>
 		<delete dir='src/java'/>
 		<delete dir='test'/>
-		<delete dir='lib'/>
 		<delete dir='web-app/META-INF'/>
 		<delete dir='web-app/WEB-INF'/>
 	</target>
