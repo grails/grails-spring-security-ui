@@ -14,13 +14,10 @@
  */
 package grails.plugins.springsecurity.ui
 
-import grails.plugins.springsecurity.ui.AbstractS2UiController
-
 import grails.converters.JSON
+import grails.util.GrailsNameUtils
 
 import org.springframework.dao.DataIntegrityViolationException
-
-import grails.util.GrailsNameUtils 
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -46,16 +43,15 @@ class RoleController extends AbstractS2UiController {
 		def role = params.name ? lookupRoleClass().findByAuthority(params.name) : null
 		if (!role) role = findById()
 		if (!role) return
-		
+
 		setIfMissing 'max', 10, 100
-		
+
 		def roleClassName = GrailsNameUtils.getShortName(lookupRoleClassName())
-		def userField = GrailsNameUtils.getShortName(lookupUserClassName())
-		userField = (userField) ? "${Character.toLowerCase(userField.charAt(0))}${userField.substring(1)}" : userField
-		
+		def userField = GrailsNameUtils.getPropertyName(GrailsNameUtils.getShortName(lookupUserClassName()))
+
 		def users = lookupUserRoleClass()."findAllBy${roleClassName}"(role, params)*."$userField"
 		int userCount = lookupUserRoleClass()."countBy${roleClassName}"(role)
-		
+
 		[role: role, users: users, userCount: userCount]
 	}
 
