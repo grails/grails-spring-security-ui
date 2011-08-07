@@ -18,7 +18,6 @@ import grails.plugins.springsecurity.ui.AbstractS2UiController
 
 import grails.converters.JSON
 
-import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -26,7 +25,6 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class UserController extends AbstractS2UiController {
 
-	def saltSource
 	def userCache
 
 	def create = {
@@ -36,10 +34,6 @@ class UserController extends AbstractS2UiController {
 
 	def save = {
 		def user = lookupUserClass().newInstance(params)
-		if (params.password) {
-			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user.password = springSecurityService.encodePassword(params.password, salt)
-		}
 		if (!user.save(flush: true)) {
 			render view: 'create', model: [user: user, authorityList: sortedRoles()]
 			return
@@ -65,12 +59,7 @@ class UserController extends AbstractS2UiController {
 			return
 		}
 
-		def oldPassword = user.password
 		user.properties = params
-		if (params.password && !params.password.equals(oldPassword)) {
-			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user.password = springSecurityService.encodePassword(params.password, salt)
-		}
 
 		if (!user.save()) {
 			render view: 'edit', model: buildUserModel(user)
