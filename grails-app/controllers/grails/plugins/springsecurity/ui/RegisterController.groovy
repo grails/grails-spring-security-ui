@@ -203,10 +203,14 @@ class RegisterController extends AbstractS2UiController {
 			return 'command.password.error.username'
 		}
 
-		if (password && password.length() >= 8 && password.length() <= 64 &&
-				(!password.matches('^.*\\p{Alpha}.*$') ||
-				!password.matches('^.*\\p{Digit}.*$') ||
-				!password.matches('^.*[!@#$%^&].*$'))) {
+		def conf = SpringSecurityUtils.securityConfig
+		
+		int minLength = (conf.ui.password.minLength)? conf.ui.password.minLength : 6
+		int maxLength = (conf.ui.password.maxLength)? conf.ui.password.maxLength : 64
+
+		def passValidationRegex = (conf.ui.password.validationRegex)? conf.ui.password.validationRegex : '^.*(?=.*\\d)(?=.*[a-zA-Z])(?=.*[@#$%^&+=]).*$' 		
+		
+		if (password && (password.length() < minLength || password.length() > maxLength || !password.matches(passValidationRegex)) ) {
 			return 'command.password.error.strength'
 		}
 	}
@@ -236,7 +240,7 @@ class RegisterCommand {
 			}
 		}
 		email blank: false, email: true
-		password blank: false, minSize: 8, maxSize: 64, validator: RegisterController.passwordValidator
+		password blank: false, validator: RegisterController.passwordValidator
 		password2 validator: RegisterController.password2Validator
 	}
 }
@@ -247,7 +251,7 @@ class ResetPasswordCommand {
 	String password2
 
 	static constraints = {
-		password blank: false, minSize: 8, maxSize: 64, validator: RegisterController.passwordValidator
+		password blank: false, validator: RegisterController.passwordValidator
 		password2 validator: RegisterController.password2Validator
 	}
 }
