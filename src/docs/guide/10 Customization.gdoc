@@ -123,4 +123,15 @@ This option defaults to @true@ to avoid a breaking change, so if you have a newe
 {code}
 grails.plugins.springsecurity.ui.encodePassword = false
 {code}
- 
+
+h4. Password Verification
+
+By default the registration controller has rather strict requirements for valid passwords; they must be between 8 and 64 characters and must include at least one uppercase letter, at least one number, and at least one symbol from "!@#$%^&". You can customize these rules with these Config.groovy attributes:
+
+{table}
+*Property* | *Default Value*
+grails.plugins.springsecurity. ui.password.minLength | 8
+grails.plugins.springsecurity. ui.password.maxLength | 64
+grails.plugins.springsecurity. ui.password.validationRegex | "^.\*(?=.\*\\\\\\d)(?=.\*\[a-zA-Z\])(?=.\*\[!\@#$%^&\]).\*$"
+{table}
+

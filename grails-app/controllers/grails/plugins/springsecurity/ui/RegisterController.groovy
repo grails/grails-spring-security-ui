@@ -202,16 +202,36 @@ class RegisterController extends AbstractS2UiController {
 			return 'command.password.error.username'
 		}
 
-		def conf = SpringSecurityUtils.securityConfig
-
-		int minLength = (conf.ui.password.minLength)? conf.ui.password.minLength : 6
-		int maxLength = (conf.ui.password.maxLength)? conf.ui.password.maxLength : 64
-
-		def passValidationRegex = (conf.ui.password.validationRegex)? conf.ui.password.validationRegex : '^.*(?=.*\\d)(?=.*[a-zA-Z])(?=.*[@#$%^&+=]).*$'
-
-		if (password && (password.length() < minLength || password.length() > maxLength || !password.matches(passValidationRegex)) ) {
+		if (!checkPasswordMinLength(password, command) ||
+		    !checkPasswordMaxLength(password, command) ||
+		    !checkPasswordRegex(password, command)) {
 			return 'command.password.error.strength'
 		}
+	}
+
+	static boolean checkPasswordMinLength(String password, command) {
+		def conf = SpringSecurityUtils.securityConfig
+
+		int minLength = conf.ui.password.minLength instanceof Number ? conf.ui.password.minLength : 8
+
+		password && password.length() >= minLength
+	}
+
+	static boolean checkPasswordMaxLength(String password, command) {
+		def conf = SpringSecurityUtils.securityConfig
+
+		int maxLength = conf.ui.password.maxLength instanceof Number ? conf.ui.password.maxLength : 64
+
+		password && password.length() <= maxLength
+	}
+
+	static boolean checkPasswordRegex(String password, command) {
+		def conf = SpringSecurityUtils.securityConfig
+
+		String passValidationRegex = conf.ui.password.validationRegex ?:
+				'^.*(?=.*\\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&]).*$'
+
+		password && password.matches(passValidationRegex)
 	}
 
 	static final password2Validator = { value, command ->
