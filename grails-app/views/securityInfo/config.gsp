@@ -1,11 +1,13 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<title>Security Configuration</title>
 
 <g:javascript>
-	$(document).ready( function () {
+	$(document).ready(function() {
 		$('#config').dataTable();
-	} );
+	});
 </g:javascript>
 
 </head>
@@ -32,4 +34,4 @@
 </div>
 
 </body>
-
+</html>

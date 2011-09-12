@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<title><g:message code='spring.security.ui.aclObjectIdentity.search'/></title>
@@ -8,7 +10,7 @@
 <div>
 
 	<s2ui:form width='100%' height='275' elementId='formContainer'
-	      titleCode='spring.security.ui.aclObjectIdentity.search'>
+	           titleCode='spring.security.ui.aclObjectIdentity.search'>
 
 	<g:form action='aclObjectIdentitySearch' name='aclObjectIdentitySearchForm'>
 
@@ -123,3 +125,4 @@ def queryParams = [aclClass: aclClass, objectId: objectId, ownerSid: ownerSid, p
 </script>
 
 </body>
+</html>

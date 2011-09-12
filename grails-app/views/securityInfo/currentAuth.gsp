@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<title>Current Auth</title>
@@ -35,4 +37,6 @@
 	</tr>
 	</tbody>
 </table>
+
 </body>
+</html>

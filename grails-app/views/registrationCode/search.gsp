@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<title><g:message code='spring.security.ui.registrationCode.search'/></title>
@@ -8,7 +10,7 @@
 <div>
 
 	<s2ui:form width='100%' height='200' elementId='formContainer'
-	      titleCode='spring.security.ui.registrationCode.search'>
+	           titleCode='spring.security.ui.registrationCode.search'>
 
 	<g:form action='registrationCodeSearch' name='registrationCodeSearchForm'>
 
@@ -85,3 +87,4 @@ $(document).ready(function() {
 </script>
 
 </body>
+</html>

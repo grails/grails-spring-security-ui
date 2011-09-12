@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<g:set var="entityName" value="${message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity')}" />
@@ -9,7 +11,7 @@
 <div class="body">
 
 	<s2ui:form width='100%' height='310' elementId='formContainer'
-	      titleCode='default.edit.label' titleCodeArgs='[entityName]'>
+	           titleCode='default.edit.label' titleCodeArgs='[entityName]'>
 
 	<g:form action='update' name='aclObjectIdentityEditForm'>
 		<g:hiddenField name="id" value="${aclObjectIdentity?.id}"/>
@@ -90,3 +92,4 @@ $(document).ready(function() {
 </script>
 
 </body>
+</html>

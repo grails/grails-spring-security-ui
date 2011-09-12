@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<title><g:message code='spring.security.ui.aclEntry.search'/></title>
@@ -8,7 +10,7 @@
 <div>
 
 	<s2ui:form width='100%' height='310' elementId='formContainer'
-	      titleCode='spring.security.ui.aclEntry.search'>
+	           titleCode='spring.security.ui.aclEntry.search'>
 
 	<g:form action='aclEntrySearch' name='aclEntrySearchForm'>
 		<table>
@@ -120,3 +122,4 @@ def queryParams = [aclObjectIdentity: aclObjectIdentity, aceOrder: aceOrder, sid
 </script>
 
 </body>
+</html>

@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<g:set var="entityName" value="${message(code: 'user.label', default: 'User')}"/>
@@ -68,3 +70,4 @@ $(document).ready(function() {
 </script>
 
 </body>
+</html>

@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<g:set var="entityName" value="${message(code: 'persistentLogin.label', default: 'PersistentLogin')}" />
@@ -9,7 +11,7 @@
 <div class="body">
 
 	<s2ui:form width='100%' height='275' elementId='formContainer'
-	      titleCode='default.edit.label' titleCodeArgs='[entityName]'>
+	           titleCode='default.edit.label' titleCodeArgs='[entityName]'>
 
 	<g:form action='update' name='persistentLoginEditForm'>
 		<g:hiddenField name="id" value="${persistentLogin?.id}"/>
@@ -67,3 +69,4 @@
 </div>
 
 </body>
+</html>

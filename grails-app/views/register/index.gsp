@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='register'/>
 	<title><g:message code='spring.security.ui.register.title'/></title>
@@ -53,3 +55,4 @@ $(document).ready(function() {
 </script>
 
 </body>
+</html>

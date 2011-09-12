@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<title><g:message code='spring.security.ui.aclSid.search'/></title>
@@ -8,7 +10,7 @@
 <div>
 
 	<s2ui:form width='100%' height='225' elementId='formContainer'
-	      titleCode='spring.security.ui.aclSid.search'>
+	           titleCode='spring.security.ui.aclSid.search'>
 
 	<g:form action='aclSidSearch' name='aclSidSearchForm'>
 
@@ -95,3 +97,4 @@ $(document).ready(function() {
 </script>
 
 </body>
+</html>

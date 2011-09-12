@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<g:set var="entityName" value="${message(code: 'role.label', default: 'Role')}"/>
@@ -56,3 +58,4 @@ tabData << [name: 'users',    icon: 'icon_users', messageCode: 'spring.security.
 </g:if>
 
 </body>
+</html>

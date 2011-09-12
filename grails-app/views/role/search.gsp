@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<title><g:message code='spring.security.ui.role.search'/></title>
@@ -8,7 +10,7 @@
 <div>
 
 	<s2ui:form width='100%' height='200' elementId='formContainer'
-	      titleCode='spring.security.ui.role.search'>
+	           titleCode='spring.security.ui.role.search'>
 
 	<g:form action='roleSearch' name='roleSearchForm'>
 
@@ -77,3 +79,4 @@ $(document).ready(function() {
 </script>
 
 </body>
+</html>

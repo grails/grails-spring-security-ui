@@ -14,9 +14,6 @@
  */
 package grails.plugins.springsecurity.ui
 
-import grails.converters.JSON
-import grails.plugins.springsecurity.ui.AbstractS2UiController
-
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -100,7 +97,7 @@ class AclObjectIdentityController extends AbstractS2UiController {
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
 
-		def hql = new StringBuilder('FROM ' + lookupClassName() + ' oid WHERE 1=1 ')
+		def hql = new StringBuilder('FROM ').append(lookupClassName()).append(' oid WHERE 1=1 ')
 		def queryParams = [:]
 
 		if (params.objectId) {

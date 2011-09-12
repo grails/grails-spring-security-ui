@@ -1,3 +1,4 @@
+<html>
 <%@ page import="org.codehaus.groovy.grails.plugins.PluginManagerHolder" %>
 
 <sec:ifNotSwitched>
@@ -125,3 +126,4 @@ $(document).ready(function() {
 </script>
 
 </body>
+</html>

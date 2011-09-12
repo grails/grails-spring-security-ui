@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<title>User Cache</title>
@@ -91,3 +93,4 @@
 </g:else>
 
 </body>
+</html>

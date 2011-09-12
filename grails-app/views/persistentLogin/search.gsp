@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<title><g:message code='spring.security.ui.persistentLogin.search'/></title>
@@ -92,3 +94,4 @@ $(document).ready(function() {
 </script>
 
 </body>
+</html>

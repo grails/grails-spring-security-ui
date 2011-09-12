@@ -70,7 +70,7 @@ class PersistentLoginController extends AbstractS2UiController {
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
 
-		def hql = new StringBuilder('FROM ' + lookupPersistentLoginClassName() + ' pl WHERE 1=1 ')
+		def hql = new StringBuilder('FROM ').append(lookupPersistentLoginClassName()).append(' pl WHERE 1=1 ')
 		def queryParams = [:]
 
 		for (name in ['username', 'series', 'token']) {

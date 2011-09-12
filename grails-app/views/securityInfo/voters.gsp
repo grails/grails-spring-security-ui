@@ -1,3 +1,5 @@
+<html>
+
 <head>
 	<meta name='layout' content='springSecurityUI'/>
 	<title>Mappings</title>
@@ -16,3 +18,5 @@
 	</tbody>
 </table>
 </body>
+
+</html>
