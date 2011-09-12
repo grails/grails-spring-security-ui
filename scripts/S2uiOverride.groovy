@@ -79,16 +79,15 @@ private void copyFiles() {
 	String type = typeAndPackage[0]
 	String controller = controllers[type.toLowerCase()]
 	if (!controller) {
-		ant.echo message: "\nERROR: unknown type '$type'\n"
-		ant.echo message: USAGE
+		errorMessage "\nERROR: unknown type '$type'\n${USAGE}"
 		System.exit 1
 	}
 
-	ant.echo message: "Copying $type resources"
+	printMessage "Copying $type resources"
 
 	String packageName = typeAndPackage[1].trim()
 	if ('grails.plugins.springsecurity.ui'.equals(packageName)) {
-		ant.echo message: "\nERROR: The controller package cannot be the same as the plugin controller\n"
+		errorMessage "\nERROR: The controller package cannot be the same as the plugin controller\n"
 		System.exit 1
 	}
 
@@ -124,7 +123,7 @@ private parseArgs() {
 		return args
 	}
 
-	ant.echo message: USAGE
+	errorMessage USAGE
 	System.exit 1
 }
 
@@ -165,7 +164,7 @@ generateFile = { String templatePath, String outputPath ->
 
 	File templateFile = new File(templatePath)
 	if (!templateFile.exists()) {
-		ant.echo message: "\nERROR: $templatePath doesn't exist"
+		errorMessage "\nERROR: $templatePath doesn't exist"
 		return
 	}
 
@@ -177,7 +176,10 @@ generateFile = { String templatePath, String outputPath ->
 		templateEngine.createTemplate(templateFile.text).make(templateAttributes).writeTo(writer)
 	}
 
-	ant.echo message: "generated $outFile.absolutePath"
+	printMessage "generated $outFile.absolutePath"
 }
+
+printMessage = { String message -> event('StatusUpdate', [message]) }
+errorMessage = { String message -> event('StatusError', [message]) }
 
 setDefaultTarget 's2uiOverride'

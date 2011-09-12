@@ -19,7 +19,7 @@ target(createS2UiTestApp: 'Creates test apps for functional tests') {
 	}
 
 	new ConfigSlurper().parse(configFile.text).each { name, config ->
-		echo "\nCreating app based on configuration $name: ${config.flatten()}\n"
+		printMessage "\nCreating app based on configuration $name: ${config.flatten()}\n"
 		init name, config
 		createApp()
 		installPlugins()
@@ -27,7 +27,7 @@ target(createS2UiTestApp: 'Creates test apps for functional tests') {
 		copySampleFiles()
 		copyTests(false)
 
-		echo "\nCreating extended app based on configuration $name: ${config.flatten()}\n"
+		printMessage "\nCreating extended app based on configuration $name: ${config.flatten()}\n"
 		init name + '_ext', config
 		createApp()
 		installPlugins()
@@ -159,7 +159,7 @@ private void deleteDir(String path) {
 			deleteAll = true
 		}
 		else if (!'y'.equalsIgnoreCase(result)) {
-			ant.echo "\nNot deleting $path"
+			printMessage "\nNot deleting $path"
 			exit 1
 		}
 	}
@@ -168,7 +168,7 @@ private void deleteDir(String path) {
 }
 
 private void die(String message) {
-	ant.echo "\n\nERROR: $message\n\n"
+	errorMessage "\n\nERROR: $message\n\n"
 	exit 1
 }
 
@@ -180,5 +180,8 @@ private void callGrails(String grailsHome, String dir, String env, String action
 		extraArgs?.call()
 	}
 }
+
+printMessage = { String message -> event('StatusUpdate', [message]) }
+errorMessage = { String message -> event('StatusError', [message]) }
 
 setDefaultTarget 'createS2UiTestApp'
