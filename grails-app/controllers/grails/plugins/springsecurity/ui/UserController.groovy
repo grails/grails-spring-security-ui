@@ -14,8 +14,6 @@
  */
 package grails.plugins.springsecurity.ui
 
-import grails.plugins.springsecurity.ui.AbstractS2UiController
-
 import grails.converters.JSON
 
 import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
@@ -38,7 +36,7 @@ class UserController extends AbstractS2UiController {
 		def user = lookupUserClass().newInstance(params)
 		if (params.password) {
 			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user.password = springSecurityService.encodePassword(params.password, salt)
+			user.password = encodePassword(params.password, salt)
 		}
 		if (!user.save(flush: true)) {
 			render view: 'create', model: [user: user, authorityList: sortedRoles()]
@@ -69,7 +67,7 @@ class UserController extends AbstractS2UiController {
 		user.properties = params
 		if (params.password && !params.password.equals(oldPassword)) {
 			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user.password = springSecurityService.encodePassword(params.password, salt)
+			user.password = encodePassword(params.password, salt)
 		}
 
 		if (!user.save()) {
@@ -111,7 +109,7 @@ class UserController extends AbstractS2UiController {
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
 
-		def hql = new StringBuilder('FROM ' + lookupUserClassName() + ' u WHERE 1=1 ')
+		def hql = new StringBuilder('FROM ').append(lookupUserClassName()).append(' u WHERE 1=1 ')
 		def queryParams = [:]
 
 		for (name in ['username']) {

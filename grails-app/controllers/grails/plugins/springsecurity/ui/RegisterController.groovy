@@ -43,7 +43,7 @@ class RegisterController extends AbstractS2UiController {
 		}
 
 		String salt = saltSource instanceof NullSaltSource ? null : command.username
-		String password = springSecurityService.encodePassword(command.password, salt)
+		String password = encodePassword(command.password, salt)
 		def user = lookupUserClass().newInstance(email: command.email, username: command.username,
 				password: password, accountLocked: true, enabled: true)
 		if (!user.validate() || !user.save()) {
@@ -173,7 +173,7 @@ class RegisterController extends AbstractS2UiController {
 		String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
 		RegistrationCode.withTransaction { status ->
 			def user = lookupUserClass().findByUsername(registrationCode.username)
-			user.password = springSecurityService.encodePassword(command.password, salt)
+			user.password = encodePassword(command.password, salt)
 			user.save()
 			registrationCode.delete()
 		}
@@ -191,7 +191,6 @@ class RegisterController extends AbstractS2UiController {
 		createLink(base: "$request.scheme://$request.serverName:$request.serverPort$request.contextPath",
 				controller: 'register', action: action,
 				params: linkParams)
-
 	}
 
 	protected String evaluate(s, binding) {
@@ -204,12 +203,12 @@ class RegisterController extends AbstractS2UiController {
 		}
 
 		def conf = SpringSecurityUtils.securityConfig
-		
+
 		int minLength = (conf.ui.password.minLength)? conf.ui.password.minLength : 6
 		int maxLength = (conf.ui.password.maxLength)? conf.ui.password.maxLength : 64
 
-		def passValidationRegex = (conf.ui.password.validationRegex)? conf.ui.password.validationRegex : '^.*(?=.*\\d)(?=.*[a-zA-Z])(?=.*[@#$%^&+=]).*$' 		
-		
+		def passValidationRegex = (conf.ui.password.validationRegex)? conf.ui.password.validationRegex : '^.*(?=.*\\d)(?=.*[a-zA-Z])(?=.*[@#$%^&+=]).*$'
+
 		if (password && (password.length() < minLength || password.length() > maxLength || !password.matches(passValidationRegex)) ) {
 			return 'command.password.error.strength'
 		}
