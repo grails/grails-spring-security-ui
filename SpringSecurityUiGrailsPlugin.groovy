@@ -32,7 +32,6 @@ class SpringSecurityUiGrailsPlugin {
 		'src/docs/**',
 		'scripts/CreateS2UiTestApps.groovy',
 		'scripts/Fixpdf.groovy',
-		'grails-app/domain/**/Acl*.groovy',
 		'lib/**'
 	]
 
@@ -41,6 +40,13 @@ class SpringSecurityUiGrailsPlugin {
 	String title = 'User interface extensions for the Spring Security plugin.'
 	String description = 'User interface extensions for the Spring Security plugin.'
 	String documentation = 'http://grails.org/plugin/spring-security-ui'
+
+	String license = 'APACHE'
+	def organization = [ name: 'SpringSource', url: 'http://www.springsource.org/' ]
+	def developers = [
+		 [ name: 'Burt Beckwith', email: 'beckwithb@vmware.com' ] ]
+	def issueManagement = [ system: 'JIRA', url: 'http://jira.grails.org/browse/GPSPRINGSECURITYUI' ]
+	def scm = [ url: 'https://github.com/grails-plugins/grails-spring-security-ui/' ]
 
 	def doWithSpring = {
 
