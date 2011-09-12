@@ -11,17 +11,17 @@
 
 <title><g:layoutTitle default='Security Management Console'/></title>
 
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css')}"/>
+<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css',plugin:'spring-security-ui')}"/>
 <g:javascript library='jquery' plugin='jquery' />
 <jqui:resources />
 <link rel="stylesheet" media="screen" href="${resource(dir:'css/smoothness',file:'jquery-ui-1.8.2.custom.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'date_input.css')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.css')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.slate.css')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'table.css')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css')}"/>
+<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
+<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
+<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'date_input.css',plugin:'spring-security-ui')}"/>
+<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.css',plugin:'spring-security-ui')}"/>
+<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.slate.css',plugin:'spring-security-ui')}"/>
+<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'table.css',plugin:'spring-security-ui')}"/>
+<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
 
 <%-- tab icons --%>
 <style>
@@ -168,14 +168,14 @@
 
 		<div id="s2ui_main">
 			<div id="s2ui_content">
-				<g:javascript src='jquery/jquery.jgrowl.js'/>
-				<g:javascript src='jquery/jquery.checkbox.js'/>
-				<g:javascript src='jquery/jquery.date_input.js'/>
-				<g:javascript src='jquery/jquery.positionBy.js'/>
-				<g:javascript src='jquery/jquery.bgiframe.js'/>
-				<g:javascript src='jquery/jquery.jdMenu.js'/>
-				<g:javascript src='jquery/jquery.dataTables.min.js'/>
-				<g:javascript src='spring-security-ui.js'/>
+				<g:javascript src='jquery/jquery.jgrowl.js' plugin='spring-security-ui'/>
+				<g:javascript src='jquery/jquery.checkbox.js' plugin='spring-security-ui'/>
+				<g:javascript src='jquery/jquery.date_input.js' plugin='spring-security-ui'/>
+				<g:javascript src='jquery/jquery.positionBy.js' plugin='spring-security-ui'/>
+				<g:javascript src='jquery/jquery.bgiframe.js' plugin='spring-security-ui'/>
+				<g:javascript src='jquery/jquery.jdMenu.js' plugin='spring-security-ui'/>
+				<g:javascript src='jquery/jquery.dataTables.min.js' plugin='spring-security-ui'/>
+				<g:javascript src='spring-security-ui.js' plugin='spring-security-ui'/>
 				<g:layoutBody/>
 			</div>
 		</div>
@@ -188,4 +188,3 @@
 
 </body>
 </html>
-

@@ -2,9 +2,9 @@
 
 <head>
 <title>Login</title>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'auth.css')}"/>
+<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css',plugin:'spring-security-ui')}"/>
+<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
+<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'auth.css',plugin:'spring-security-ui')}"/>
 </head>
 
 <body>
@@ -28,3 +28,4 @@
 </script>
 
 </body>
+</html>

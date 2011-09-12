@@ -33,6 +33,5 @@ var loginButtonCaption = "<g:message code='spring.security.ui.login.login'/>";
 var logoutLink = '<%=link(controller: 'logout') { 'Logout' }%>';
 var loggingYouIn = "<g:message code='spring.security.ui.login.loggingYouIn'/>";
 </script>
-<g:javascript src='jquery/jquery.form.js'/>
-<g:javascript src='ajaxLogin.js'/>
-
+<g:javascript src='jquery/jquery.form.js' plugin='spring-security-ui'/>
+<g:javascript src='ajaxLogin.js' plugin='spring-security-ui'/>
