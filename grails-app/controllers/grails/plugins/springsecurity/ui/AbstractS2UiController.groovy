@@ -24,7 +24,6 @@ abstract class AbstractS2UiController {
 	static allowedMethods = [save: 'POST', update: 'POST', delete: 'POST']
 	static defaultAction = 'search'
 
-	def grailsApplication
 	def springSecurityService
 	def springSecurityUiService
 

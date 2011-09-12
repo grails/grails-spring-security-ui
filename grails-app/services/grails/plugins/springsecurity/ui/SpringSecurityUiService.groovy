@@ -16,8 +16,6 @@ package grails.plugins.springsecurity.ui
 
 import java.text.SimpleDateFormat
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
-
 /**
  * Helper methods for UI management.
  *
@@ -28,8 +26,6 @@ class SpringSecurityUiService {
 	static final String DATE_FORMAT = 'd MMM yyyy HH:mm:ss'
 
 	static transactional = true
-
-	def grailsApplication
 
 	boolean updatePersistentLogin(persistentLogin, newProperties) {
 		if (newProperties.lastUsed && newProperties.lastUsed instanceof String) {
