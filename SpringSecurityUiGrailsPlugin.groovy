@@ -23,11 +23,12 @@ class SpringSecurityUiGrailsPlugin {
 	String grailsVersion = '1.2.2 > *'
 	Map dependsOn = [springSecurityCore: '0.4 > *',
 	                 mail: '0.9 > *',
-						  jquery: '1.4.2.5 > *',
-						  jqueryUi: '1.8.2.3 > *',
-						  famfamfam: '1.0 > *']
+						  jquery: '1.4.4 > *', // since 1.4.4 jquery plugin is resources aware
+						  jqueryUi: '1.8.7 > *', // since 1.8.7 jquery plugin is resources aware
+						  famfamfam: '1.0 > *',
+                          resources: '1.0 > *']
 
-	List pluginExcludes = [
+    List pluginExcludes = [
 		'docs/**',
 		'src/docs/**',
 		'scripts/CreateS2UiTestApps.groovy',
