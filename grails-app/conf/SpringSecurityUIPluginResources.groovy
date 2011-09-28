@@ -23,7 +23,6 @@ modules = {
         resource url: [dir: 'js/jquery', file: 'jquery.jdMenu.js', plugin: 'spring-security-ui']
         resource url: [dir: 'js/jquery', file: 'jquery.dataTables.min.js', plugin: 'spring-security-ui']
         resource url: [dir: 'js', file: 'spring-security-ui.js', plugin: 'spring-security-ui']
-        resource url: [dir: 'js/jquery', file: 'jquery.checkbox.js', plugin: 'spring-security-ui']
 
     }
     
