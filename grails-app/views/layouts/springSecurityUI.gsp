@@ -7,49 +7,51 @@
 
 <head>
 
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
-<title><g:layoutTitle default='Security Management Console'/></title>
-
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css',plugin:'spring-security-ui')}"/>
-<g:javascript library='jquery' plugin='jquery' />
-<jqui:resources />
-<link rel="stylesheet" media="screen" href="${resource(dir:'css/smoothness',file:'jquery-ui-1.8.2.custom.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'date_input.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.slate.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'table.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
-
-<%-- tab icons --%>
-<style>
-.icon_role {
-	background-image: url('${fam.icon(name: 'lock')}');
-}
-.icon_users {
-	background-image: url('${fam.icon(name: 'group')}');
-}
-.icon_user {
-	background-image: url('${fam.icon(name: 'user')}');
-}
-.icon_error {
-	background-image: url('${fam.icon(name: 'exclamation')}');
-}
-.icon_info {
-	background-image: url('${fam.icon(name: 'information')}');
-}
-.icon, .ui-tabs .ui-tabs-nav li a.icon {
-	background-repeat: no-repeat;
-	padding-left: 24px;
-	background-position: 4px center;
-}
-</style>
-
-<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon"/>
-
-<g:layoutHead/>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	
+	<title><g:layoutTitle default='Security Management Console'/></title>
+		
+	<g:javascript library='jquery' />
+	<g:layoutHead/>
+	<r:layoutResources />
+	<jqui:resources />
+	
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css',plugin:'spring-security-ui')}"/>
+	
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css/smoothness',file:'jquery-ui-1.8.2.custom.css',plugin:'spring-security-ui')}"/>
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'date_input.css',plugin:'spring-security-ui')}"/>
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.css',plugin:'spring-security-ui')}"/>
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.slate.css',plugin:'spring-security-ui')}"/>
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'table.css',plugin:'spring-security-ui')}"/>
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
+	
+	<%-- tab icons --%>
+	<style>
+	.icon_role {
+		background-image: url('${fam.icon(name: 'lock')}');
+	}
+	.icon_users {
+		background-image: url('${fam.icon(name: 'group')}');
+	}
+	.icon_user {
+		background-image: url('${fam.icon(name: 'user')}');
+	}
+	.icon_error {
+		background-image: url('${fam.icon(name: 'exclamation')}');
+	}
+	.icon_info {
+		background-image: url('${fam.icon(name: 'information')}');
+	}
+	.icon, .ui-tabs .ui-tabs-nav li a.icon {
+		background-repeat: no-repeat;
+		padding-left: 24px;
+		background-position: 4px center;
+	}
+	</style>
+	
+	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon"/>
 
 </head>
 
@@ -182,9 +184,9 @@
 
 	</div>
 
-<g:render template='/includes/ajaxLogin' plugin='spring-security-ui'/>
-
-<s2ui:showFlash/>
-
+	<g:render template='/includes/ajaxLogin' plugin='spring-security-ui'/>
+	
+	<s2ui:showFlash/>
+	
 </body>
 </html>
