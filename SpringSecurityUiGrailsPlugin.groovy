@@ -21,11 +21,13 @@ class SpringSecurityUiGrailsPlugin {
 
 	String version = '0.2.0'
 	String grailsVersion = '1.2.2 > *'
-	Map dependsOn = [springSecurityCore: '1.2.7.1 > *',
-	                 mail: '1.0 > *',
-						  jquery: '1.4.2.5 > *',
-						  jqueryUi: '1.8.2.3 > *',
-						  famfamfam: '1.0 > *']
+	Map dependsOn = [
+		springSecurityCore: '1.2.7.1 > *',
+		mail: '1.0 > *',
+		resources: '1.1.0 > *',
+		jquery: '1.4.2.5 > *',
+		jqueryUi: '1.8.2.3 > *',
+		famfamfam: '1.0 > *' ]
 
 	List pluginExcludes = [
 		'docs/**',
