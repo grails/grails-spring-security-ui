@@ -17,7 +17,6 @@ package grails.plugins.springsecurity.ui
 import groovy.text.SimpleTemplateEngine
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
-import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode
 
@@ -42,10 +41,8 @@ class RegisterController extends AbstractS2UiController {
 			return
 		}
 
-		String salt = saltSource instanceof NullSaltSource ? null : command.username
-		String password = encodePassword(command.password, salt)
 		def user = lookupUserClass().newInstance(email: command.email, username: command.username,
-				password: password, accountLocked: true, enabled: true)
+				password: command.password, accountLocked: true, enabled: true)
 		if (!user.validate() || !user.save()) {
 			// TODO
 		}
@@ -170,10 +167,9 @@ class RegisterController extends AbstractS2UiController {
 			return [token: token, command: command]
 		}
 
-		String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
 		RegistrationCode.withTransaction { status ->
 			def user = lookupUserClass().findByUsername(registrationCode.username)
-			user.password = encodePassword(command.password, salt)
+			user.password = command.password
 			user.save()
 			registrationCode.delete()
 		}
