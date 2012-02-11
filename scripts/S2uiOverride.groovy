@@ -1,4 +1,4 @@
-/* Copyright 2009-2010 the original author or authors.
+/* Copyright 2009-2012 SpringSource.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,9 @@ target(s2uiOverride: 'Copy plugin UI files to the project so they can be overrid
 private void copyFiles() {
 
 	String[] typeAndPackage = parseArgs()
+	if (!typeAndPackage) {
+		return
+	}
 	if (typeAndPackage.length == 1) {
 		if ('layout'.equals(typeAndPackage[0])) {
 			// special case for springSecurityUI.gsp
@@ -80,7 +83,7 @@ private void copyFiles() {
 	String controller = controllers[type.toLowerCase()]
 	if (!controller) {
 		errorMessage "\nERROR: unknown type '$type'\n${USAGE}"
-		System.exit 1
+		return
 	}
 
 	printMessage "Copying $type resources"
@@ -88,13 +91,13 @@ private void copyFiles() {
 	String packageName = typeAndPackage[1].trim()
 	if ('grails.plugins.springsecurity.ui'.equals(packageName)) {
 		errorMessage "\nERROR: The controller package cannot be the same as the plugin controller\n"
-		System.exit 1
+		return
 	}
 
 	// copy controller
 	String dir = packageName.replaceAll('\\.', '/')
 	ant.mkdir dir: "$appGrailsApp/controllers/$dir"
-	
+
 	templateAttributes.packageDeclaration = "package $packageName"
 	generateFile "$templateDir/${controller}Controller.groovy.template",
 	             "$appGrailsApp/controllers/$dir/${controller}Controller.groovy"
@@ -124,7 +127,7 @@ private parseArgs() {
 	}
 
 	errorMessage USAGE
-	System.exit 1
+	null
 }
 
 okToWrite = { String dest ->
