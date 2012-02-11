@@ -19,8 +19,13 @@ grails.project.dependency.resolution = {
 	}
 
 	plugins {
-		build(':release:1.0.0.RC3') {
-			export = false
-		}
+		build(':release:1.0.0') { export = false }
+		
+		compile ':jquery:1.7.1'
+		compile ':jquery-ui:1.8.15'
+		compile ':mail:0.9'
+		compile ':spring-security-acl:1.1'
+		compile ':spring-security-core:1.2.7'
+		compile ':famfamfam:1.0'
 	}
 }
