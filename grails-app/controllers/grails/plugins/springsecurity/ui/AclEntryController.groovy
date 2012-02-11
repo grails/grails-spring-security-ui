@@ -110,7 +110,7 @@ class AclEntryController extends AbstractS2UiController {
 		}
 
 		for (name in ['granting', 'auditSuccess', 'auditFailure']) {
-			int value = params.int(name)
+			Integer value = params.int(name)
 			if (value) {
 				hql.append " AND e.$name=:$name"
 				queryParams[name] = value == 1
@@ -125,8 +125,8 @@ class AclEntryController extends AbstractS2UiController {
 
 		int totalCount = lookupClass().executeQuery("SELECT COUNT(DISTINCT e) $hql", queryParams)[0]
 
-		int max = params.int('max')
-		int offset = params.int('offset')
+		Integer max = params.int('max')
+		Integer offset = params.int('offset')
 
 		String orderBy = ''
 		if (params.sort) {

@@ -97,7 +97,7 @@ class AclSidController extends AbstractS2UiController {
 		}
 
 		for (name in ['principal']) {
-			int value = params.int(name)
+			Integer value = params.int(name)
 			if (value) {
 				hql.append " AND s.$name=:$name"
 				queryParams[name] = value == 1
@@ -106,8 +106,8 @@ class AclSidController extends AbstractS2UiController {
 
 		int totalCount = lookupClass().executeQuery("SELECT COUNT(DISTINCT s) $hql", queryParams)[0]
 
-		int max = params.int('max')
-		int offset = params.int('offset')
+		Integer max = params.int('max')
+		Integer offset = params.int('offset')
 
 		String orderBy = ''
 		if (params.sort) {

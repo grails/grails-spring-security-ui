@@ -129,8 +129,8 @@ class UserController extends AbstractS2UiController {
 
 		int totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
 
-		int max = params.int('max')
-		int offset = params.int('offset')
+		Integer max = params.int('max')
+		Integer offset = params.int('offset')
 
 		String orderBy = ''
 		if (params.sort) {

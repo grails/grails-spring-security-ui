@@ -87,8 +87,8 @@ class RegistrationCodeController extends AbstractS2UiController {
 
 		int totalCount = RegistrationCode.executeQuery("SELECT COUNT(DISTINCT rc) $hql", queryParams)[0]
 
-		int max = params.int('max')
-		int offset = params.int('offset')
+		Integer max = params.int('max')
+		Integer offset = params.int('offset')
 
 		String orderBy = ''
 		if (params.sort) {
