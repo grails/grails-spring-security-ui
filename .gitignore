@@ -3,4 +3,5 @@
 /testapps.config.groovy
 /grails-spring-security-ui-*.zip
 /target
-
+/docs/
+.settings
