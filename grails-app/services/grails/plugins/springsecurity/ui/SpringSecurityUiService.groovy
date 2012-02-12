@@ -16,6 +16,10 @@ package grails.plugins.springsecurity.ui
 
 import java.text.SimpleDateFormat
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode
+import org.springframework.transaction.interceptor.TransactionAspectSupport
+
 /**
  * Helper methods for UI management.
  *
@@ -25,7 +29,8 @@ class SpringSecurityUiService {
 
 	static final String DATE_FORMAT = 'd MMM yyyy HH:mm:ss'
 
-	static transactional = true
+	def messageSource
+	def springSecurityService
 
 	boolean updatePersistentLogin(persistentLogin, newProperties) {
 		if (newProperties.lastUsed && newProperties.lastUsed instanceof String) {
@@ -145,5 +150,50 @@ class SpringSecurityUiService {
 	protected retrieveAclClass(String name, id) {
 		def clazz = grailsApplication.getClassForName('org.codehaus.groovy.grails.plugins.springsecurity.acl' + name)
 		clazz.get id
+	}
+
+	void warnErrors(bean, messageSource, Locale locale = Locale.getDefault()) {
+		if (!log.isWarnEnabled()) {
+			return
+		}
+
+		def message = new StringBuilder(
+				"problem ${bean.id ? 'updating' : 'creating'} ${bean.getClass().simpleName}: $bean")
+		for (fieldErrors in bean.errors) {
+			for (error in fieldErrors.allErrors) {
+				message.append("\n\t").append(messageSource.getMessage(error, locale))
+			}
+		}
+		log.warn message
+	}
+
+	String encodePassword(String password, salt) {
+		def encode = SpringSecurityUtils.securityConfig.ui.encodePassword
+		if (!(encode instanceof Boolean) || (encode instanceof Boolean && encode)) {
+			password = springSecurityService.encodePassword(password, salt)
+		}
+		password
+	}
+
+	RegistrationCode register(user, String cleartextPassword, salt) {
+
+		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
+
+		String password = encodePassword(cleartextPassword, salt)
+		user."$passwordFieldName" = password
+		if (!user.save()) {
+			warnErrors user, messageSource
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
+			return null
+		}
+
+		def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
+		if (!registrationCode.save()) {
+			warnErrors registrationCode, messageSource
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
+		}
+
+		registrationCode
 	}
 }

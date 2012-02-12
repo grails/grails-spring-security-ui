@@ -16,7 +16,6 @@ package grails.plugins.springsecurity.ui
 
 import groovy.text.SimpleTemplateEngine
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode
@@ -26,13 +25,21 @@ import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode
  */
 class RegisterController extends AbstractS2UiController {
 
+	// override default value from base class
 	static defaultAction = 'index'
 
+	// override default value from base class
+	static allowedMethods = [register: 'POST']
+
 	def mailService
+	def messageSource
 	def saltSource
 
 	def index = {
-		[command: new RegisterCommand()]
+		def copy = [:] + (flash.chainedParams ?: [:])
+		copy.remove 'controller'
+		copy.remove 'action'
+		[command: new RegisterCommand(copy)]
 	}
 
 	def register = { RegisterCommand command ->
@@ -43,14 +50,18 @@ class RegisterController extends AbstractS2UiController {
 		}
 
 		String salt = saltSource instanceof NullSaltSource ? null : command.username
-		String password = encodePassword(command.password, salt)
 		def user = lookupUserClass().newInstance(email: command.email, username: command.username,
-				password: password, accountLocked: true, enabled: true)
-		if (!user.validate() || !user.save()) {
-			// TODO
+				accountLocked: true, enabled: true)
+
+		RegistrationCode registrationCode = springSecurityUiService.register(user, command.password, salt)
+		if (registrationCode == null || registrationCode.hasErrors()) {
+			// null means problem creating the user
+			flash.error = message(code: 'spring.security.ui.register.miscError')
+			flash.chainedParams = params
+			redirect action: 'index'
+			return
 		}
 
-		def registrationCode = new RegistrationCode(username: user.username).save()
 		String url = generateLink('verifyRegistration', [t: registrationCode.token])
 
 		def conf = SpringSecurityUtils.securityConfig
@@ -120,16 +131,20 @@ class RegisterController extends AbstractS2UiController {
 		String username = params.username
 		if (!username) {
 			flash.error = message(code: 'spring.security.ui.forgotPassword.username.missing')
+			redirect action: 'forgotPassword'
 			return
 		}
 
-		def user = lookupUserClass().findByUsername(username)
+		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		def user = lookupUserClass().findWhere((usernameFieldName): username)
 		if (!user) {
 			flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
+			redirect action: 'forgotPassword'
 			return
 		}
 
-		def registrationCode = new RegistrationCode(username: user.username).save()
+		def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
+		registrationCode.save(flush: true)
 
 		String url = generateLink('resetPassword', [t: registrationCode.token])
 
@@ -173,7 +188,7 @@ class RegisterController extends AbstractS2UiController {
 		String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
 		RegistrationCode.withTransaction { status ->
 			def user = lookupUserClass().findByUsername(registrationCode.username)
-			user.password = encodePassword(command.password, salt)
+			user.password = springSecurityUiService.encodePassword(command.password, salt)
 			user.save()
 			registrationCode.delete()
 		}
@@ -248,18 +263,20 @@ class RegisterCommand {
 	String password
 	String password2
 
+	def grailsApplication
+
 	static constraints = {
-		username blank: false, validator: { value, command ->
+		username blank: false, nullable: false, validator: { value, command ->
 			if (value) {
-				def User = AH.application.getDomainClass(
+				def User = command.grailsApplication.getDomainClass(
 					SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).clazz
 				if (User.findByUsername(value)) {
 					return 'registerCommand.username.unique'
 				}
 			}
 		}
-		email blank: false, email: true
-		password blank: false, validator: RegisterController.passwordValidator
+		email blank: false, nullable: false, email: true
+		password blank: false, nullable: false, validator: RegisterController.passwordValidator
 		password2 validator: RegisterController.password2Validator
 	}
 }
@@ -270,7 +287,8 @@ class ResetPasswordCommand {
 	String password2
 
 	static constraints = {
-		password blank: false, validator: RegisterController.passwordValidator
+		username nullable: false
+		password blank: false, nullable: false, validator: RegisterController.passwordValidator
 		password2 validator: RegisterController.password2Validator
 	}
 }

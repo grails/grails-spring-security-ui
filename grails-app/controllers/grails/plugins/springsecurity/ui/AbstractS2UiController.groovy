@@ -80,12 +80,4 @@ abstract class AbstractS2UiController {
 	protected Class<?> lookupRequestmapClass() {
 		grailsApplication.getDomainClass(lookupRequestmapClassName()).clazz
 	}
-
-	protected String encodePassword(String password, salt) {
-		def encode = SpringSecurityUtils.securityConfig.ui.encodePassword
-		if (!(encode instanceof Boolean) || (encode instanceof Boolean && encode)) {
-			password = springSecurityService.encodePassword(password, salt)
-		}
-		password
-	}
 }
