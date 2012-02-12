@@ -15,10 +15,8 @@
 package grails.plugins.springsecurity.ui
 
 import grails.converters.JSON
-import grails.plugins.springsecurity.ui.AbstractS2UiController
 
 import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode
-
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
