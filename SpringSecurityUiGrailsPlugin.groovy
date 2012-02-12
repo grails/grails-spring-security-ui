@@ -20,13 +20,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 class SpringSecurityUiGrailsPlugin {
 
 	String version = '0.1.3'
-	String grailsVersion = '1.2.2 > *'
-	Map dependsOn = [springSecurityCore: '0.4 > *',
-	                 mail: '0.9 > *',
-						  jquery: '1.4.2.5 > *',
-						  jqueryUi: '1.8.2.3 > *',
-						  famfamfam: '1.0 > *']
-
+	String grailsVersion = '1.3 > *'
 	List pluginExcludes = [
 		'docs/**',
 		'src/docs/**',
@@ -37,16 +31,14 @@ class SpringSecurityUiGrailsPlugin {
 
 	String author = 'Burt Beckwith'
 	String authorEmail = 'beckwithb@vmware.com'
-	String title = 'User interface extensions for the Spring Security plugin.'
-	String description = 'User interface extensions for the Spring Security plugin.'
+	String title = 'Spring Security UI'
+	String description = 'User interface extensions for the Spring Security plugin'
 	String documentation = 'http://grails.org/plugin/spring-security-ui'
 
 	String license = 'APACHE'
-	def organization = [ name: 'SpringSource', url: 'http://www.springsource.org/' ]
-	def developers = [
-		 [ name: 'Burt Beckwith', email: 'beckwithb@vmware.com' ] ]
-	def issueManagement = [ system: 'JIRA', url: 'http://jira.grails.org/browse/GPSPRINGSECURITYUI' ]
-	def scm = [ url: 'https://github.com/grails-plugins/grails-spring-security-ui/' ]
+	def organization = [name: 'SpringSource', url: 'http://www.springsource.org/']
+	def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPSPRINGSECURITYUI']
+	def scm = [url: 'https://github.com/grails-plugins/grails-spring-security-ui/']
 
 	def doWithSpring = {
 
@@ -55,8 +47,10 @@ class SpringSecurityUiGrailsPlugin {
 			return
 		}
 
-		println 'Configuring Spring Security UI ...'
+		println '\nConfiguring Spring Security UI ...'
 
 		SpringSecurityUtils.loadSecondaryConfig 'DefaultUiSecurityConfig'
+
+		println '... finished configuring Spring Security UI\n'
 	}
 }
