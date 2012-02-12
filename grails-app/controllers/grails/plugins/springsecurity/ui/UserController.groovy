@@ -15,8 +15,10 @@
 package grails.plugins.springsecurity.ui
 
 import grails.converters.JSON
+import grails.util.GrailsNameUtils
 
 import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -36,7 +38,7 @@ class UserController extends AbstractS2UiController {
 		def user = lookupUserClass().newInstance(params)
 		if (params.password) {
 			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user.password = encodePassword(params.password, salt)
+			user.password = springSecurityUiService.encodePassword(params.password, salt)
 		}
 		if (!user.save(flush: true)) {
 			render view: 'create', model: [user: user, authorityList: sortedRoles()]
@@ -49,7 +51,9 @@ class UserController extends AbstractS2UiController {
 	}
 
 	def edit = {
-		def user = params.username ? lookupUserClass().findByUsername(params.username) : null
+		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+
+		def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
 		if (!user) user = findById()
 		if (!user) return
 
@@ -57,27 +61,31 @@ class UserController extends AbstractS2UiController {
 	}
 
 	def update = {
+		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
+
 		def user = findById()
 		if (!user) return
 		if (!versionCheck('user.label', 'User', user, [user: user])) {
 			return
 		}
 
-		def oldPassword = user.password
+		def oldPassword = user."$passwordFieldName"
 		user.properties = params
 		if (params.password && !params.password.equals(oldPassword)) {
 			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user.password = encodePassword(params.password, salt)
+			user."$passwordFieldName" = springSecurityUiService.encodePassword(params.password, salt)
 		}
 
-		if (!user.save()) {
+		if (!user.save(flush: true)) {
 			render view: 'edit', model: buildUserModel(user)
 			return
 		}
 
+		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+
 		lookupUserRoleClass().removeAll user
 		addRoles user
-		userCache.removeUserFromCache user.username
+		userCache.removeUserFromCache user[usernameFieldName]
 		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
 		redirect action: edit, id: user.id
 	}
@@ -86,10 +94,11 @@ class UserController extends AbstractS2UiController {
 		def user = findById()
 		if (!user) return
 
+		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		try {
 			lookupUserRoleClass().removeAll user
 			user.delete flush: true
-			userCache.removeUserFromCache user.username
+			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
 			redirect action: search
 		}
@@ -112,18 +121,29 @@ class UserController extends AbstractS2UiController {
 		def hql = new StringBuilder('FROM ').append(lookupUserClassName()).append(' u WHERE 1=1 ')
 		def queryParams = [:]
 
-		for (name in ['username']) {
-			if (params[name]) {
-				hql.append " AND LOWER(u.$name) LIKE :$name"
-				queryParams[name] = params[name].toLowerCase() + '%'
+		def userLookup = SpringSecurityUtils.securityConfig.userLookup
+		String usernameFieldName = userLookup.usernamePropertyName
+
+		for (name in [username: usernameFieldName]) {
+			if (params[name.key]) {
+				hql.append " AND LOWER(u.${name.value}) LIKE :${name.key}"
+				queryParams[name.key] = params[name.key].toLowerCase() + '%'
 			}
 		}
 
-		for (name in ['enabled', 'accountExpired', 'accountLocked', 'passwordExpired']) {
-			int value = params.int(name)
+		String enabledPropertyName = userLookup.enabledPropertyName
+		String accountExpiredPropertyName = userLookup.accountExpiredPropertyName
+		String accountLockedPropertyName = userLookup.accountLockedPropertyName
+		String passwordExpiredPropertyName = userLookup.passwordExpiredPropertyName
+
+		for (name in [enabled: enabledPropertyName,
+		              accountExpired: accountExpiredPropertyName,
+		              accountLocked: accountLockedPropertyName,
+		              passwordExpired: passwordExpiredPropertyName]) {
+			Integer value = params.int(name.key)
 			if (value) {
-				hql.append " AND u.$name=:$name"
-				queryParams[name] = value == 1
+				hql.append " AND u.${name.value}=:${name.key}"
+				queryParams[name.key] = value == 1
 			}
 		}
 
@@ -160,14 +180,15 @@ class UserController extends AbstractS2UiController {
 
 		if (params.term?.length() > 2) {
 			String username = params.term
+			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
 			setIfMissing 'max', 10, 100
 
 			def results = lookupUserClass().executeQuery(
-					"SELECT DISTINCT u.username " +
+					"SELECT DISTINCT u.$usernameFieldName " +
 					"FROM ${lookupUserClassName()} u " +
-					"WHERE LOWER(u.username) LIKE :name " +
-					"ORDER BY u.username",
+					"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
+					"ORDER BY u.$usernameFieldName",
 					[name: "${username.toLowerCase()}%"],
 					[max: params.max])
 
@@ -180,25 +201,32 @@ class UserController extends AbstractS2UiController {
 	}
 
 	protected void addRoles(user) {
+		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
+			SpringSecurityUtils.securityConfig.authority.nameField, null)
+
 		for (String key in params.keySet()) {
 			if (key.contains('ROLE') && 'on' == params.get(key)) {
-				lookupUserRoleClass().create user, lookupRoleClass().findByAuthority(key), true
+				lookupUserRoleClass().create user, lookupRoleClass()."findBy$upperAuthorityFieldName"(key), true
 			}
 		}
 	}
 
 	protected Map buildUserModel(user) {
 
+		String authorityFieldName = SpringSecurityUtils.securityConfig.authority.nameField
+		String authoritiesPropertyName = SpringSecurityUtils.securityConfig.userLookup.authoritiesPropertyName
+
 		List roles = sortedRoles()
-		Set userRoleNames = user.authorities*.authority
+		Set userRoleNames = user[authoritiesPropertyName].collect { it[authorityFieldName] }
 		def granted = [:]
 		def notGranted = [:]
 		for (role in roles) {
-			if (userRoleNames.contains(role.authority)) {
-				granted[(role)] = userRoleNames.contains(role.authority)
+			String authority = role[authorityFieldName]
+			if (userRoleNames.contains(authority)) {
+				granted[(role)] = userRoleNames.contains(authority)
 			}
 			else {
-				notGranted[(role)] = userRoleNames.contains(role.authority)
+				notGranted[(role)] = userRoleNames.contains(authority)
 			}
 		}
 

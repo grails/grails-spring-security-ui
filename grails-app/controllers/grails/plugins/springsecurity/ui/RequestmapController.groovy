@@ -14,6 +14,7 @@
  */
 package grails.plugins.springsecurity.ui
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -32,10 +33,13 @@ class RequestmapController extends AbstractS2UiController {
 		def hql = new StringBuilder('FROM ').append(lookupRequestmapClassName()).append(' r WHERE 1=1 ')
 		def queryParams = [:]
 
-		for (name in ['url', 'configAttribute']) {
-			if (params[name]) {
-				hql.append " AND LOWER(r.$name) LIKE :$name"
-				queryParams[name] = '%' + params[name].toLowerCase() + '%'
+		String urlField = SpringSecurityUtils.securityConfig.requestMap.urlField
+		String configAttributeField = SpringSecurityUtils.securityConfig.requestMap.configAttributeField
+
+		for (name in [url: urlField, configAttribute: configAttributeField]) {
+			if (params[name.key]) {
+				hql.append " AND LOWER(r.${name.value}) LIKE :$name.key"
+				queryParams[name.key] = '%' + params[name.key].toLowerCase() + '%'
 			}
 		}
 

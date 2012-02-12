@@ -17,6 +17,7 @@ package grails.plugins.springsecurity.ui
 import grails.converters.JSON
 import grails.util.GrailsNameUtils
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -40,7 +41,11 @@ class RoleController extends AbstractS2UiController {
 	}
 
 	def edit = {
-		def role = params.name ? lookupRoleClass().findByAuthority(params.name) : null
+
+		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
+			SpringSecurityUtils.securityConfig.authority.nameField, null)
+
+		def role = params.name ? lookupRoleClass()."findBy$upperAuthorityFieldName"(params.name) : null
 		if (!role) role = findById()
 		if (!role) return
 
@@ -49,8 +54,8 @@ class RoleController extends AbstractS2UiController {
 		def roleClassName = GrailsNameUtils.getShortName(lookupRoleClassName())
 		def userField = GrailsNameUtils.getPropertyName(GrailsNameUtils.getShortName(lookupUserClassName()))
 
-		def users = lookupUserRoleClass()."findAllBy${roleClassName}"(role, params)*."$userField"
-		int userCount = lookupUserRoleClass()."countBy${roleClassName}"(role)
+		def users = lookupUserRoleClass()."findAllBy$roleClassName"(role, params)*."$userField"
+		int userCount = lookupUserRoleClass()."countBy$roleClassName"(role)
 
 		[role: role, users: users, userCount: userCount]
 	}
@@ -91,6 +96,8 @@ class RoleController extends AbstractS2UiController {
 
 	def roleSearch = {
 
+		String authorityField = SpringSecurityUtils.securityConfig.authority.nameField
+
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
@@ -98,14 +105,14 @@ class RoleController extends AbstractS2UiController {
 		String name = params.authority ?: 'ROLE_'
 		def roles = search(name, false, 10, params.int('offset'))
 		if (roles.size() == 1 && !useOffset) {
-			forward action: 'edit', params: [name: roles[0].authority]
+			forward action: 'edit', params: [name: roles[0][authorityField]]
 			return
 		}
 
 		String hql =
 			"SELECT COUNT(DISTINCT r) " +
 			"FROM ${lookupRoleClassName()} r " +
-			"WHERE LOWER(r.authority) LIKE :name"
+			"WHERE LOWER(r.${authorityField}) LIKE :name"
 		int total = lookupRoleClass().executeQuery(hql, [name: "%${name.toLowerCase()}%"])[0]
 
 		render view: 'search', model: [results: roles,
@@ -134,12 +141,13 @@ class RoleController extends AbstractS2UiController {
 		render text: jsonData as JSON, contentType: 'text/plain'
 	}
 
-	protected search(String name, boolean nameOnly, int max, int offset) {
+	protected search(String name, boolean nameOnly, Integer max, Integer offset) {
+		String authorityField = SpringSecurityUtils.securityConfig.authority.nameField
 		String hql =
-			"SELECT DISTINCT ${nameOnly ? 'r.authority' : 'r'} " +
+			"SELECT DISTINCT ${nameOnly ? 'r.' + authorityField : 'r'} " +
 			"FROM ${lookupRoleClassName()} r " +
-			"WHERE LOWER(r.authority) LIKE :name " +
-			"ORDER BY r.authority"
+			"WHERE LOWER(r.${authorityField}) LIKE :name " +
+			"ORDER BY r.${authorityField}"
 		lookupRoleClass().executeQuery hql, [name: "%${name.toLowerCase()}%"], [max: max, offset: offset]
 	}
 
@@ -148,6 +156,7 @@ class RoleController extends AbstractS2UiController {
 		if (!role) {
 			flash.error = "${message(code: 'default.not.found.message', args: [message(code: 'role.label', default: 'Role'), params.id])}"
 			redirect action: search
+			return null
 		}
 
 		role
