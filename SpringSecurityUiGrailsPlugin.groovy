@@ -19,7 +19,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
  */
 class SpringSecurityUiGrailsPlugin {
 
-	String version = '0.1.3'
+	String version = '0.2'
 	String grailsVersion = '1.3 > *'
 	List pluginExcludes = [
 		'docs/**',
