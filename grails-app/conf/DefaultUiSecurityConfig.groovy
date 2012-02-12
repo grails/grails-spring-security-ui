@@ -20,7 +20,7 @@ Hi $user.username,<br/>
 <br/>
 You (or someone pretending to be you) created an account with this email address.<br/>
 <br/>
-If you made the request, please click <a href="$url">here</a> to finish the registration.
+If you made the request, please click&nbsp;<a href="$url">here</a> to finish the registration.
 '''
 			emailFrom = 'do.not.reply@localhost'
 			emailSubject = 'New Account'
