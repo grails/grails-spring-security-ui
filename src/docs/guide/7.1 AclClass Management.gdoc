@@ -1,0 +1,24 @@
+The default action for the AclClass controller is search. The @className@ field has an Ajax autocomplete to assist in finding instances. Leave the className field empty to return all instances.
+
+!acl_class_search_start.png!
+
+Results are shown paginated in groups of 10. The class name column header is clickable and will sort the results by that field:
+
+!acl_class_search_results.png!
+
+h4. AclClass Edit
+
+After clicking through an instance you get to the edit page (there are no view pages):
+
+!acl_class_edit.png!
+
+You can update the name, and delete the instance if there aren't any associated @AclObjectIdentity@ or @AclEntry@ instances - by default there is no support for cascading.
+
+You can also see the associated @AclObjectIdentity@ instances (OIDs) or @AclEntry@ instances.
+
+h4. AclClass Create
+
+You can create new instances by going to @/aclClass/create@ or by clicking the @Create@ action in the @Class@ menu under @ACL@.
+
+!acl_class_create.png!
+

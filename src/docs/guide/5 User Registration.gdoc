@@ -1,0 +1,84 @@
+Most of the plugin's controllers are intended to be part of a backend admin application, but the Registration and Forgot Password workflows are expected to be user-facing. So they're not available in the admin menu like the User, Role, and other backend functionality - you'll need to expose them to your users.
+
+One way to do this is to replace the default @login.gsp@ that's provided by the Spring Security Core plugin with this plugin's version. You can do this by running @grails s2ui-override auth@ - see [the section on configuration|guide:10 Customization] for more details. If you do this your users will have links to both workflows from the login screen:
+
+!login.png!
+
+h4. Registration
+
+Navigate to @/register/@:
+
+!register_start.png!
+
+After filling out valid values an email will be sent and you'll see a success screen:
+
+!register_sent.png!
+
+Click on the link in the email:
+
+!register_email.png!
+
+and you'll finalize the process, which involves enabling the locked user and pre-authenticating, then redirecting to the configured destination:
+
+!register_final.png!
+
+h4. Configuration
+
+The post-registration destination url is configurable in @grails-app/conf/Config.groovy@ using the @postRegisterUrl@ attribute:
+
+{code}
+grails.plugins.springsecurity.ui.register.postRegisterUrl = '/welcome'
+{code}
+
+If you don't specify a value then the @defaultTargetUrl@ value will be used, which is @'/'@ by default.
+
+You can customize the subject, body, and from address of the registration email by overriding the default values in @grails-app/conf/Config.groovy@, for example:
+
+{code}
+grails.plugins.springsecurity.ui.register.emailBody = '...'
+grails.plugins.springsecurity.ui.register.emailFrom = '...'
+grails.plugins.springsecurity.ui.register.emailSubject = '...'
+{code}
+
+The @emailBody@ property should be a GString and will have the User domain class instance in scope in the @user@ variable, and the generated url to click to finalize the signup in the @url@ variable.
+
+In addition, each new user will be granted @ROLE_USER@ after finalizing the registration. If you want to change the default role, add more, or grant no roles at all (for example if you want an admin to approve new users and explicitly enable new users) then you can customize that with the @defaultRoleNames@ attribute (which is a List of Strings):
+
+{code}
+grails.plugins.springsecurity.ui.register.defaultRoleNames = [] // no roles
+{code}
+
+or
+
+{code}
+grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_CUSTOMER']
+{code}
+
+h4. Mail configuration
+
+The plugin uses the [Mail plugin|http://grails.org/plugin/mail] to send registration emails, so you'll need to configure an SMTP server. See the plugin's documentation for the syntax.
+
+h4. Notes
+
+You should consider the registration code as starter code - every signup workflow will be different, and this should help you get going but is unlikely to be sufficient. You may wish to collect more information than just username and email - first and last name for example. Run @grails s2ui-override register@ to copy the registration controller and GSPs into your application to be customized.
+
+If there are unexpected validation errors during registration (which can happen when there is a disconnect between the domain classes and the code in @RegisterController@ they will be logged at the @warn@ level, so enable logging to ensure that you see the messages, e.g.
+
+{code}
+log4j = {
+   error 'org.codehaus.groovy.grails',
+         'org.springframework',
+         'org.hibernate',
+         'net.sf.ehcache.hibernate'
+   // pre-2.0
+   // warn 'grails.app.service.grails.plugins.springsecurity.ui.SpringSecurityUiService'
+
+   // 2.0
+   warn 'grails.app.services.grails.plugins.springsecurity.ui.SpringSecurityUiService'
+}
+{code}
+
+{note}
+@RegisterController@ and its GSPs assume that your User domain class has an @email@ field. Be sure to either rework the workflow (using the @s2ui-override@ script) if you don't need an email confirmation step or add an email field.
+{note}
+

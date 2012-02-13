@@ -1,0 +1,13 @@
+${packageDeclaration}
+
+import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclEntry
+import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclSid
+
+class AclEntryController extends grails.plugins.springsecurity.ui.AclEntryController {
+
+	protected String lookupClassName() { AclEntry.name }
+
+	protected Class<?> lookupClass() { AclEntry }
+
+	protected Class<?> lookupAclSidClass() { AclSid }
+}
