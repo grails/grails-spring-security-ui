@@ -62,6 +62,22 @@ h4. Notes
 
 You should consider the registration code as starter code - every signup workflow will be different, and this should help you get going but is unlikely to be sufficient. You may wish to collect more information than just username and email - first and last name for example. Run @grails s2ui-override register@ to copy the registration controller and GSPs into your application to be customized.
 
+If there are unexpected validation errors during registration (which can happen when there is a disconnect between the domain classes and the code in @RegisterController@ they will be logged at the @warn@ level, so enable logging to ensure that you see the messages, e.g.
+
+{code}
+log4j = {
+   error 'org.codehaus.groovy.grails',
+         'org.springframework',
+         'org.hibernate',
+         'net.sf.ehcache.hibernate'
+   // pre-2.0
+   // warn 'grails.app.service.grails.plugins.springsecurity.ui.SpringSecurityUiService'
+
+   // 2.0
+   warn 'grails.app.services.grails.plugins.springsecurity.ui.SpringSecurityUiService'
+}
+{code}
+
 {note}
 @RegisterController@ and its GSPs assume that your User domain class has an @email@ field. Be sure to either rework the workflow (using the @s2ui-override@ script) if you don't need an email confirmation step or add an email field.
 {note}
