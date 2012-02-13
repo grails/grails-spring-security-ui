@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>5 User Registration 0.2</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/1%20Introduction%20to%20the%20Spring%20Security%20UI%20Plugin.html"><strong>1</strong><span>Introduction to the Spring Security UI Plugin</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/2%20User%20Management.html"><strong>2</strong><span>User Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/3%20Role%20Management.html"><strong>3</strong><span>Role Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/4%20Requestmap%20Management.html"><strong>4</strong><span>Requestmap Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/5%20User%20Registration.html"><strong>5</strong><span>User Registration</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/6%20Forgot%20Password.html"><strong>6</strong><span>Forgot Password</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/7%20ACL%20Management.html"><strong>7</strong><span>ACL Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/8%20Persistent%20Cookie%20Management.html"><strong>8</strong><span>Persistent Cookie Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/9%20Security%20Configuration%20UI.html"><strong>9</strong><span>Security Configuration UI</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/10%20Customization.html"><strong>10</strong><span>Customization</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p>User interface extensions for the Spring Security plugin</p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../guide/4%20Requestmap%20Management.html">&lt;&lt; <strong>4</strong><span>Requestmap Management</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../guide/6%20Forgot%20Password.html"><strong>6</strong><span>Forgot Password</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>5 User Registration - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Burt Beckwith</p>
+
+                    <p><strong>Version:</strong> 0.2</p>
+
+                    
+                </div>
+
+                
+
+                
+
+<h1 id="5 User Registration">5 User Registration</h1>
+Most of the plugin's controllers are intended to be part of a backend admin application, but the Registration and Forgot Password workflows are expected to be user-facing. So they're not available in the admin menu like the User, Role, and other backend functionality - you'll need to expose them to your users.<p class="paragraph"/>One way to do this is to replace the default <code>login.gsp</code> that's provided by the Spring Security Core plugin with this plugin's version. You can do this by running <code>grails s2ui-override auth</code> - see <a href="../guide/single.html#10%20Customization" class="guide">the section on configuration</a> for more details. If you do this your users will have links to both workflows from the login screen:<p class="paragraph"/><img border="0" class="center" src="../img/login.png"></img><p class="paragraph"/><h4>Registration</h4><p class="paragraph"/>Navigate to <code>/register/</code>:<p class="paragraph"/><img border="0" class="center" src="../img/register_start.png"></img><p class="paragraph"/>After filling out valid values an email will be sent and you'll see a success screen:<p class="paragraph"/><img border="0" class="center" src="../img/register_sent.png"></img><p class="paragraph"/>Click on the link in the email:<p class="paragraph"/><img border="0" class="center" src="../img/register_email.png"></img><p class="paragraph"/>and you'll finalize the process, which involves enabling the locked user and pre-authenticating, then redirecting to the configured destination:<p class="paragraph"/><img border="0" class="center" src="../img/register_final.png"></img><p class="paragraph"/><h4>Configuration</h4><p class="paragraph"/>The post-registration destination url is configurable in <code>grails-app/conf/Config.groovy</code> using the <code>postRegisterUrl</code> attribute:<p class="paragraph"/><div class="code"><pre>grails.plugins.springsecurity.ui.register.postRegisterUrl = '/welcome'</pre></div><p class="paragraph"/>If you don't specify a value then the <code>defaultTargetUrl</code> value will be used, which is <code>'/'</code> by default.<p class="paragraph"/>You can customize the subject, body, and from address of the registration email by overriding the default values in <code>grails-app/conf/Config.groovy</code>, for example:<p class="paragraph"/><div class="code"><pre>grails.plugins.springsecurity.ui.register.emailBody = '...'
+grails.plugins.springsecurity.ui.register.emailFrom = '...'
+grails.plugins.springsecurity.ui.register.emailSubject = '...'</pre></div><p class="paragraph"/>The <code>emailBody</code> property should be a GString and will have the User domain class instance in scope in the <code>user</code> variable, and the generated url to click to finalize the signup in the <code>url</code> variable.<p class="paragraph"/>In addition, each new user will be granted <code>ROLE_USER</code> after finalizing the registration. If you want to change the default role, add more, or grant no roles at all (for example if you want an admin to approve new users and explicitly enable new users) then you can customize that with the <code>defaultRoleNames</code> attribute (which is a List of Strings):<p class="paragraph"/><div class="code"><pre>grails.plugins.springsecurity.ui.register.defaultRoleNames = &#91;&#93; // no roles</pre></div><p class="paragraph"/>or<p class="paragraph"/><div class="code"><pre>grails.plugins.springsecurity.ui.register.defaultRoleNames = &#91;'ROLE_CUSTOMER'&#93;</pre></div><p class="paragraph"/><h4>Mail configuration</h4><p class="paragraph"/>The plugin uses the <a href="http://grails.org/plugin/mail" target="blank">Mail plugin</a> to send registration emails, so you'll need to configure an SMTP server. See the plugin's documentation for the syntax.<p class="paragraph"/><h4>Notes</h4><p class="paragraph"/>You should consider the registration code as starter code - every signup workflow will be different, and this should help you get going but is unlikely to be sufficient. You may wish to collect more information than just username and email - first and last name for example. Run <code>grails s2ui-override register</code> to copy the registration controller and GSPs into your application to be customized.<p class="paragraph"/>If there are unexpected validation errors during registration (which can happen when there is a disconnect between the domain classes and the code in <code>RegisterController</code> they will be logged at the <code>warn</code> level, so enable logging to ensure that you see the messages, e.g.<p class="paragraph"/><div class="code"><pre>log4j = &#123;
+   error 'org.codehaus.groovy.grails',
+         'org.springframework',
+         'org.hibernate',
+         'net.sf.ehcache.hibernate'
+   // pre&#45;2.0
+   // warn 'grails.app.service.grails.plugins.springsecurity.ui.SpringSecurityUiService'<p class="paragraph"/>   // 2.0
+   warn 'grails.app.services.grails.plugins.springsecurity.ui.SpringSecurityUiService'
+&#125;</pre></div><p class="paragraph"/><blockquote class="note">
+<code>RegisterController</code> and its GSPs assume that your User domain class has an <code>email</code> field. Be sure to either rework the workflow (using the <code>s2ui-override</code> script) if you don't need an email confirmation step or add an email field.
+</blockquote><p class="paragraph"/>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../guide/4%20Requestmap%20Management.html">&lt;&lt; <strong>4</strong><span>Requestmap Management</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../guide/6%20Forgot%20Password.html"><strong>6</strong><span>Forgot Password</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>
