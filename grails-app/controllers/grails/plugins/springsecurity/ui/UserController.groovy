@@ -37,8 +37,7 @@ class UserController extends AbstractS2UiController {
 	def save = {
 		def user = lookupUserClass().newInstance(params)
 		if (params.password) {
-			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user.password = springSecurityUiService.encodePassword(params.password, salt)
+			user.password = params.password
 		}
 		if (!user.save(flush: true)) {
 			render view: 'create', model: [user: user, authorityList: sortedRoles()]
@@ -72,8 +71,7 @@ class UserController extends AbstractS2UiController {
 		def oldPassword = user."$passwordFieldName"
 		user.properties = params
 		if (params.password && !params.password.equals(oldPassword)) {
-			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user."$passwordFieldName" = springSecurityUiService.encodePassword(params.password, salt)
+			user."$passwordFieldName" = params.password
 		}
 
 		if (!user.save(flush: true)) {

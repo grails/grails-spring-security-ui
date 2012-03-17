@@ -180,8 +180,7 @@ class SpringSecurityUiService {
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
 
-		String password = encodePassword(cleartextPassword, salt)
-		user."$passwordFieldName" = password
+		user."$passwordFieldName" = cleartextPassword
 		if (!user.save()) {
 			warnErrors user, messageSource
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
