@@ -218,19 +218,13 @@ class UserController extends AbstractS2UiController {
 
 		List roles = sortedRoles()
 		Set userRoleNames = user[authoritiesPropertyName].collect { it[authorityFieldName] }
-		def granted = [:]
-		def notGranted = [:]
+		def roleMap = [:] as LinkedHashMap
 		for (role in roles) {
 			String authority = role[authorityFieldName]
-			if (userRoleNames.contains(authority)) {
-				granted[(role)] = userRoleNames.contains(authority)
-			}
-			else {
-				notGranted[(role)] = userRoleNames.contains(authority)
-			}
+			roleMap[(role)] = userRoleNames.contains(authority)
 		}
 
-		return [user: user, roleMap: granted + notGranted]
+		return [user: user, roleMap: roleMap]
 	}
 
 	protected findById() {
