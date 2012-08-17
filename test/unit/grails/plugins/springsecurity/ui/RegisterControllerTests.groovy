@@ -20,8 +20,8 @@ class RegisterControllerTests extends GroovyTestCase {
 		assertTrue RegisterController.checkPasswordMaxLength(password, command)
 		assertTrue RegisterController.checkPasswordRegex(password, command)
 
-		assertEquals 'command.password.error.strength',
-			RegisterController.passwordValidator(password, command)
+        assertEquals 'command.password.error.length',
+			RegisterController.passwordValidator(password, command)[0]
 
 		SpringSecurityUtils.securityConfig.ui.password.minLength = 3
 
@@ -43,8 +43,8 @@ class RegisterControllerTests extends GroovyTestCase {
 		assertFalse RegisterController.checkPasswordMaxLength(password, command)
 		assertTrue RegisterController.checkPasswordRegex(password, command)
 
-		assertEquals 'command.password.error.strength',
-			RegisterController.passwordValidator(password, command)
+		assertEquals 'command.password.error.length',
+			RegisterController.passwordValidator(password, command)[0]
 
 		SpringSecurityUtils.securityConfig.ui.password.maxLength = 100
 
