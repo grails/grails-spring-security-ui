@@ -187,8 +187,6 @@ class RegisterController extends AbstractS2UiController {
 		}
 
 		String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
-		
-		
 		RegistrationCode.withTransaction { status ->
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def user = lookupUserClass().findWhere((usernameFieldName): registrationCode.username)
