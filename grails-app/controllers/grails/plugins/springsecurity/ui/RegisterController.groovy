@@ -29,7 +29,7 @@ class RegisterController extends AbstractS2UiController {
 	static defaultAction = 'index'
 
 	// override default value from base class
-	static allowedMethods = [register: 'POST']
+	static allowedMethods = [register: 'POST', sendNewPassword: 'POST']
 
 	def mailService
 	def messageSource
@@ -45,7 +45,7 @@ class RegisterController extends AbstractS2UiController {
 	def register = { RegisterCommand command ->
 
 		if (command.hasErrors()) {
-			render view: 'index', model: [command: command]
+			render model: [command: command]
 			return
 		}
 
@@ -76,7 +76,7 @@ class RegisterController extends AbstractS2UiController {
 			html body.toString()
 		}
 
-		render view: 'index', model: [emailSent: true]
+		render model: [emailSent: true]
 	}
 
 	def verifyRegistration = {
@@ -122,48 +122,46 @@ class RegisterController extends AbstractS2UiController {
 	}
 
 	def forgotPassword = {
-
-		if (!request.post) {
-			// show the form
-			return
-		}
-
-		String username = params.username
-		if (!username) {
-			flash.error = message(code: 'spring.security.ui.forgotPassword.username.missing')
-			redirect action: 'forgotPassword'
-			return
-		}
-
-		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-		def user = lookupUserClass().findWhere((usernameFieldName): username)
-		if (!user) {
-			flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
-			redirect action: 'forgotPassword'
-			return
-		}
-
-		def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
-		registrationCode.save(flush: true)
-
-		String url = generateLink('resetPassword', [t: registrationCode.token])
-
-		def conf = SpringSecurityUtils.securityConfig
-		def body = conf.ui.forgotPassword.emailBody
-		if (body.contains('$')) {
-			body = evaluate(body, [user: user, url: url])
-		}
-		mailService.sendMail {
-			to user.email
-			from conf.ui.forgotPassword.emailFrom
-			subject conf.ui.forgotPassword.emailSubject
-			html body.toString()
-		}
-
-		[emailSent: true]
 	}
 
-	def resetPassword = { ResetPasswordCommand command ->
+    def sendNewPassword = {
+        String username = params.username
+        if (!username) {
+            flash.error = message(code: 'spring.security.ui.forgotPassword.username.missing')
+            redirect action: 'forgotPassword'
+            return
+        }
+
+        String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+        def user = lookupUserClass().findWhere((usernameFieldName): username)
+        if (!user) {
+            flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
+            redirect action: 'forgotPassword'
+            return
+        }
+
+        def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
+        registrationCode.save(flush: true)
+
+        String url = generateLink('resetPassword', [t: registrationCode.token])
+
+        def conf = SpringSecurityUtils.securityConfig
+        def body = conf.ui.forgotPassword.emailBody
+        if (body.contains('$')) {
+            body = evaluate(body, [user: user, url: url])
+        }
+        mailService.sendMail {
+            to user.email
+            from conf.ui.forgotPassword.emailFrom
+            subject conf.ui.forgotPassword.emailSubject
+            html body.toString()
+        }
+
+        [emailSent: true]
+    }
+
+
+    def resetPassword = { ResetPasswordCommand command ->
 
 		String token = params.t
 

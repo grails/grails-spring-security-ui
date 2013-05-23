@@ -12,7 +12,7 @@
 <s2ui:form width='350' height='220' elementId='forgotPasswordFormContainer'
            titleCode='spring.security.ui.forgotPassword.header' center='true'>
 
-	<g:form action='forgotPassword' name="forgotPasswordForm" autocomplete='off'>
+	<g:form action='sendNewPassword' name="forgotPasswordForm" autocomplete='off'>
 
 	<g:if test='${emailSent}'>
 	<br/>
