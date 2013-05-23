@@ -45,7 +45,7 @@ class RegisterController extends AbstractS2UiController {
 	def register = { RegisterCommand command ->
 
 		if (command.hasErrors()) {
-			render view: 'index', model: [command: command]
+			render view: 'register', model: [command: command]
 			return
 		}
 
@@ -76,7 +76,7 @@ class RegisterController extends AbstractS2UiController {
 			html body.toString()
 		}
 
-		render view: 'index', model: [emailSent: true]
+		render view: 'register', model: [emailSent: true]
 	}
 
 	def verifyRegistration = {
