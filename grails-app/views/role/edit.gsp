@@ -10,7 +10,7 @@
 
 <h3><g:message code="default.edit.label" args="[entityName]"/></h3>
 
-<g:form action="update" name='roleEditForm'>
+<g:form action="update" name='roleEditForm' useToken="true">
 <g:hiddenField name="id" value="${role?.id}"/>
 <g:hiddenField name="version" value="${role?.version}"/>
 

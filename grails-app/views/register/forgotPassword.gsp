@@ -1,8 +1,9 @@
 <html>
 
 <head>
-<title><g:message code='spring.security.ui.forgotPassword.title'/></title>
-<meta name='layout' content='register'/>
+    <title><g:message code='spring.security.ui.forgotPassword.title'/></title>
+    <meta name='layout' content='register'/>
+    <meta name="page" content="forgot-password" />
 </head>
 
 <body>

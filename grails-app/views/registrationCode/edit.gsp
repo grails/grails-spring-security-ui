@@ -13,7 +13,7 @@
 	<s2ui:form width='100%' height='225' elementId='formContainer'
 	           titleCode='default.edit.label' titleCodeArgs='[entityName]'>
 
-	<g:form action='update' name='registrationCodeEditForm'>
+	<g:form action='update' name='registrationCodeEditForm' useToken="true">
 		<g:hiddenField name="id" value="${registrationCode?.id}"/>
 		<g:hiddenField name="version" value="${registrationCode?.version}"/>
 		<div class="dialog">
