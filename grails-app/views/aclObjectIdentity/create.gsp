@@ -13,7 +13,7 @@
 	<s2ui:form width='100%' height='275' elementId='formContainer'
 	           titleCode='default.create.label' titleCodeArgs='[entityName]'>
 
-	<g:form action="save" name='aclObjectIdentityCreateForm'>
+	<g:form action="save" name='aclObjectIdentityCreateForm' useToken="true">
 		<div class="dialog">
 
 			<br/>

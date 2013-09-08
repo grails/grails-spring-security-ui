@@ -32,19 +32,27 @@ class RegistrationCodeController extends AbstractS2UiController {
 	}
 
 	def update = {
-		def registrationCode = findById()
-		if (!registrationCode) return
-		if (!versionCheck('registrationCode.label', 'RegistrationCode', registrationCode, [registrationCode: registrationCode])) {
+		withForm {
+			def registrationCode = findById()
+			if (!registrationCode) return
+			if (!versionCheck('registrationCode.label', 'RegistrationCode', registrationCode, [registrationCode: registrationCode])) {
+				return
+			}
+
+			if (!springSecurityUiService.updateRegistrationCode(registrationCode, params.username, params.token)) {
+				render view: 'edit', model: [registrationCode: registrationCode]
+				return
+			}
+
+			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), registrationCode.id])}"
+			redirect action: edit, id: registrationCode.id
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.className])}"
+			redirect action: search
 			return
 		}
-
-		if (!springSecurityUiService.updateRegistrationCode(registrationCode, params.username, params.token)) {
-			render view: 'edit', model: [registrationCode: registrationCode]
-			return
-		}
-
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), registrationCode.id])}"
-		redirect action: edit, id: registrationCode.id
 	}
 
 	def delete = {
@@ -52,9 +60,16 @@ class RegistrationCodeController extends AbstractS2UiController {
 		if (!registrationCode) return
 
 		try {
-			springSecurityUiService.deleteRegistrationCode registrationCode
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"
-			redirect action: search
+			withForm {
+				springSecurityUiService.deleteRegistrationCode registrationCode
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"
+				redirect action: search
+			}.invalidToken {
+				response.status = 500
+				log.warn("User $authenticatedUser.id possible CSRF or double submit: $params")
+				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.className])}"
+				redirect action: search
+			}
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"

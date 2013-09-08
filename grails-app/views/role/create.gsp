@@ -13,7 +13,7 @@
 	<s2ui:form width='100%' height='200' elementId='formContainer'
 	           titleCode='default.create.label' titleCodeArgs='[entityName]'>
 
-	<g:form action="save" name='roleCreateForm'>
+	<g:form action="save" name='roleCreateForm' useToken="true">
 		<div class="dialog">
 
 			<br/>
