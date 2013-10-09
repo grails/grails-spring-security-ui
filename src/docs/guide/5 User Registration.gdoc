@@ -27,7 +27,7 @@ h4. Configuration
 The post-registration destination url is configurable in @grails-app/conf/Config.groovy@ using the @postRegisterUrl@ attribute:
 
 {code}
-grails.plugins.springsecurity.ui.register.postRegisterUrl = '/welcome'
+grails.plugin.springsecurity.ui.register.postRegisterUrl = '/welcome'
 {code}
 
 If you don't specify a value then the @defaultTargetUrl@ value will be used, which is @'/'@ by default.
@@ -35,9 +35,9 @@ If you don't specify a value then the @defaultTargetUrl@ value will be used, whi
 You can customize the subject, body, and from address of the registration email by overriding the default values in @grails-app/conf/Config.groovy@, for example:
 
 {code}
-grails.plugins.springsecurity.ui.register.emailBody = '...'
-grails.plugins.springsecurity.ui.register.emailFrom = '...'
-grails.plugins.springsecurity.ui.register.emailSubject = '...'
+grails.plugin.springsecurity.ui.register.emailBody = '...'
+grails.plugin.springsecurity.ui.register.emailFrom = '...'
+grails.plugin.springsecurity.ui.register.emailSubject = '...'
 {code}
 
 The @emailBody@ property should be a GString and will have the User domain class instance in scope in the @user@ variable, and the generated url to click to finalize the signup in the @url@ variable.
@@ -45,13 +45,13 @@ The @emailBody@ property should be a GString and will have the User domain class
 In addition, each new user will be granted @ROLE_USER@ after finalizing the registration. If you want to change the default role, add more, or grant no roles at all (for example if you want an admin to approve new users and explicitly enable new users) then you can customize that with the @defaultRoleNames@ attribute (which is a List of Strings):
 
 {code}
-grails.plugins.springsecurity.ui.register.defaultRoleNames = [] // no roles
+grails.plugin.springsecurity.ui.register.defaultRoleNames = [] // no roles
 {code}
 
 or
 
 {code}
-grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_CUSTOMER']
+grails.plugin.springsecurity.ui.register.defaultRoleNames = ['ROLE_CUSTOMER']
 {code}
 
 h4. Mail configuration
@@ -70,11 +70,7 @@ log4j = {
          'org.springframework',
          'org.hibernate',
          'net.sf.ehcache.hibernate'
-   // pre-2.0
-   // warn 'grails.app.service.grails.plugins.springsecurity.ui.SpringSecurityUiService'
-
-   // 2.0
-   warn 'grails.app.services.grails.plugins.springsecurity.ui.SpringSecurityUiService'
+   warn 'grails.app.services.grails.plugin.springsecurity.ui.SpringSecurityUiService'
 }
 {code}
 

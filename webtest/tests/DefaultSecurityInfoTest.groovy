@@ -31,8 +31,8 @@ class DefaultSecurityInfoTest extends AbstractSecurityWebTest {
 		get '/securityInfo/filterChain'
 		assertContentContains '/**'
 		assertContentContains 'org.springframework.security.web.context.SecurityContextPersistenceFilter'
-		assertContentContains 'org.codehaus.groovy.grails.plugins.springsecurity.MutableLogoutFilter'
-		assertContentContains 'org.codehaus.groovy.grails.plugins.springsecurity.RequestHolderAuthenticationFilter'
+		assertContentContains 'grails.plugin.springsecurity.web.authentication.logout.MutableLogoutFilter'
+		assertContentContains 'grails.plugin.springsecurity.web.authentication.RequestHolderAuthenticationFilter'
 		assertContentContains 'org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter'
 		assertContentContains 'org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter'
 		assertContentContains 'org.springframework.security.web.authentication.AnonymousAuthenticationFilter'
@@ -50,7 +50,7 @@ class DefaultSecurityInfoTest extends AbstractSecurityWebTest {
 		get '/securityInfo/voters'
 		assertContentContains 'org.springframework.security.access.vote.AuthenticatedVoter'
 		assertContentContains 'org.springframework.security.access.vote.RoleHierarchyVoter'
-		assertContentContains 'org.codehaus.groovy.grails.plugins.springsecurity.WebExpressionVoter'
+		assertContentContains 'grails.plugin.springsecurity.web.access.expression.WebExpressionVoter'
 	}
 
 	void testProviders() {

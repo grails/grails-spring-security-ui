@@ -89,7 +89,7 @@ private void copyFiles() {
 	printMessage "Copying $type resources"
 
 	String packageName = typeAndPackage[1].trim()
-	if ('grails.plugins.springsecurity.ui'.equals(packageName)) {
+	if ('grails.plugin.springsecurity.ui'.equals(packageName)) {
 		errorMessage "\nERROR: The controller package cannot be the same as the plugin controller\n"
 		return
 	}

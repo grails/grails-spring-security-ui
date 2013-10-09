@@ -1,10 +1,10 @@
 ${packageDeclaration}
 
-import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclClass
-import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclObjectIdentity
-import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclSid
+import grails.plugin.springsecurity.acl.AclClass
+import grails.plugin.springsecurity.acl.AclObjectIdentity
+import grails.plugin.springsecurity.acl.AclSid
 
-class AclObjectIdentityController extends grails.plugins.springsecurity.ui.AclObjectIdentityController {
+class AclObjectIdentityController extends grails.plugin.springsecurity.ui.AclObjectIdentityController {
 
 	protected String lookupClassName() { AclObjectIdentity.name }
 
