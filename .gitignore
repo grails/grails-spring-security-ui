@@ -1,7 +1,8 @@
 *.log
-/plugin.xml
-/testapps.config.groovy
-/grails-spring-security-ui-*.zip
 /target
-/docs/
-.settings
+/docs
+/grails-spring-security-ui-*.zip
+/grails-spring-security-ui-*.zip.sha1
+/plugin.xml
+/.settings
+/web-app/WEB-INF
