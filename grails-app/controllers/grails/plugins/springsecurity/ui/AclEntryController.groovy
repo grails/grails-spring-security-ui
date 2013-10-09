@@ -23,13 +23,13 @@ class AclEntryController extends AbstractS2UiController {
 
 	def aclPermissionFactory
 
-	def create = {
+	def create() {
 		def aclEntry = lookupClass().newInstance(params)
 		aclEntry.granting = true
 		[aclEntry: aclEntry, sids: lookupAclSidClass().list()]
 	}
 
-	def save = {
+	def save() {
 		def aclEntry = lookupClass().newInstance(params)
 		if (!aclEntry.save(flush: true)) {
 			render view: 'create', model: [aclEntry: aclEntry, sids: lookupAclSidClass().list()]
@@ -37,17 +37,17 @@ class AclEntryController extends AbstractS2UiController {
 		}
 
 		flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), aclEntry.id])}"
-		redirect action: edit, id: aclEntry.id
+		redirect action: 'edit', id: aclEntry.id
 	}
 
-	def edit = {
+	def edit() {
 		def aclEntry = findById()
 		if (!aclEntry) return
 
 		[aclEntry: aclEntry, sids: lookupAclSidClass().list()]
 	}
 
-	def update = {
+	def update() {
 
 		def aclEntry = findById()
 		if (!aclEntry) return
@@ -65,29 +65,29 @@ class AclEntryController extends AbstractS2UiController {
 		}
 
 		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), aclEntry.id])}"
-		redirect action: edit, id: aclEntry.id
+		redirect action: 'edit', id: aclEntry.id
 	}
 
-	def delete = {
+	def delete() {
 		def aclEntry = findById()
 		if (!aclEntry) return
 
 		try {
 			springSecurityUiService.deleteAclEntry aclEntry
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), params.id])}"
-			redirect action: edit, id: params.id
+			redirect action: 'edit', id: params.id
 		}
 	}
 
-	def search = {
+	def search() {
 		[granting: 0, auditSuccess: 0, auditFailure: 0, sids: lookupAclSidClass().list()]
 	}
 
-	def aclEntrySearch = {
+	def aclEntrySearch() {
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
@@ -151,7 +151,7 @@ class AclEntryController extends AbstractS2UiController {
 		def aclEntry = lookupClass().get(params.id)
 		if (!aclEntry) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 
 		aclEntry

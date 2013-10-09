@@ -24,14 +24,14 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class RegistrationCodeController extends AbstractS2UiController {
 
-	def edit = {
+	def edit() {
 		def registrationCode = findById()
 		if (!registrationCode) return
 
 		[registrationCode: registrationCode]
 	}
 
-	def update = {
+	def update() {
 		def registrationCode = findById()
 		if (!registrationCode) return
 		if (!versionCheck('registrationCode.label', 'RegistrationCode', registrationCode, [registrationCode: registrationCode])) {
@@ -44,27 +44,27 @@ class RegistrationCodeController extends AbstractS2UiController {
 		}
 
 		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), registrationCode.id])}"
-		redirect action: edit, id: registrationCode.id
+		redirect action: 'edit', id: registrationCode.id
 	}
 
-	def delete = {
+	def delete() {
 		def registrationCode = findById()
 		if (!registrationCode) return
 
 		try {
 			springSecurityUiService.deleteRegistrationCode registrationCode
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"
-			redirect action: edit, id: params.id
+			redirect action: 'edit', id: params.id
 		}
 	}
 
-	def search = {}
+	def search() {}
 
-	def registrationCodeSearch = {
+	def registrationCodeSearch() {
 
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
@@ -109,7 +109,7 @@ class RegistrationCodeController extends AbstractS2UiController {
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def ajaxRegistrationCodeSearch = {
+	def ajaxRegistrationCodeSearch() {
 
 		def jsonData = []
 
@@ -138,7 +138,7 @@ class RegistrationCodeController extends AbstractS2UiController {
 		def registrationCode = RegistrationCode.get(params.id)
 		if (!registrationCode) {
 			flash.error = "${message(code: 'default.not.found.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 
 		registrationCode

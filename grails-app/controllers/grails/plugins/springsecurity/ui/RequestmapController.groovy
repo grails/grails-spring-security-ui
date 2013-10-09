@@ -14,7 +14,8 @@
  */
 package grails.plugins.springsecurity.ui
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
+
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -22,9 +23,9 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class RequestmapController extends AbstractS2UiController {
 
-	def search = {}
+	def search() {}
 
-	def requestmapSearch = {
+	def requestmapSearch() {
 
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
@@ -66,11 +67,11 @@ class RequestmapController extends AbstractS2UiController {
 		render view: 'search', model: model
 	}
 
-	def create = {
+	def create() {
 		[requestmap: lookupRequestmapClass().newInstance(params)]
 	}
 
-	def save = {
+	def save() {
 		def requestmap = lookupRequestmapClass().newInstance(params)
 		if (!requestmap.save(flush: true)) {
          render view: 'create', model: [requestmap: requestmap]
@@ -79,17 +80,17 @@ class RequestmapController extends AbstractS2UiController {
 
 		springSecurityService.clearCachedRequestmaps()
 		flash.error = "${message(code: 'default.created.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), requestmap.id])}"
-		redirect action: edit, id: requestmap.id
+		redirect action: 'edit', id: requestmap.id
 	}
 
-	def edit = {
+	def edit() {
 		def requestmap = findById()
 		if (!requestmap) return
 
 		[requestmap: requestmap]
 	}
 
-	def update = {
+	def update() {
 		def requestmap = lookupRequestmapClass().get(params.id)
 		requestmap.properties = params
 
@@ -100,10 +101,10 @@ class RequestmapController extends AbstractS2UiController {
 
 		springSecurityService.clearCachedRequestmaps()
 		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), requestmap.id])}"
-		redirect action: edit, id: requestmap.id
+		redirect action: 'edit', id: requestmap.id
 	}
 
-	def delete = {
+	def delete() {
 		def requestmap = findById()
 		if (!requestmap) return
 
@@ -111,11 +112,11 @@ class RequestmapController extends AbstractS2UiController {
 			requestmap.delete(flush: true)
 			springSecurityService.clearCachedRequestmaps()
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
-			redirect action: edit, id: params.id
+			redirect action: 'edit', id: params.id
 		}
 	}
 
@@ -123,7 +124,7 @@ class RequestmapController extends AbstractS2UiController {
 		def requestmap = lookupRequestmapClass().get(params.id)
 		if (!requestmap) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 
 		requestmap

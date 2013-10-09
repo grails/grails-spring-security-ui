@@ -15,9 +15,9 @@
 package grails.plugins.springsecurity.ui
 
 import grails.converters.JSON
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.GrailsNameUtils
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -25,11 +25,11 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class RoleController extends AbstractS2UiController {
 
-	def create = {
+	def create() {
 		[role: lookupRoleClass().newInstance(params)]
 	}
 
-	def save = {
+	def save() {
 		def role = lookupRoleClass().newInstance(params)
 		if (!role.save(flush: true)) {
          render view: 'create', model: [role: role]
@@ -37,10 +37,10 @@ class RoleController extends AbstractS2UiController {
 		}
 
 		flash.message = "${message(code: 'default.created.message', args: [message(code: 'role.label', default: 'Role'), role.id])}"
-		redirect action: edit, id: role.id
+		redirect action: 'edit', id: role.id
 	}
 
-	def edit = {
+	def edit() {
 
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
 			SpringSecurityUtils.securityConfig.authority.nameField, null)
@@ -60,7 +60,7 @@ class RoleController extends AbstractS2UiController {
 		[role: role, users: users, userCount: userCount]
 	}
 
-	def update = {
+	def update() {
 		def role = findById()
 		if (!role) return
 		if (!versionCheck('role.label', 'Role', role, [role: role])) {
@@ -73,10 +73,10 @@ class RoleController extends AbstractS2UiController {
 		}
 
 		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'role.label', default: 'Role'), role.id])}"
-		redirect action: edit, id: role.id
+		redirect action: 'edit', id: role.id
 	}
 
-	def delete = {
+	def delete() {
 		def role = findById()
 		if (!role) return
 
@@ -84,17 +84,17 @@ class RoleController extends AbstractS2UiController {
 			lookupUserRoleClass().removeAll role
 			springSecurityService.deleteRole(role)
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'role.label', default: 'Role'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'role.label', default: 'Role'), params.id])}"
-			redirect action: edit, id: params.id
+			redirect action: 'edit', id: params.id
 		}
 	}
 
-	def search = {}
+	def search() {}
 
-	def roleSearch = {
+	def roleSearch() {
 
 		String authorityField = SpringSecurityUtils.securityConfig.authority.nameField
 
@@ -103,7 +103,7 @@ class RoleController extends AbstractS2UiController {
 		setIfMissing 'offset', 0
 
 		String name = params.authority ?: 'ROLE_'
-		def roles = search(name, false, 10, params.int('offset'))
+		def roles = doSearch(name, false, 10, params.int('offset'))
 		if (roles.size() == 1 && !useOffset) {
 			forward action: 'edit', params: [name: roles[0][authorityField]]
 			return
@@ -124,7 +124,7 @@ class RoleController extends AbstractS2UiController {
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def ajaxRoleSearch = {
+	def ajaxRoleSearch() {
 
 		def jsonData = []
 
@@ -132,7 +132,7 @@ class RoleController extends AbstractS2UiController {
 			setIfMissing 'max', 10, 100
 			setIfMissing 'offset', 0
 
-			def names = search(params.term, true, params.int('max'), params.int('offset'))
+			def names = doSearch(params.term, true, params.int('max'), params.int('offset'))
 			for (name in names) {
 				jsonData << [value: name]
 			}
@@ -141,7 +141,7 @@ class RoleController extends AbstractS2UiController {
 		render text: jsonData as JSON, contentType: 'text/plain'
 	}
 
-	protected search(String name, boolean nameOnly, Integer max, Integer offset) {
+	protected doSearch(String name, boolean nameOnly, Integer max, Integer offset) {
 		String authorityField = SpringSecurityUtils.securityConfig.authority.nameField
 		String hql =
 			"SELECT DISTINCT ${nameOnly ? 'r.' + authorityField : 'r'} " +
@@ -155,7 +155,7 @@ class RoleController extends AbstractS2UiController {
 		def role = lookupRoleClass().get(params.id)
 		if (!role) {
 			flash.error = "${message(code: 'default.not.found.message', args: [message(code: 'role.label', default: 'Role'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 			return null
 		}
 

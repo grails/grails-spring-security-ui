@@ -15,10 +15,10 @@
 package grails.plugins.springsecurity.ui
 
 import grails.converters.JSON
+import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.util.GrailsNameUtils
 
-import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -29,12 +29,12 @@ class UserController extends AbstractS2UiController {
 	def saltSource
 	def userCache
 
-	def create = {
+	def create() {
 		def user = lookupUserClass().newInstance(params)
 		[user: user, authorityList: sortedRoles()]
 	}
 
-	def save = {
+	def save() {
 		def user = lookupUserClass().newInstance(params)
 		if (params.password) {
 			String salt = saltSource instanceof NullSaltSource ? null : params.username
@@ -47,10 +47,10 @@ class UserController extends AbstractS2UiController {
 
 		addRoles(user)
 		flash.message = "${message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
-		redirect action: edit, id: user.id
+		redirect action: 'edit', id: user.id
 	}
 
-	def edit = {
+	def edit() {
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
 		def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
@@ -60,7 +60,7 @@ class UserController extends AbstractS2UiController {
 		return buildUserModel(user)
 	}
 
-	def update = {
+	def update() {
 		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
 
 		def user = findById()
@@ -87,10 +87,10 @@ class UserController extends AbstractS2UiController {
 		addRoles user
 		userCache.removeUserFromCache user[usernameFieldName]
 		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
-		redirect action: edit, id: user.id
+		redirect action: 'edit', id: user.id
 	}
 
-	def delete = {
+	def delete() {
 		def user = findById()
 		if (!user) return
 
@@ -100,19 +100,19 @@ class UserController extends AbstractS2UiController {
 			user.delete flush: true
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-			redirect action: edit, id: params.id
+			redirect action: 'edit', id: params.id
 		}
 	}
 
-	def search = {
+	def search() {
 		[enabled: 0, accountExpired: 0, accountLocked: 0, passwordExpired: 0]
 	}
 
-	def userSearch = {
+	def userSearch() {
 
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
@@ -174,7 +174,7 @@ class UserController extends AbstractS2UiController {
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def ajaxUserSearch = {
+	def ajaxUserSearch() {
 
 		def jsonData = []
 
@@ -237,7 +237,7 @@ class UserController extends AbstractS2UiController {
 		def user = lookupUserClass().get(params.id)
 		if (!user) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 
 		user

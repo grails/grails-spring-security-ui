@@ -14,10 +14,12 @@
  */
 package grails.plugins.springsecurity.ui
 
+import grails.plugin.springsecurity.SpringSecurityUtils
+
 import java.text.SimpleDateFormat
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 /**
@@ -32,6 +34,7 @@ class SpringSecurityUiService {
 	def messageSource
 	def springSecurityService
 
+	@Transactional
 	boolean updatePersistentLogin(persistentLogin, newProperties) {
 		if (newProperties.lastUsed && newProperties.lastUsed instanceof String) {
 			Calendar c = Calendar.instance
@@ -47,10 +50,12 @@ class SpringSecurityUiService {
 		return !persistentLogin.hasErrors()
 	}
 
+	@Transactional
 	void deletePersistentLogin(persistentLogin) {
 		persistentLogin.delete()
 	}
 
+	@Transactional
 	boolean updateRegistrationCode(registrationCode, String username, String token) {
 		registrationCode.token = token
 		registrationCode.username = username
@@ -58,21 +63,25 @@ class SpringSecurityUiService {
 		return !registrationCode.hasErrors()
 	}
 
+	@Transactional
 	void deleteRegistrationCode(registrationCode) {
 		registrationCode.delete()
 	}
 
+	@Transactional
 	boolean updateAclClass(aclClass, String newName) {
 		aclClass.className = newName
 		aclClass.save()
 		return !aclClass.hasErrors()
 	}
 
+	@Transactional
 	void deleteAclClass(aclClass) {
 		// will fail if there are FK references
 		aclClass.delete()
 	}
 
+	@Transactional
 	boolean updateAclSid(aclSid, String newName, boolean newPrincipal) {
 		aclSid.sid = newName
 		aclSid.principal = newPrincipal
@@ -80,11 +89,13 @@ class SpringSecurityUiService {
 		return !aclSid.hasErrors()
 	}
 
+	@Transactional
 	void deleteAclSid(aclSid) {
 		// will fail if there are FK references
 		aclSid.delete()
 	}
 
+	@Transactional
 	boolean updateAclObjectIdentity(aclObjectIdentity, long objectId, long aclClassId,
 			Long parentId, Long ownerId, boolean entriesInheriting) {
 
@@ -117,11 +128,13 @@ class SpringSecurityUiService {
 		return !aclObjectIdentity.hasErrors()
 	}
 
+	@Transactional
 	void deleteAclObjectIdentity(aclObjectIdentity) {
 		// will fail if there are FK references
 		aclObjectIdentity.delete()
 	}
 
+	@Transactional
 	boolean updateAclEntry(aclEntry, long aclObjectIdentityId, long sidId, int aceOrder,
 			int mask, boolean granting, boolean auditSuccess, boolean auditFailure) {
 
@@ -143,6 +156,7 @@ class SpringSecurityUiService {
 		return !aclEntry.hasErrors()
 	}
 
+	@Transactional
 	void deleteAclEntry(aclEntry) {
 		aclEntry.delete()
 	}
@@ -169,12 +183,16 @@ class SpringSecurityUiService {
 
 	String encodePassword(String password, salt) {
 		def encode = SpringSecurityUtils.securityConfig.ui.encodePassword
-		if (!(encode instanceof Boolean) || (encode instanceof Boolean && encode)) {
+		if (!(encode instanceof Boolean)) {
+			encode = false
+		}
+		if (encode) {
 			password = springSecurityService.encodePassword(password, salt)
 		}
 		password
 	}
 
+	@Transactional
 	RegistrationCode register(user, String cleartextPassword, salt) {
 
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName

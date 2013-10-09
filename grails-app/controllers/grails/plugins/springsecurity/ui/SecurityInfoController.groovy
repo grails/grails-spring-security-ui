@@ -14,9 +14,9 @@
  */
 package grails.plugins.springsecurity.ui
 
-import org.springframework.security.core.context.SecurityContextHolder
+import grails.plugin.springsecurity.SpringSecurityUtils
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import org.springframework.security.core.context.SecurityContextHolder
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -32,43 +32,43 @@ class SecurityInfoController {
 	def springSecurityFilterChain
 	def userCache
 
-	def index = {}
+	def index() {}
 
-	def config = {
+	def config() {
 		[conf: new TreeMap(SpringSecurityUtils.securityConfig.flatten())]
 	}
 
-	def mappings = {
+	def mappings() {
 		// Map<Object, Collection<ConfigAttribute>>
 		[configAttributeMap: new TreeMap(objectDefinitionSource.configAttributeMap),
 		 securityConfigType: SpringSecurityUtils.securityConfig.securityConfigType]
 	}
 
-	def currentAuth = {
+	def currentAuth() {
 		[auth: SecurityContextHolder.context.authentication]
 	}
 
-	def usercache = {
+	def usercache() {
 		[cache: SpringSecurityUtils.securityConfig.cacheUsers ? userCache.cache : null]
 	}
 
-	def filterChain = {
+	def filterChain() {
 		[filterChainMap: springSecurityFilterChain.filterChainMap]
 	}
 
-	def logoutHandler = {
+	def logoutHandler() {
 		render view: 'logoutHandlers', model: [handlers: logoutHandlers]
 	}
 
-	def voters = {
+	def voters() {
 		[voters: accessDecisionManager.decisionVoters]
 	}
 
-	def providers = {
+	def providers() {
 		[providers: authenticationManager.providers]
 	}
 /*
-	def secureChannel = {
+	def secureChannel() {
 		def securityMetadataSource = channelProcessingFilter?.securityMetadataSource
 		render securityMetadataSource.getClass().name
 	}

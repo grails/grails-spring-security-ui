@@ -15,8 +15,8 @@
 package grails.plugins.springsecurity.ui
 
 import grails.converters.JSON
+import grails.plugin.springsecurity.SpringSecurityUtils
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -24,14 +24,14 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class PersistentLoginController extends AbstractS2UiController {
 
-	def edit = {
+	def edit() {
 		def persistentLogin = findById()
 		if (!persistentLogin) return
 
 		[persistentLogin: persistentLogin]
 	}
 
-	def update = {
+	def update() {
 		def persistentLogin = findById()
 		if (!persistentLogin) return
 		if (!versionCheck('persistentLogin.label', 'PersistentLogin', persistentLogin, [persistentLogin: persistentLogin])) {
@@ -44,27 +44,27 @@ class PersistentLoginController extends AbstractS2UiController {
 		}
 
 		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), persistentLogin.id])}"
-		redirect action: edit, id: persistentLogin.id
+		redirect action: 'edit', id: persistentLogin.id
 	}
 
-	def delete = {
+	def delete() {
 		def persistentLogin = findById()
 		if (!persistentLogin) return
 
 		try {
 			springSecurityUiService.deletePersistentLogin persistentLogin
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), params.id])}"
-			redirect action: edit, id: params.id
+			redirect action: 'edit', id: params.id
 		}
 	}
 
-	def search = {}
+	def search() {}
 
-	def persistentLoginSearch = {
+	def persistentLoginSearch() {
 
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
@@ -109,7 +109,7 @@ class PersistentLoginController extends AbstractS2UiController {
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def ajaxPersistentLoginSearch = {
+	def ajaxPersistentLoginSearch() {
 
 		def jsonData = []
 
@@ -138,7 +138,7 @@ class PersistentLoginController extends AbstractS2UiController {
 		def persistentLogin = lookupPersistentLoginClass().get(params.id)
 		if (!persistentLogin) {
 			flash.error = "${message(code: 'default.not.found.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 
 		persistentLogin

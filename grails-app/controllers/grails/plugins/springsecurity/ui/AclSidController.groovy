@@ -23,11 +23,11 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class AclSidController extends AbstractS2UiController {
 
-	def create = {
+	def create() {
 		[aclSid: lookupClass().newInstance(params)]
 	}
 
-	def save = {
+	def save() {
 		def aclSid = lookupClass().newInstance(params)
 		if (!aclSid.save(flush: true)) {
 			render view: 'create', model: [aclSid: aclSid]
@@ -35,17 +35,17 @@ class AclSidController extends AbstractS2UiController {
 		}
 
 		flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclSid.label', default: 'AclSid'), aclSid.id])}"
-		redirect action: edit, id: aclSid.id
+		redirect action: 'edit', id: aclSid.id
 	}
 
-	def edit = {
+	def edit() {
 		def aclSid = findById()
 		if (!aclSid) return
 
 		[aclSid: aclSid]
 	}
 
-	def update = {
+	def update() {
 		def aclSid = findById()
 		if (!aclSid) return
 		if (!versionCheck('aclSid.label', 'AclSid', aclSid, [aclSid: aclSid])) {
@@ -58,29 +58,29 @@ class AclSidController extends AbstractS2UiController {
 		}
 
 		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclSid.label', default: 'AclSid'), aclSid.id])}"
-		redirect action: edit, id: aclSid.id
+		redirect action: 'edit', id: aclSid.id
 	}
 
-	def delete = {
+	def delete() {
 		def aclSid = findById()
 		if (!aclSid) return
 
 		try {
 			springSecurityUiService.deleteAclSid aclSid
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclSid.label', default: 'AclSid'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'aclSid.label', default: 'AclSid'), params.id])}"
-			redirect action: edit, id: params.id
+			redirect action: 'edit', id: params.id
 		}
 	}
 
-	def search = {
+	def search() {
 		[principal: 0]
 	}
 
-	def aclSidSearch = {
+	def aclSidSearch() {
 
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
@@ -130,7 +130,7 @@ class AclSidController extends AbstractS2UiController {
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def ajaxAclSidSearch = {
+	def ajaxAclSidSearch() {
 
 		def jsonData = []
 
@@ -157,7 +157,7 @@ class AclSidController extends AbstractS2UiController {
 		def aclSid = lookupClass().get(params.id)
 		if (!aclSid) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'aclSid.label', default: 'AclSid'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 
 		aclSid

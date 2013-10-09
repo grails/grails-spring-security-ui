@@ -14,10 +14,10 @@
  */
 package grails.plugins.springsecurity.ui
 
+import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import groovy.text.SimpleTemplateEngine
 
-import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode
 
 /**
@@ -35,14 +35,14 @@ class RegisterController extends AbstractS2UiController {
 	def messageSource
 	def saltSource
 
-	def index = {
+	def index() {
 		def copy = [:] + (flash.chainedParams ?: [:])
 		copy.remove 'controller'
 		copy.remove 'action'
 		[command: new RegisterCommand(copy)]
 	}
 
-	def register = { RegisterCommand command ->
+	def register(RegisterCommand command) {
 
 		if (command.hasErrors()) {
 			render view: 'index', model: [command: command]
@@ -79,7 +79,7 @@ class RegisterController extends AbstractS2UiController {
 		render view: 'index', model: [emailSent: true]
 	}
 
-	def verifyRegistration = {
+	def verifyRegistration() {
 
 		def conf = SpringSecurityUtils.securityConfig
 		String defaultTargetUrl = conf.successHandler.defaultTargetUrl
@@ -121,7 +121,7 @@ class RegisterController extends AbstractS2UiController {
 		redirect uri: conf.ui.register.postRegisterUrl ?: defaultTargetUrl
 	}
 
-	def forgotPassword = {
+	def forgotPassword() {
 
 		if (!request.post) {
 			// show the form
@@ -163,7 +163,7 @@ class RegisterController extends AbstractS2UiController {
 		[emailSent: true]
 	}
 
-	def resetPassword = { ResetPasswordCommand command ->
+	def resetPassword(ResetPasswordCommand command) {
 
 		String token = params.t
 
@@ -266,7 +266,7 @@ class RegisterCommand {
 	def grailsApplication
 
 	static constraints = {
-		username blank: false, nullable: false, validator: { value, command ->
+		username blank: false, validator: { value, command ->
 			if (value) {
 				def User = command.grailsApplication.getDomainClass(
 					SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).clazz
@@ -275,8 +275,8 @@ class RegisterCommand {
 				}
 			}
 		}
-		email blank: false, nullable: false, email: true
-		password blank: false, nullable: false, validator: RegisterController.passwordValidator
+		email blank: false, email: true
+		password blank: false, validator: RegisterController.passwordValidator
 		password2 validator: RegisterController.password2Validator
 	}
 }
@@ -287,8 +287,7 @@ class ResetPasswordCommand {
 	String password2
 
 	static constraints = {
-		username nullable: false
-		password blank: false, nullable: false, validator: RegisterController.passwordValidator
+		password blank: false, validator: RegisterController.passwordValidator
 		password2 validator: RegisterController.password2Validator
 	}
 }

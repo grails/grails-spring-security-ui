@@ -21,12 +21,12 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class AclObjectIdentityController extends AbstractS2UiController {
 
-	def create = {
+	def create() {
 		[aclObjectIdentity: lookupClass().newInstance(params),
 		 classes: lookupAclClassClass().list(), sids: lookupAclSidClass().list()]
 	}
 
-	def save = {
+	def save() {
 		def aclObjectIdentity = lookupClass().newInstance(params)
 		if (!aclObjectIdentity.save(flush: true)) {
 			render view: 'create', model: [aclObjectIdentity: aclObjectIdentity,
@@ -36,10 +36,10 @@ class AclObjectIdentityController extends AbstractS2UiController {
 		}
 
 		flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), aclObjectIdentity.id])}"
-		redirect action: edit, id: aclObjectIdentity.id
+		redirect action: 'edit', id: aclObjectIdentity.id
 	}
 
-	def edit = {
+	def edit() {
 		def aclObjectIdentity = findById()
 		if (!aclObjectIdentity) return
 
@@ -48,7 +48,7 @@ class AclObjectIdentityController extends AbstractS2UiController {
 		 sids: lookupAclSidClass().list()]
 	}
 
-	def update = {
+	def update() {
 
 		def aclObjectIdentity = findById()
 		if (!aclObjectIdentity) return
@@ -67,31 +67,31 @@ class AclObjectIdentityController extends AbstractS2UiController {
 		}
 
 		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), aclObjectIdentity.id])}"
-		redirect action: edit, id: aclObjectIdentity.id
+		redirect action: 'edit', id: aclObjectIdentity.id
 	}
 
-	def delete = {
+	def delete() {
 		def aclObjectIdentity = findById()
 		if (!aclObjectIdentity) return
 
 		try {
 			springSecurityUiService.deleteAclObjectIdentity aclObjectIdentity
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), params.id])}"
-			redirect action: edit, id: params.id
+			redirect action: 'edit', id: params.id
 		}
 	}
 
-	def search = {
+	def search() {
 		[entriesInheriting: 0,
 		 classes: lookupAclClassClass().list(),
 		 sids: lookupAclSidClass().list()]
 	}
 
-	def aclObjectIdentitySearch = {
+	def aclObjectIdentitySearch() {
 
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
@@ -150,7 +150,7 @@ class AclObjectIdentityController extends AbstractS2UiController {
 		def aclObjectIdentity = lookupClass().get(params.id)
 		if (!aclObjectIdentity) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), params.id])}"
-			redirect action: search
+			redirect action: 'search'
 		}
 
 		aclObjectIdentity
