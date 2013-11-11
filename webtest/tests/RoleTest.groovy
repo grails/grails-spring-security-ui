@@ -41,9 +41,6 @@ class RoleTest extends AbstractSecurityWebTest {
 
 	void testCreateAndEdit() {
 
-		// need this to avoid an onload error that fails the test
-		javaScriptEnabled = false
-
 		String newName = 'ROLE_NEW_TEST' + System.currentTimeMillis()
 		// make sure it doesn't exist
 		get '/role/search'
@@ -71,10 +68,13 @@ class RoleTest extends AbstractSecurityWebTest {
 		}
 		assertContentContains 'Edit Role'
 		assertContentContains newName + '_new'
-	}
 
-	protected void tearDown() {
-		super.tearDown()
-		javaScriptEnabled = true
+		// delete
+		String instanceId = findHiddenId()
+		post('/role/delete') {
+			id = instanceId
+		}
+
+		assertContentContains "Role $instanceId deleted"
 	}
 }

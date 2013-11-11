@@ -82,5 +82,13 @@ class AclSidTest extends AbstractSecurityWebTest {
 		}
 		assertContentContains 'Edit AclSid'
 		assertContentContains newName + '_new'
+
+		// delete
+		String instanceId = findHiddenId()
+		post('/aclSid/delete') {
+			id = instanceId
+		}
+
+		assertContentContains "AclSid $instanceId deleted"
 	}
 }

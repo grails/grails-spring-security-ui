@@ -82,5 +82,13 @@ class AclObjectIdentityTest extends AbstractSecurityWebTest {
 		}
 		assertContentContains 'Edit AclObjectIdentity'
 		assertContentContains((newId.toInteger() + 1).toString())
+
+		// delete
+		String instanceId = findHiddenId()
+		post('/aclObjectIdentity/delete') {
+			id = instanceId
+		}
+
+		assertContentContains "AclObjectIdentity $instanceId deleted"
 	}
 }
