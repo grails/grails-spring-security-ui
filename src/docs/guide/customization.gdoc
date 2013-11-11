@@ -106,7 +106,7 @@ There are a few configuration options specified in @DefaultUiSecurityConfig.groo
 * grails.plugin.springsecurity.ui.forgotPassword.emailSubject
 * grails.plugin.springsecurity.ui.forgotPassword.postResetUrl
 
-See [Section 5|guide:5 User Registration] and [Section 6|guide:6 Forgot Password] for more details on these attributes.
+See [Section 5|guide:userRegistration] and [Section 6|guide:forgotPassword] for more details on these attributes.
 
 h4. CSS
 

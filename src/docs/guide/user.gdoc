@@ -1,6 +1,6 @@
 h4. User search
 
-The default action for the User controller is search. By default only the standard fields (@username@, @enabled@, @accountExpired@, @accountLocked@, and @passwordExpired@) are available but this is customizable with the @grails s2ui-override@ script - see [the section on configuration|guide:10 Customization].
+The default action for the User controller is search. By default only the standard fields (@username@, @enabled@, @accountExpired@, @accountLocked@, and @passwordExpired@) are available but this is customizable with the @grails s2ui-override@ script - see [the section on configuration|guide:customization].
 
 You can search by any combination of fields, and the @username@ field has an Ajax autocomplete to assist in finding users. In this screenshot you can see that an @email@ field has been added to the domain class and UI. Leave all fields empty and all checkboxes set at Either to return all users.
 
