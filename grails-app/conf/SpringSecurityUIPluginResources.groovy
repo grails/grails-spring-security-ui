@@ -3,7 +3,7 @@ modules = {
 		dependsOn 'jquery-ui'
 
 		for (name in ['reset',
-		              'smoothness/jquery-ui-1.8.2.custom',
+		              'smoothness/jquery-ui-1.10.3.custom',
 		              'jquery.jgrowl',
 		              'jquery.safari-checkbox',
 		              'date_input',
@@ -32,7 +32,7 @@ modules = {
 
 		for (name in ['reset',
 		              'spring-security-ui',
-		              'smoothness/jquery-ui-1.8.2.custom',
+		              'smoothness/jquery-ui-1.10.3.custom',
 		              'jquery.jgrowl',
 		              'jquery.safari-checkbox',
 		              'auth']) {

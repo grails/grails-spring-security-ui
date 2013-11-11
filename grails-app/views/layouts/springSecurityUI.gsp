@@ -1,6 +1,5 @@
 <%@ page import="org.codehaus.groovy.grails.plugins.PluginManagerHolder" %>
 <%@ page import="grails.plugin.springsecurity.SpringSecurityUtils" %>
-<%@ page import="grails.plugin.springsecurity.SecurityConfigType" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -21,7 +20,7 @@ The 'resources' tag in SecurityUiTagLib renders these tags if you're not using t
    <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css',plugin:'spring-security-ui')}"/>
    <g:javascript library='jquery' plugin='jquery' />
    <jqui:resources />
-   <link rel="stylesheet" media="screen" href="${resource(dir:'css/smoothness',file:'jquery-ui-1.8.2.custom.css',plugin:'spring-security-ui')}"/>
+   <link rel="stylesheet" media="screen" href="${resource(dir:'css/smoothness',file:'jquery-ui-1.10.3.custom.css',plugin:'spring-security-ui')}"/>
    <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
    <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
    <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'date_input.css',plugin:'spring-security-ui')}"/>
@@ -86,7 +85,7 @@ the explicit tags above and edit those, not the taglib code.
 						<li><g:link controller="role" action='create'><g:message code="spring.security.ui.create"/></g:link></li>
 					</ul>
 				</li>
-				<g:if test='${SpringSecurityUtils.securityConfig.securityConfigType == SecurityConfigType.Requestmap}'>
+				<g:if test='${SpringSecurityUtils.securityConfig.securityConfigType?.toString() == 'Requestmap'}'>
 				<li><a class="accessible"><g:message code="spring.security.ui.menu.requestmaps"/></a>
 					<ul>
 						<li><g:link controller="requestmap" action='search'><g:message code="spring.security.ui.search"/></g:link></li>
