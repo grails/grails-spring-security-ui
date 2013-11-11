@@ -16,6 +16,9 @@ This is to support both 1.3.x and 2.x applications without specifying a fixed ve
 {note}
 
 h4. Release History
+* November 11, 2013
+** 1.0-RC1 release
+** [JIRA Issues|http://jira.grails.org/secure/ReleaseNote.jspa?projectId=10233&amp;version=13069]
 * February 12, 2012
 ** 0.2 release
 ** [JIRA Issues|http://jira.grails.org/secure/ReleaseNote.jspa?projectId=10233&amp;version=12709]

@@ -1,4 +1,4 @@
-/* Copyright 2009-2012 SpringSource.
+/* Copyright 2009-2013 SpringSource.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils
  */
 class SpringSecurityUiGrailsPlugin {
 
-	String version = '0.2'
+	String version = '1.0-RC1'
 	String grailsVersion = '2.0.0 > *'
 	List loadAfter = ['springSecurityCore']
 	List pluginExcludes = [
@@ -31,7 +31,7 @@ class SpringSecurityUiGrailsPlugin {
 	]
 
 	String author = 'Burt Beckwith'
-	String authorEmail = 'beckwithb@vmware.com'
+	String authorEmail = 'burt@burtbeckwith.com'
 	String title = 'Spring Security UI'
 	String description = 'User interface extensions for the Spring Security plugin'
 	String documentation = 'http://grails-plugins.github.io/grails-spring-security-ui/'
