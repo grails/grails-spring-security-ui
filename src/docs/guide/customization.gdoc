@@ -118,10 +118,10 @@ In recent versions of the Spring Security Core plugin, the "User" domain class i
 
 The unfortunate consequence of mixing a newer domain class that does password encryption with controllers that call @springSecurityService.encodePassword()@ is the the passwords get double-encrypted, and users aren't able to login. So to get around this there's a configuration option you can set to tell this plugin's controllers whether to encrypt or not: @grails.plugin.springsecurity.ui.encodePassword@.
 
-This option defaults to @true@ to avoid a breaking change, so if you have a newer domain class that handles encryption just disable this plugin's encryption:
+This option defaults to @false@, so if you have an older domain class that doesn't handle encryption just enable this plugin's encryption:
 
 {code}
-grails.plugin.springsecurity.ui.encodePassword = false
+grails.plugin.springsecurity.ui.encodePassword = true
 {code}
 
 h4. Password Verification
