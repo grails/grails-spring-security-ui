@@ -7,8 +7,12 @@
 
 <body>
 
+<br/>
+
 <g:if test='${cache}'>
 <h4>UserCache: ${cache.getClass().name}</h4>
+
+<br/>
 
 <table>
 	<tr>
@@ -93,4 +97,5 @@
 </g:else>
 
 </body>
+
 </html>

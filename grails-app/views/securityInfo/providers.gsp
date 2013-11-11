@@ -2,10 +2,12 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title>Mappings</title>
+	<title>Authentication Providers</title>
 </head>
 
 <body>
+
+<br/>
 
 <table>
 	<thead>
@@ -17,6 +19,6 @@
 	</g:each>
 	</tbody>
 </table>
-
 </body>
+
 </html>

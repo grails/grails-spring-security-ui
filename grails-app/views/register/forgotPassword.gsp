@@ -9,7 +9,7 @@
 
 <p/>
 
-<s2ui:form width='350' height='220' elementId='forgotPasswordFormContainer'
+<s2ui:form width='400' height='220' elementId='forgotPasswordFormContainer'
            titleCode='spring.security.ui.forgotPassword.header' center='true'>
 
 	<g:form action='forgotPassword' name="forgotPasswordForm" autocomplete='off'>
