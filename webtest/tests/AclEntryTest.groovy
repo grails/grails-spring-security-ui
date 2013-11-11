@@ -112,5 +112,13 @@ class AclEntryTest extends AbstractSecurityWebTest {
 		}
 		assertContentContains 'Edit AclEntry'
 		assertContentContains((newOrder.toInteger() + 1).toString())
+
+		// delete
+		String instanceId = findHiddenId()
+		post('/aclEntry/delete') {
+			id = instanceId
+		}
+
+		assertContentContains "AclEntry $instanceId deleted"
 	}
 }

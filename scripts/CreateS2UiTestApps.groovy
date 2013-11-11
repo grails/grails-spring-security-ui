@@ -1,4 +1,18 @@
-includeTargets << grailsScript('_GrailsBootstrap')
+/* Copyright 2006-2013 SpringSource.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+includeTargets << new File(springSecurityCorePluginDir, "scripts/_S2Common.groovy")
 
 functionalTestPluginVersion = '1.2.7'
 projectfiles = new File(basedir, 'webtest/projectFiles')
@@ -7,22 +21,22 @@ dotGrails = null
 projectDir = null
 appName = null
 pluginVersion = null
-pluginZip = null
 testprojectRoot = null
 deleteAll = false
+grailsVersion = null
 
 target(createS2UiTestApp: 'Creates test apps for functional tests') {
 
 	def configFile = new File(basedir, 'testapps.config.groovy')
 	if (!configFile.exists()) {
-		die "$configFile.path not found"
+		error "$configFile.path not found"
 	}
 
 	new ConfigSlurper().parse(configFile.text).each { name, config ->
 		printMessage "\nCreating app based on configuration $name: ${config.flatten()}\n"
 		init name, config
 		createApp()
-		installPlugins()
+		installPlugins(false)
 		runQuickstart()
 		copySampleFiles()
 		copyTests(false)
@@ -30,12 +44,11 @@ target(createS2UiTestApp: 'Creates test apps for functional tests') {
 		printMessage "\nCreating extended app based on configuration $name: ${config.flatten()}\n"
 		init name + '_ext', config
 		createApp()
-		installPlugins()
+		installPlugins(true)
 		runQuickstart()
 		copySampleFiles()
 		copyTests(true)
 		runCreatePersistentToken()
-		installAclPlugin()
 	}
 }
 
@@ -43,23 +56,24 @@ private void init(String name, config) {
 
 	pluginVersion = config.pluginVersion
 	if (!pluginVersion) {
-		die "pluginVersion wasn't specified for config '$name'"
+		error "pluginVersion wasn't specified for config '$name'"
 	}
 
-	pluginZip = new File(basedir, "grails-spring-security-ui-${pluginVersion}.zip")
+	def pluginZip = new File(basedir, "grails-spring-security-ui-${pluginVersion}.zip")
 	if (!pluginZip.exists()) {
-		die "plugin $pluginZip.absolutePath not found"
+		error "plugin $pluginZip.absolutePath not found"
 	}
 
 	grailsHome = config.grailsHome
 	if (!new File(grailsHome).exists()) {
-		die "Grails home $grailsHome not found"
+		error "Grails home $grailsHome not found"
 	}
 
 	projectDir = config.projectDir
 	appName = 'spring-security-ui-test-' + name
 	testprojectRoot = "$projectDir/$appName"
-	dotGrails = config.dotGrails
+	grailsVersion = config.grailsVersion
+	dotGrails = config.dotGrails + '/' + grailsVersion
 }
 
 private void createApp() {
@@ -69,19 +83,14 @@ private void createApp() {
 	deleteDir testprojectRoot
 	deleteDir "$dotGrails/projects/$appName"
 
-	callGrails(grailsHome, projectDir, 'dev', 'create-app') {
-		ant.arg value: appName
-	}
+	callGrails grailsHome, projectDir, 'dev', 'create-app', [appName]
 }
 
 private void copySampleFiles() {
 	ant.unzip src: "$projectfiles.path/testDb.zip", dest: "$testprojectRoot/db"
 	ant.copy file: "$projectfiles.path/DataSource.groovy", todir: "$testprojectRoot/grails-app/conf"
-	ant.copy file: "$projectfiles.path/index.gsp", todir: "$testprojectRoot/grails-app/views"
-	ant.copy file: "$projectfiles.path/User.groovy", todir: "$testprojectRoot/grails-app/domain/com/testapp", overwrite: true
-
-	ant.mkdir dir: "${testprojectRoot}/src/templates/war"
-	ant.copy file: "$projectfiles.path/web.xml", todir: "$testprojectRoot/src/templates/war"
+	ant.copy file: "$projectfiles.path/error.gsp", todir: "$testprojectRoot/grails-app/views", overwrite: true
+	ant.copy file: "$projectfiles.path/index.gsp", todir: "$testprojectRoot/grails-app/views", overwrite: true
 
 	new File("$testprojectRoot/grails-app/conf/Config.groovy").withWriterAppend {
 		it.writeLine 'grails {'
@@ -96,26 +105,78 @@ private void copySampleFiles() {
 	}
 }
 
-private void installPlugins() {
+private void installPlugins(boolean includeAcl) {
 
-	// install plugins in local dir to make optional STS setup easier
-	ant.copy file: "$projectfiles.path/BuildConfig.groovy", todir: "$testprojectRoot/grails-app/conf"
+	File buildConfig = new File(testprojectRoot, 'grails-app/conf/BuildConfig.groovy')
+	String contents = buildConfig.text
 
-	ant.mkdir dir: "${testprojectRoot}/plugins"
+	contents = contents.replace('grails.project.class.dir = "target/classes"', "grails.project.work.dir = 'target'")
+	contents = contents.replace('grails.project.test.class.dir = "target/test-classes"', '')
+	contents = contents.replace('grails.project.test.reports.dir = "target/test-reports"', '')
 
-	callGrails(grailsHome, testprojectRoot, 'dev', 'install-plugin') {
-		ant.arg value: "functional-test ${functionalTestPluginVersion}"
-	}
+	contents = contents.replace('//mavenLocal()', 'mavenLocal()')
+	contents = contents.replace('repositories {', '''repositories {
+mavenRepo 'http://repo.spring.io/milestone' // TODO remove
+''')
 
-	callGrails(grailsHome, testprojectRoot, 'dev', 'install-plugin') {
-		ant.arg value: pluginZip.absolutePath
-	}
+	contents = contents.replace('grails.project.fork', 'grails.project.forkDISABLED')
+
+	contents = contents.replace('plugins {', """plugins {
+runtime ":mail:1.0.1"
+runtime ":famfamfam:1.0"
+runtime ":jquery:1.10.2"
+runtime ":jquery-ui:1.10.3"
+test ":functional-test:$functionalTestPluginVersion"
+runtime ":spring-security-ui:$pluginVersion"
+${includeAcl ? 'runtime ":spring-security-acl:2.0-RC1"' : ''}
+""")
+
+	contents = contents.replace('dependencies {', """dependencies {
+runtime 'com.h2database:h2:1.3.163'
+test('dumbster:dumbster:1.6') {
+	excludes 'mail', 'activation'
+}
+""")
+
+	buildConfig.withWriter { it.writeLine contents }
+
+	callGrails grailsHome, testprojectRoot, 'dev', 'compile', null, true // can fail when installing the functional-test plugin
+	callGrails grailsHome, testprojectRoot, 'dev', 'compile'
 }
 
+
 private void runQuickstart() {
-	callGrails(grailsHome, testprojectRoot, 'dev', 's2-quickstart') {
-		['com.testapp', 'User', 'Role', 'Requestmap'].each { ant.arg value: it }
-	}
+	callGrails grailsHome, testprojectRoot, 'dev', 's2-quickstart', ['com.testapp', 'User', 'Role', 'Requestmap']
+
+	File user = new File(testprojectRoot, 'grails-app/domain/com/testapp/User.groovy')
+	String contents = user.text
+	contents = contents.replace('boolean passwordExpired', '''boolean passwordExpired
+	String email''')
+	contents = contents.replace('static constraints = {', '''static constraints = {
+		email blank: false, email: true, unique: true
+''')
+	contents = contents.replace("password column: '`password`'", '')
+
+	user.withWriter { it.writeLine contents }
+
+	File config = new File(testprojectRoot, 'grails-app/conf/Config.groovy')
+	contents = config.text
+
+	contents += '''
+grails.plugin.springsecurity.fii.rejectPublicInvocations = false
+grails.plugin.springsecurity.rejectIfNoRule = false
+'''
+
+	config.withWriter { it.writeLine contents }
+
+	File requestmap = new File(testprojectRoot, 'grails-app/domain/com/testapp/Requestmap.groovy')
+	contents = requestmap.text
+
+	contents = contents.replace('HttpMethod httpMethod', '')
+	contents = contents.replace('httpMethod nullable: true', '')
+	contents = contents.replace("unique: 'httpMethod'", 'unique: true')
+
+	requestmap.withWriter { it.writeLine contents }
 }
 
 private void copyTests(boolean extraTests) {
@@ -139,15 +200,7 @@ private void copyTests(boolean extraTests) {
 }
 
 private void runCreatePersistentToken() {
-	callGrails(grailsHome, testprojectRoot, 'dev', 's2-create-persistent-token') {
-		ant.arg value: 'com.testapp.PersistentToken'
-	}
-}
-
-private void installAclPlugin() {
-	callGrails(grailsHome, testprojectRoot, 'dev', 'install-plugin') {
-		ant.arg value: 'spring-security-acl'
-	}
+	callGrails grailsHome, testprojectRoot, 'dev', 's2-create-persistent-token', ['com.testapp.PersistentToken']
 }
 
 private void deleteDir(String path) {
@@ -167,21 +220,34 @@ private void deleteDir(String path) {
 	ant.delete dir: path
 }
 
-private void die(String message) {
+private void error(String message) {
 	errorMessage "\n\nERROR: $message\n\n"
 	exit 1
 }
 
-private void callGrails(String grailsHome, String dir, String env, String action, extraArgs = null) {
-	ant.exec(executable: "${grailsHome}/bin/grails", dir: dir, failonerror: 'true') {
+private void callGrails(String grailsHome, String dir, String env, String action, List extraArgs = null, boolean ignoreFailure = false) {
+
+	String resultproperty = 'exitCode' + System.currentTimeMillis()
+	String outputproperty = 'execOutput' + System.currentTimeMillis()
+
+	println "Running 'grails $env $action ${extraArgs?.join(' ') ?: ''}'"
+
+	ant.exec(executable: "${grailsHome}/bin/grails", dir: dir, failonerror: false,
+				resultproperty: resultproperty, outputproperty: outputproperty) {
 		ant.env key: 'GRAILS_HOME', value: grailsHome
 		ant.arg value: env
 		ant.arg value: action
-		extraArgs?.call()
+		extraArgs.each { ant.arg value: it }
+		ant.arg value: '--stacktrace'
+	}
+
+	println ant.project.getProperty(outputproperty)
+
+	int exitCode = ant.project.getProperty(resultproperty) as Integer
+	if (exitCode && !ignoreFailure) {
+		exit exitCode
 	}
 }
 
-printMessage = { String message -> event('StatusUpdate', [message]) }
-errorMessage = { String message -> event('StatusError', [message]) }
 
 setDefaultTarget 'createS2UiTestApp'

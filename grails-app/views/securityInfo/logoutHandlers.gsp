@@ -2,7 +2,7 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title>Mappings</title>
+	<title>Logout Handlers</title>
 </head>
 
 <body>
@@ -17,6 +17,6 @@
 	</g:each>
 	</tbody>
 </table>
-
 </body>
+
 </html>

@@ -2,10 +2,12 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title>Mappings</title>
+	<title>Voters</title>
 </head>
 
 <body>
+
+<br/>
 
 <table>
 	<thead>

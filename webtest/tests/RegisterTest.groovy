@@ -3,16 +3,29 @@ import com.dumbster.smtp.SimpleSmtpServer
 import java.net.ServerSocket
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 class RegisterTest extends AbstractSecurityWebTest {
 
-	private _server
-	private static String _username
+	private server
 
 	def mailSender
 
 	protected void setUp() {
 		super.setUp()
+		startMailServer()
+	}
+
+	protected void tearDown() {
+		super.tearDown()
+		server.stop()
+	}
+
+	private void startMailServer() {
+
+		if (!mailSender) {
+			mailSender = ApplicationHolder.application.mainContext.mailSender
+		}
 
 		int port = 1025
 		while (true) {
@@ -27,13 +40,8 @@ class RegisterTest extends AbstractSecurityWebTest {
 				}
 			}
 		}
-		_server = SimpleSmtpServer.start(port)
+		server = SimpleSmtpServer.start(port)
 		mailSender.port = port
-	}
-
-	protected void tearDown() {
-		super.tearDown()
-		_server.stop()
 	}
 
 	void testRegisterValidation() {
@@ -58,7 +66,7 @@ class RegisterTest extends AbstractSecurityWebTest {
 
 		assertContentContains 'The username is taken'
 		assertContentContains 'Please provide a valid email address'
-		assertContentContains 'Password must be between 8 and 64 characters'
+		assertContentContains 'Password must have at least one letter, number, and special character: !@#$%^&'
 		assertContentContains 'Passwords do not match'
 
 		form('registerForm') {
@@ -70,40 +78,6 @@ class RegisterTest extends AbstractSecurityWebTest {
 		}
 
 		assertContentContains 'Password must have at least one letter, number, and special character: !@#$%^&'
-	}
-
-	void testRegister() {
-		get '/register'
-		assertContentContains 'Create Account'
-
-		_username = 'test_user_abcdef' + System.currentTimeMillis()
-
-		form('registerForm') {
-			username = this._username
-			email = this._username + '@abcdef.com'
-			password = 'aaaaaa1#'
-			password2 = 'aaaaaa1#'
-			click 'create_submit'
-		}
-
-		assertContentContains 'Your account registration email was sent - check your mail!'
-
-		assertEquals 1, _server.receivedEmailSize
-
-		def email = _server.receivedEmail.next()
-		assertEquals 'New Account', email.getHeaderValue('Subject')
-
-		String body = email.body
-		assertTrue body.contains('Hi ' + _username)
-
-		int index = body.indexOf('/register/verifyRegistration?t=')
-		assertTrue index > -1
-		int index2 = body.indexOf('"', index + 1)
-		String code = body.substring(index + '/register/verifyRegistration?t='.length(), index2)
-
-		get '/register/verifyRegistration?t=' + code
-		assertContentContains 'Your registration is complete'
-		assertContentContains 'Logged in as ' + _username
 	}
 
 	void testForgotPasswordValidation() {
@@ -122,23 +96,65 @@ class RegisterTest extends AbstractSecurityWebTest {
 		assertContentContains 'No user was found with that username'
 	}
 
-	void testForgotPassword() {
+	void testRegisterAndForgotPassword() {
+		String un = 'test_user_abcdef' + System.currentTimeMillis()
+		testRegister un
+
+		server.stop()
+		startMailServer()
+
+		testForgotPassword un
+	}
+
+	private void testRegister(String un) {
+		get '/register'
+		assertContentContains 'Create Account'
+
+		form('registerForm') {
+			username = un
+			email = un + '@abcdef.com'
+			password = 'aaaaaa1#'
+			password2 = 'aaaaaa1#'
+			click 'create_submit'
+		}
+
+		assertContentContains 'Your account registration email was sent - check your mail!'
+
+		assertEquals 1, server.receivedEmailSize
+
+		def email = server.receivedEmail.next()
+		assertEquals 'New Account', email.getHeaderValue('Subject')
+
+		String body = email.body
+		assertTrue body.contains('Hi ' + un)
+
+		int index = body.indexOf('/register/verifyRegistration?t=')
+		assertTrue index > -1
+		int index2 = body.indexOf('"', index + 1)
+		String code = body.substring(index + '/register/verifyRegistration?t='.length(), index2)
+
+		get '/register/verifyRegistration?t=' + code
+		assertContentContains 'Your registration is complete'
+		assertContentContains 'Logged in as ' + un
+	}
+
+	private void testForgotPassword(String un) {
 		get '/register/forgotPassword'
 		assertContentContains 'Forgot Password'
 
 		form('forgotPasswordForm') {
-			username = this._username
+			username = un
 			click 'reset_submit'
 		}
 		assertContentContains 'Your password reset email was sent - check your mail!'
 
-		assertEquals 1, _server.receivedEmailSize
-		def email = _server.receivedEmail.next()
+		assertEquals 1, server.receivedEmailSize
+		def email = server.receivedEmail.next()
 
 		assertEquals 'Password Reset', email.getHeaderValue('Subject')
 
 		String body = email.body
-		assertTrue body.contains('Hi ' + _username)
+		assertTrue body.contains('Hi ' + un)
 
 		int index = body.indexOf('/register/resetPassword?t=')
 		assertTrue index > -1
@@ -161,7 +177,7 @@ class RegisterTest extends AbstractSecurityWebTest {
 			password2 = 'def'
 			click 'reset_submit'
 		}
-		assertContentContains 'Password must be between 8 and 64 characters'
+		assertContentContains 'Password must have at least one letter, number, and special character: !@#$%^&'
 		assertContentContains 'Passwords do not match'
 
 		form('resetPasswordForm') {
@@ -178,6 +194,6 @@ class RegisterTest extends AbstractSecurityWebTest {
 		}
 
 		assertContentContains 'Your password was successfully changed'
-		assertContentContains 'Logged in as ' + _username
+		assertContentContains 'Logged in as ' + un
 	}
 }

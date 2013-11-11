@@ -32,7 +32,7 @@ class UserTest extends AbstractSecurityWebTest {
 		get '/user/search'
 
 		form('userSearchForm') {
-			enabled='-1'
+			enabled = '-1'
 			click 'search_submit'
 		}
 
@@ -44,7 +44,7 @@ class UserTest extends AbstractSecurityWebTest {
 		get '/user/search'
 
 		form('userSearchForm') {
-			accountExpired='1'
+			accountExpired = '1'
 			click 'search_submit'
 		}
 
@@ -58,7 +58,7 @@ class UserTest extends AbstractSecurityWebTest {
 		get '/user/search'
 
 		form('userSearchForm') {
-			accountLocked='1'
+			accountLocked = '1'
 			click 'search_submit'
 		}
 
@@ -72,7 +72,7 @@ class UserTest extends AbstractSecurityWebTest {
 		get '/user/search'
 
 		form('userSearchForm') {
-			passwordExpired='1'
+			passwordExpired = '1'
 			click 'search_submit'
 		}
 
@@ -89,7 +89,7 @@ class UserTest extends AbstractSecurityWebTest {
 		assertContentDoesNotContain '<input type="checkbox" name="ROLE_ADMIN" checked="checked" id="ROLE_ADMIN"  />'
 
 //		form('userEditForm') {
-//			passwordExpired='1'
+//			passwordExpired = '1'
 //			click 'update_submit'
 //		}
 	}

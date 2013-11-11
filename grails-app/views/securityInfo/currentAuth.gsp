@@ -20,10 +20,6 @@
 		<td>${auth.authorities}</td>
 	</tr>
 	<tr>
-		<td>Credentials</td>
-		<td>${auth.credentials}</td>
-	</tr>
-	<tr>
 		<td>Details</td>
 		<td>${auth.details}</td>
 	</tr>
@@ -37,6 +33,6 @@
 	</tr>
 	</tbody>
 </table>
-
 </body>
+
 </html>

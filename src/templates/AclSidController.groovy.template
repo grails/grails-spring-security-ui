@@ -1,8 +1,8 @@
 ${packageDeclaration}
 
-import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclSid
+import grails.plugin.springsecurity.acl.AclSid
 
-class AclSidController extends grails.plugins.springsecurity.ui.AclSidController {
+class AclSidController extends grails.plugin.springsecurity.ui.AclSidController {
 
 	protected String lookupClassName() { AclSid.name }
 

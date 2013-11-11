@@ -86,5 +86,13 @@ class RequestmapTest extends AbstractSecurityWebTest {
 		}
 		assertContentContains 'Edit Requestmap'
 		assertContentContains newUrl + '/new'
+
+		// delete
+		String instanceId = findHiddenId()
+		post('/requestmap/delete') {
+			id = instanceId
+		}
+
+		assertContentContains "Requestmap $instanceId deleted"
 	}
 }

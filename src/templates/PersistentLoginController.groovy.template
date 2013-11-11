@@ -1,4 +1,4 @@
 ${packageDeclaration}
 
-class PersistentLoginController extends grails.plugins.springsecurity.ui.PersistentLoginController {
+class PersistentLoginController extends grails.plugin.springsecurity.ui.PersistentLoginController {
 }

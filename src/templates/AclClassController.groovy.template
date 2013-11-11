@@ -1,8 +1,8 @@
 ${packageDeclaration}
 
-import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclClass
+import grails.plugin.springsecurity.acl.AclClass
 
-class AclClassController extends grails.plugins.springsecurity.ui.AclClassController {
+class AclClassController extends grails.plugin.springsecurity.ui.AclClassController {
 
 	protected String lookupClassName() { AclClass.name }
 
