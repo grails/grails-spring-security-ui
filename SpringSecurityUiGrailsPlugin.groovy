@@ -33,7 +33,7 @@ class SpringSecurityUiGrailsPlugin {
 	String authorEmail = 'beckwithb@vmware.com'
 	String title = 'Spring Security UI'
 	String description = 'User interface extensions for the Spring Security plugin'
-	String documentation = 'http://grails.org/plugin/spring-security-ui'
+	String documentation = 'http://grails-plugins.github.io/grails-spring-security-ui/'
 
 	String license = 'APACHE'
 	def organization = [name: 'SpringSource', url: 'http://www.springsource.org/']
