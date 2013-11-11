@@ -13,7 +13,11 @@
  * limitations under the License.
  */
 security {
+
 	ui {
+
+		encodePassword = false
+
 		register {
 			emailBody = '''\
 Hi $user.username,<br/>

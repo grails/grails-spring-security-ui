@@ -24,9 +24,20 @@
 	</thead>
 	<tbody>
 	<g:each var='entry' in='${conf}'>
+<%
+def key = entry.key
+if (key.startsWith('failureHandler.exceptionMappings.')) {
+	key = key - 'failureHandler.exceptionMappings.'
+	key = 'failureHandler.exceptionMappings. ' + key.replaceAll('\\.', '\\. ')
+}
+def value = entry.value
+if (value instanceof Class) {
+	value = value.name.replaceAll('\\.', '\\. ')
+}
+%>
 	<tr>
-		<td>${entry.key}</td>
-		<td>${entry.value}</td>
+		<td>${key}</td>
+		<td>${value}</td>
 	</tr>
 	</g:each>
 	</tbody>

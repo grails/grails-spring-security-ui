@@ -20,7 +20,8 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 class SpringSecurityUiGrailsPlugin {
 
 	String version = '0.2'
-	String grailsVersion = '1.3 > *'
+	String grailsVersion = '2.0.0 > *'
+	List loadAfter = ['springSecurityCore']
 	List pluginExcludes = [
 		'docs/**',
 		'src/docs/**',
