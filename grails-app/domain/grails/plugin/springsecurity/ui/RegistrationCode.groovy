@@ -20,6 +20,7 @@ package grails.plugin.springsecurity.ui
 class RegistrationCode {
 
 	String username
+	String username1
 	String token = UUID.randomUUID().toString().replaceAll('-', '')
 	Date dateCreated
 
