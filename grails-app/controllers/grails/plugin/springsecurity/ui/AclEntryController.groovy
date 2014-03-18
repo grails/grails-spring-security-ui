@@ -28,6 +28,13 @@ class AclEntryController extends AbstractS2UiController {
 		aclEntry.granting = true
 		[aclEntry: aclEntry, sids: lookupAclSidClass().list()]
 	}
+	def edit() {
+def aclEntry = findById()
+if (!aclEntry) return
+
+[aclEntry: aclEntry, sids: lookupAclSidClass().list()]
+}
+
 
 	def save() {
 		def aclEntry = lookupClass().newInstance(params)
