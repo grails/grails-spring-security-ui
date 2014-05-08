@@ -69,37 +69,36 @@ class RegistrationCodeController extends AbstractS2UiController {
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
 
-		def hql = new StringBuilder('FROM RegistrationCode rc WHERE 1=1 ')
-		def queryParams = [:]
-
-		if (params.token) {
-			hql.append " AND LOWER(rc.token) LIKE :token"
-			queryParams.token = params.token.toLowerCase() + '%'
+		int totalCount = RegistrationCode.createCriteria().count() {
+			if(params.token) {
+				ilike('token', params.token + '%')
+			}
+			if(params.username) {
+				ilike('username', params.username + '%')
+			}
 		}
-
-		if (params.username) {
-			hql.append " AND LOWER(rc.username) LIKE :username"
-			queryParams.username = params.username.toLowerCase() + '%'
-		}
-
-		int totalCount = RegistrationCode.executeQuery("SELECT COUNT(DISTINCT rc) $hql", queryParams)[0]
 
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
 
-		String orderBy = ''
-		if (params.sort) {
-			orderBy = " ORDER BY rc.$params.sort ${params.order ?: 'ASC'}"
+		def results = RegistrationCode.createCriteria().list(max: max, offset: offset) {
+			if(params.token) {
+				ilike('token', params.token + '%')
+			}
+			if(params.username) {
+				ilike('username', params.username + '%')
+			}
+			if(params.sort) {
+				// TODO: Check to see if case matters here, old code used ASC, view may need updating
+				order(params.sort, params.order ?: 'asc')
+			}
 		}
 
-		def results = RegistrationCode.executeQuery(
-				"SELECT DISTINCT rc $hql $orderBy",
-				queryParams, [max: max, offset: offset])
 		def model = [results: results, totalCount: totalCount, searched: true]
 
 		// add query params to model for paging
 		for (name in ['username', 'token']) {
-		 	model[name] = params[name]
+			model[name] = params[name]
 		}
 
 		render view: 'search', model: model
@@ -117,13 +116,12 @@ class RegistrationCodeController extends AbstractS2UiController {
 
 			setIfMissing 'max', 10, 100
 
-			def results = RegistrationCode.executeQuery(
-					"SELECT DISTINCT rc.username " +
-					"FROM RegistrationCode rc " +
-					"WHERE LOWER(rc.username) LIKE :name " +
-					"ORDER BY rc.username ",
-					[name: "%${username.toLowerCase()}%"],
-					[max: params.max])
+			def results = RegistrationCode.createCriteria().list(max: params.max, sort: 'username') {
+				projections {
+					distinct('username')
+				}
+				ilike('username', "%${params.username}%")
+			}
 
 			for (result in results) {
 				jsonData << [value: result]
