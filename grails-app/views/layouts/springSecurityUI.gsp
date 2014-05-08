@@ -1,4 +1,4 @@
-<%@ page import="org.codehaus.groovy.grails.plugins.PluginManagerHolder" %>
+<%@ page import="grails.util.Holders" %>
 <%@ page import="grails.plugin.springsecurity.SpringSecurityUtils" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -105,7 +105,7 @@ the explicit tags above and edit those, not the taglib code.
 						<li><g:link controller="registrationCode" action='search'><g:message code="spring.security.ui.search"/></g:link></li>
 					</ul>
 				</li>
-				<g:if test="${PluginManagerHolder.pluginManager.hasGrailsPlugin('springSecurityAcl')}">
+				<g:if test="${Holders.pluginManager.hasGrailsPlugin('springSecurityAcl')}">
 				<li><a class="accessible"><g:message code="spring.security.ui.menu.acl"/></a>
 					<ul>
 						<li><g:message code="spring.security.ui.menu.aclClass"/> &raquo;

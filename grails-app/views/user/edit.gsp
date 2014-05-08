@@ -1,5 +1,5 @@
 <html>
-<%@ page import="org.codehaus.groovy.grails.plugins.PluginManagerHolder" %>
+<%@ page import="grails.util.Holders" %>
 
 <sec:ifNotSwitched>
 	<sec:ifAllGranted roles='ROLE_SWITCH_USER'>
@@ -27,7 +27,7 @@
 def tabData = []
 tabData << [name: 'userinfo', icon: 'icon_user', messageCode: 'spring.security.ui.user.info']
 tabData << [name: 'roles',    icon: 'icon_role', messageCode: 'spring.security.ui.user.roles']
-boolean isOpenId = PluginManagerHolder.pluginManager.hasGrailsPlugin('springSecurityOpenid')
+boolean isOpenId = Holders.pluginManager.hasGrailsPlugin('springSecurityOpenid')
 if (isOpenId) {
 	tabData << [name: 'openIds', icon: 'icon_role', messageCode: 'spring.security.ui.user.openIds']
 }

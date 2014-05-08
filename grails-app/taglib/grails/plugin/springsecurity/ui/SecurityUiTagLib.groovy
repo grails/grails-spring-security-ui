@@ -14,7 +14,7 @@
  */
 package grails.plugin.springsecurity.ui
 
-import org.codehaus.groovy.grails.plugins.PluginManagerHolder
+import grails.util.Holders
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -24,7 +24,7 @@ class SecurityUiTagLib {
 	static namespace = 's2ui'
 
 	def resources = { attrs ->
-		boolean hasResourcesPlugin = PluginManagerHolder.pluginManager.hasGrailsPlugin('resources')
+		boolean hasResourcesPlugin = Holders.pluginManager.hasGrailsPlugin('resources')
 
 		if ('spring-security-ui' == attrs.module) {
 			if (hasResourcesPlugin) {
@@ -72,7 +72,7 @@ class SecurityUiTagLib {
 	}
 
 	def layoutResources = { attrs ->
-		boolean hasResourcesPlugin = PluginManagerHolder.pluginManager.hasGrailsPlugin('resources')
+		boolean hasResourcesPlugin = Holders.pluginManager.hasGrailsPlugin('resources')
 
 		if ('spring-security-ui' == attrs.module) {
 			if (hasResourcesPlugin) {
