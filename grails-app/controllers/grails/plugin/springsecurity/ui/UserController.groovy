@@ -113,59 +113,69 @@ class UserController extends AbstractS2UiController {
 	}
 
 	def userSearch() {
+		def criteria = lookupUserClass().createCriteria()
 
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
 
-		def hql = new StringBuilder('FROM ').append(lookupUserClassName()).append(' u WHERE 1=1 ')
-		def queryParams = [:]
-
 		def userLookup = SpringSecurityUtils.securityConfig.userLookup
 		String usernameFieldName = userLookup.usernamePropertyName
-
-		for (name in [username: usernameFieldName]) {
-			if (params[name.key]) {
-				hql.append " AND LOWER(u.${name.value}) LIKE :${name.key}"
-				queryParams[name.key] = params[name.key].toLowerCase() + '%'
-			}
-		}
-
 		String enabledPropertyName = userLookup.enabledPropertyName
 		String accountExpiredPropertyName = userLookup.accountExpiredPropertyName
 		String accountLockedPropertyName = userLookup.accountLockedPropertyName
 		String passwordExpiredPropertyName = userLookup.passwordExpiredPropertyName
 
-		for (name in [enabled: enabledPropertyName,
-		              accountExpired: accountExpiredPropertyName,
-		              accountLocked: accountLockedPropertyName,
-		              passwordExpired: passwordExpiredPropertyName]) {
-			Integer value = params.int(name.key)
-			if (value) {
-				hql.append " AND u.${name.value}=:${name.key}"
-				queryParams[name.key] = value == 1
+		// TODO: Make this less duplicative
+		int totalCount = criteria.count() {
+			for (name in [username: usernameFieldName]) {
+				if (params[name.key]) {
+					ilike(name.value, params[name.key] + '%')
+				}
+			}
+
+			for (name in [enabled: enabledPropertyName,
+					accountExpired: accountExpiredPropertyName,
+					accountLocked: accountLockedPropertyName,
+					passwordExpired: passwordExpiredPropertyName]) {
+				Integer value = params.int(name.key)
+				if (value) {
+					eq(name.value, value == 1)
+				}
 			}
 		}
-
-		int totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
 
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
 
-		String orderBy = ''
-		if (params.sort) {
-			orderBy = " ORDER BY u.$params.sort ${params.order ?: 'ASC'}"
-		}
+		criteria = lookupUserClass().createCriteria()
+		def results = criteria.list(max: max, offset: offset) {
+			for (name in [username: usernameFieldName]) {
+				if (params[name.key]) {
+					ilike(name.value, params[name.key] + '%')
+				}
+			}
 
-		def results = lookupUserClass().executeQuery(
-				"SELECT DISTINCT u $hql $orderBy",
-				queryParams, [max: max, offset: offset])
+			for (name in [enabled: enabledPropertyName,
+					accountExpired: accountExpiredPropertyName,
+					accountLocked: accountLockedPropertyName,
+					passwordExpired: passwordExpiredPropertyName]) {
+				Integer value = params.int(name.key)
+				if (value) {
+					eq(name.value, value == 1)
+				}
+			}
+
+			if(params.sort) {
+				order(params.sort, 'asc')
+			}
+		}
 		def model = [results: results, totalCount: totalCount, searched: true]
 
 		// add query params to model for paging
 		for (name in ['username', 'enabled', 'accountExpired', 'accountLocked',
-		              'passwordExpired', 'sort', 'order']) {
-		 	model[name] = params[name]
+				  'passwordExpired', 'sort', 'order']) {
+			model[name] = params[name]
 		}
 
 		render view: 'search', model: model
@@ -184,13 +194,12 @@ class UserController extends AbstractS2UiController {
 
 			setIfMissing 'max', 10, 100
 
-			def results = lookupUserClass().executeQuery(
-					"SELECT DISTINCT u.$usernameFieldName " +
-					"FROM ${lookupUserClassName()} u " +
-					"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
-					"ORDER BY u.$usernameFieldName",
-					[name: "${username.toLowerCase()}%"],
-					[max: params.max])
+			def results = lookupUserClass().createCriteria().list(max: params.max, sort:usernameFieldName) {
+				projections {
+					distinct(usernameFieldName)
+				}
+				ilike(usernameFieldName, "${username}%")
+			}
 
 			for (result in results) {
 				jsonData << [value: result]
