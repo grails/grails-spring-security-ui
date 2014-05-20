@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>7.4 AclEntry Management 1.0-RC2</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/introduction.html"><strong>1</strong><span>Introduction to the Spring Security UI Plugin</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/user.html"><strong>2</strong><span>User Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/role.html"><strong>3</strong><span>Role Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/requestmap.html"><strong>4</strong><span>Requestmap Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/userRegistration.html"><strong>5</strong><span>User Registration</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/forgotPassword.html"><strong>6</strong><span>Forgot Password</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/acls.html"><strong>7</strong><span>ACL Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/persistentCookie.html"><strong>8</strong><span>Persistent Cookie Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/configUI.html"><strong>9</strong><span>Security Configuration UI</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/customization.html"><strong>10</strong><span>Customization</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p>User interface extensions for the Spring Security plugin</p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../../guide/forgotPassword.html">&lt;&lt; <strong>6</strong><span>Forgot Password</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../../guide/persistentCookie.html"><strong>8</strong><span>Persistent Cookie Management</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>7.4 AclEntry Management - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Burt Beckwith</p>
+
+                    <p><strong>Version:</strong> 1.0-RC2</p>
+
+                    
+                </div>
+
+                
+
+                
+
+<h2 id="aclEntry">7.4 AclEntry Management</h2>
+The default action for the AclEntry controller is search. Leave all fields at their default values to return all instances.<p class="paragraph"/><img border="0" class="center" src="../img/acl_entry_search_start.png"></img><p class="paragraph"/>Results are shown paginated in groups of 10. The column headers are clickable and will sort the results by that field:<p class="paragraph"/><img border="0" class="center" src="../img/acl_entry_search_results.png"></img><p class="paragraph"/><h4>AclEntry Edit</h4><p class="paragraph"/>After clicking through to an instance you get to the edit page (there are no view pages):<p class="paragraph"/><img border="0" class="center" src="../img/acl_entry_edit.png"></img><p class="paragraph"/>You can update the values and delete the instance if there aren't any associated <code>AclEntry</code> instances - by default there is no support for cascading.<p class="paragraph"/><h4>AclEntry Create</h4><p class="paragraph"/>You can create new instances by going to <code>/aclEntry/create</code> or by clicking the <code>Create</code> action in the <code>Entry</code> menu under <code>ACL</code>.<p class="paragraph"/><img border="0" class="center" src="../img/acl_entry_create.png"></img><p class="paragraph"/>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../../guide/forgotPassword.html">&lt;&lt; <strong>6</strong><span>Forgot Password</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../../guide/persistentCookie.html"><strong>8</strong><span>Persistent Cookie Management</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>

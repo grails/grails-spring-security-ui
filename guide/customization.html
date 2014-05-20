@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>10 Customization 1.0-RC2</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/introduction.html"><strong>1</strong><span>Introduction to the Spring Security UI Plugin</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/user.html"><strong>2</strong><span>User Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/role.html"><strong>3</strong><span>Role Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/requestmap.html"><strong>4</strong><span>Requestmap Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/userRegistration.html"><strong>5</strong><span>User Registration</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/forgotPassword.html"><strong>6</strong><span>Forgot Password</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/acls.html"><strong>7</strong><span>ACL Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/persistentCookie.html"><strong>8</strong><span>Persistent Cookie Management</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/configUI.html"><strong>9</strong><span>Security Configuration UI</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/customization.html"><strong>10</strong><span>Customization</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p>User interface extensions for the Spring Security plugin</p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../guide/configUI.html">&lt;&lt; <strong>9</strong><span>Security Configuration UI</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+
+
+                <div class="project">
+                    <h1>10 Customization - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Burt Beckwith</p>
+
+                    <p><strong>Version:</strong> 1.0-RC2</p>
+
+                    
+                </div>
+
+                
+
+                
+
+<h1 id="customization">10 Customization</h1>
+Most aspects of the plugin are configurable.<p class="paragraph"/><h4><code>s2ui-override</code> script</h4><p class="paragraph"/>The plugin's controllers and GSPs are easily overridden using the <code>s2ui-override</code> script. The general syntax for running the script is<p class="paragraph"/><div class="code"><pre>grails s2ui&#45;override &#60;type&#62; &#60;controller&#45;<span class="java&#45;keyword">package</span>&#62;</pre></div><p class="paragraph"/>The script will copy an empty controller that extends the corresponding plugin controller into your application so you can override individual actions and methods as needed. It also copies the controller's GSPs. The exceptions are 'auth' and 'layout' which only copy GSPs.<p class="paragraph"/>The files copied for each type are summarized here:
+<ul class="star">
+<li>aclclass</li>
+<ul class="star">
+<li><code>controller/AclClassController.groovy</code></li>
+<li><code>views/aclClass/create.gsp</code></li>
+<li><code>views/aclClass/edit.gsp</code></li>
+<li><code>views/aclClass/search.gsp</code></li>
+</ul>
+<li>aclentry</li>
+<ul class="star">
+<li><code>controller/AclEntryController.groovy</code></li>
+<li><code>views/aclEntry/create.gsp</code></li>
+<li><code>views/aclEntry/edit.gsp</code></li>
+<li><code>views/aclEntry/search.gsp</code></li>
+</ul>
+<li>aclobjectidentity</li>
+<ul class="star">
+<li><code>controller/AclObjectIdentityController.groovy</code></li>
+<li><code>views/aclObjectIdentity/create.gsp</code></li>
+<li><code>views/aclObjectIdentity/edit.gsp</code></li>
+<li><code>views/aclObjectIdentity/search.gsp</code></li>
+</ul>
+<li>aclsid</li>
+<ul class="star">
+<li><code>controller/AclSidController.groovy</code></li>
+<li><code>views/aclSid/create.gsp</code></li>
+<li><code>views/aclSid/edit.gsp</code></li>
+<li><code>views/aclSid/search.gsp</code></li>
+</ul>
+<li>auth</li>
+<ul class="star">
+<li><code>views/login/auth.gsp</code></li>
+</ul>
+<li>layout</li>
+<ul class="star">
+<li><code>views/layouts/springSecurityUI.gsp</code></li>
+<li><code>views/includes/_ajaxLogin.gsp</code></li>
+</ul>
+<li>persistentlogin</li>
+<ul class="star">
+<li><code>controller/PersistentLoginController.groovy</code></li>
+<li><code>views/persistentLogin/edit.gsp</code></li>
+<li><code>views/persistentLogin/search.gsp</code></li>
+</ul>
+<li>register</li>
+<ul class="star">
+<li><code>controller/RegisterController.groovy</code></li>
+<li><code>views/register/forgotPassword.gsp</code></li>
+<li><code>views/register/index.gsp</code></li>
+<li><code>views/register/resetPassword.gsp</code></li>
+</ul>
+<li>registrationcode</li>
+<ul class="star">
+<li><code>controller/RegistrationCodeController.groovy</code></li>
+<li><code>views/registrationCode/edit.gsp</code></li>
+<li><code>views/registrationCode/search.gsp</code></li>
+</ul>
+<li>requestmap</li>
+<ul class="star">
+<li><code>controller/RequestmapController.groovy</code></li>
+<li><code>views/requestmap/create.gsp</code></li>
+<li><code>views/requestmap/edit.gsp</code></li>
+<li><code>views/requestmap/search.gsp</code></li>
+</ul>
+<li>role</li>
+<ul class="star">
+<li><code>controller/RoleController.groovy</code></li>
+<li><code>views/role/create.gsp</code></li>
+<li><code>views/role/edit.gsp</code></li>
+<li><code>views/role/search.gsp</code></li>
+</ul>
+<li>securityinfo</li>
+<ul class="star">
+<li><code>controller/SecurityInfoController.groovy</code></li>
+<li><code>views/securityInfo/config.gsp</code></li>
+<li><code>views/securityInfo/currentAuth.gsp</code></li>
+<li><code>views/securityInfo/filterChain.gsp</code></li>
+<li><code>views/securityInfo/logoutHandlers.gsp</code></li>
+<li><code>views/securityInfo/mappings.gsp</code></li>
+<li><code>views/securityInfo/providers.gsp</code></li>
+<li><code>views/securityInfo/usercache.gsp</code></li>
+<li><code>views/securityInfo/voters.gsp</code></li>
+</ul>
+<li>user</li>
+<ul class="star">
+<li><code>controller/UserController.groovy</code></li>
+<li><code>views/user/create.gsp</code></li>
+<li><code>views/user/edit.gsp</code></li>
+<li><code>views/user/search.gsp</code></li>
+</ul></ul><p class="paragraph"/><h4>I18N</h4><p class="paragraph"/>Most of the plugin's displayed strings are localized and stored in the plugin's <code>grails-app/i18n/messages.spring-security-ui.properties</code> file. You can override any of these values by putting an override in your application's <code>grails-app/i18n/messages.properties</code> file.<p class="paragraph"/><h4><code>Config.groovy</code> attributes</h4><p class="paragraph"/>There are a few configuration options specified in <code>DefaultUiSecurityConfig.groovy</code> that can be overridden in your application's <code>grails-app/conf/Config.groovy</code>
+<ul class="star">
+<li>grails.plugin.springsecurity.ui.register.emailBody</li>
+<li>grails.plugin.springsecurity.ui.register.emailFrom</li>
+<li>grails.plugin.springsecurity.ui.register.emailSubject</li>
+<li>grails.plugin.springsecurity.ui.register.defaultRoleNames</li>
+<li>grails.plugin.springsecurity.ui.register.postRegisterUrl</li>
+<li>grails.plugin.springsecurity.ui.forgotPassword.emailBody</li>
+<li>grails.plugin.springsecurity.ui.forgotPassword.emailFrom</li>
+<li>grails.plugin.springsecurity.ui.forgotPassword.emailSubject</li>
+<li>grails.plugin.springsecurity.ui.forgotPassword.postResetUrl</li>
+</ul><p class="paragraph"/>See <a href="../guide/single.html#userRegistration" class="guide">Section 5</a> and <a href="../guide/single.html#forgotPassword" class="guide">Section 6</a> for more details on these attributes.<p class="paragraph"/><h4>CSS</h4><p class="paragraph"/>The plugin defines its CSS styles in <code>web-app/css/spring-security-ui.css</code> and most of the jQuery plugins have corresponding CSS files. These can be overridden by overriding the <code>springSecurityUI.gsp</code> template and including your CSS file(s).<p class="paragraph"/><h4>Password Encryption</h4><p class="paragraph"/>In recent versions of the Spring Security Core plugin, the "User" domain class is generated by the <code>s2-quickstart</code> with code to automatically encrypt the password. This makes the code simpler (for example in controllers where you create users or update user passwords) but older generated classes don't have this generated code. This presents a problem for plugins like this one since it's not possible to reliably determine if the domain class encrypts the password or if you use the older approach of explicitly calling <code>springSecurityService.encodePassword()</code>.<p class="paragraph"/>The unfortunate consequence of mixing a newer domain class that does password encryption with controllers that call <code>springSecurityService.encodePassword()</code> is the the passwords get double-encrypted, and users aren't able to login. So to get around this there's a configuration option you can set to tell this plugin's controllers whether to encrypt or not: <code>grails.plugin.springsecurity.ui.encodePassword</code>.<p class="paragraph"/>This option defaults to <code>false</code>, so if you have an older domain class that doesn't handle encryption just enable this plugin's encryption:<p class="paragraph"/><div class="code"><pre>grails.plugin.springsecurity.ui.encodePassword = <span class="java&#45;keyword">true</span></pre></div><p class="paragraph"/><h4>Password Verification</h4><p class="paragraph"/>By default the registration controller has rather strict requirements for valid passwords; they must be between 8 and 64 characters and must include at least one uppercase letter, at least one number, and at least one symbol from "!@#$%^&#38;". You can customize these rules with these Config.groovy attributes:<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Property</strong></th><th><strong class="bold">Default Value</strong></th></tr><tr class="table-odd"><td>grails.plugin.springsecurity. ui.password.minLength</td><td>8</td></tr><tr class="table-even"><td>grails.plugin.springsecurity. ui.password.maxLength</td><td>64</td></tr><tr class="table-odd"><td>grails.plugin.springsecurity. ui.password.validationRegex</td><td>"^.&#42;(?=.&#42;&#92;&#92;d)(?=.&#42;&#91;a-zA-Z&#93;)(?=.&#42;&#91;!&#64;#$%^&#38;&#93;).&#42;$"</td></tr></table><p class="paragraph"/>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../guide/configUI.html">&lt;&lt; <strong>9</strong><span>Security Configuration UI</span></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>

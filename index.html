@@ -1,134 +1,139 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
-<title>Grails Spring Security UI Plugin @ GitHub</title>
-
-<style type="text/css">
-body {
-	margin-top: 1.0em;
-	font-family: "Tahoma,Helvetica,Arial,Sans";
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+    <head>
+        <title>Spring Security UI Plugin 1.0-RC2</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="./css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
+        <link rel="stylesheet" href="./css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8" />
+    <script type="text/javascript">
+function addJsClass(el) {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
 }
+    </script>
+    </head>
 
-#container {
-	margin: 0 auto;
-	margin-left: 50px;
-	margin-right: 50px;
-}
+    <body class="body" onload="addJsClass();">
+        <div id="navigation">
+            <ul>
+                <li>
+                    <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                        <a href="./guide/index.html" class="button">Table of contents</a>
+                        <div id="nav-summary-childs" style="display:none;">
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/introduction.html"><strong>1</strong><span>Introduction to the Spring Security UI Plugin</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/user.html"><strong>2</strong><span>User Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/role.html"><strong>3</strong><span>Role Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/requestmap.html"><strong>4</strong><span>Requestmap Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/userRegistration.html"><strong>5</strong><span>User Registration</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/forgotPassword.html"><strong>6</strong><span>Forgot Password</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/acls.html"><strong>7</strong><span>ACL Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/persistentCookie.html"><strong>8</strong><span>Persistent Cookie Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/configUI.html"><strong>9</strong><span>Security Configuration UI</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/customization.html"><strong>10</strong><span>Customization</span></a></div>
+                            
+                        </div>
+                    </div>
+                </li>
+                <li class="separator selected">
+                    <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+                </li>
+            </ul>
+        </div>
+        <div id="header">
+            <div class="images clearfix">
+                
+                
+            </div>
+            <p>User interface extensions for the Spring Security plugin</p>
+        </div>
 
-.propName {
-	font-weight: bold;
-}
 
-h1 {
-	color: #00CC00;
-	margin-bottom: 3px;
-}
+        <table id="colset" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td id="col1">
+                    <div id="main" class="corner-all">
 
-td {
-	padding: 2px 5px;
-}
+                        <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
 
-.download {
-	float: right;
-}
+                        <div class="project">
+                            <h1>Spring Security UI Plugin - Reference Documentation</h1>
+                            <p><strong>Authors:</strong> Burt Beckwith</p>
+                            <p><strong>Version:</strong> 1.0-RC2</p>
+                            
+                        </div>
 
-pre {
-	background: #000;
-	color: #fff;
-	padding: 15px;
-}
+                        
+                        <div id="table-of-content">
+                            <h2>Table of Contents</h2>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/introduction.html"><strong>1</strong><span>Introduction to the Spring Security UI Plugin</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/user.html"><strong>2</strong><span>User Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/role.html"><strong>3</strong><span>Role Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/requestmap.html"><strong>4</strong><span>Requestmap Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/userRegistration.html"><strong>5</strong><span>User Registration</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/forgotPassword.html"><strong>6</strong><span>Forgot Password</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/acls.html"><strong>7</strong><span>ACL Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="./guide/acls.html#aclClass"><strong>7.1</strong><span>AclClass Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="./guide/acls.html#aclSid"><strong>7.2</strong><span>AclSid Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="./guide/acls.html#aclObjectIdentity"><strong>7.3</strong><span>AclObjectIdentity Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="./guide/acls.html#aclEntry"><strong>7.4</strong><span>AclEntry Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/persistentCookie.html"><strong>8</strong><span>Persistent Cookie Management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/configUI.html"><strong>9</strong><span>Security Configuration UI</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/customization.html"><strong>10</strong><span>Customization</span></a></div>
+                            
+                            <div style="clear:both" ></div>
+                        </div>
+                        
+                        
+                    </div>
+                </td>
+                <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="./guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+            </tr>
+        </table>
 
-hr {
-	border: 0;
-	width: 80%;
-	border-bottom: 1px solid #aaa
-}
+        <div id="footer">
+            
+            
+        </div>
 
-a {
-	color: #0196aa;
-}
 
-img {
-	border: 0;
-}
-</style>
 
-</head>
+<script type="text/javascript" src="./js/docs.js"></script>
 
-<body>
-	<a href="http://github.com/grails-plugins/grails-spring-security-ui">
-		<img style="position: absolute; top: 0; right: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
-	</a>
-
-	<div id="container">
-		<h1>Grails Spring Security UI Plugin</h1>
-		<table id="properties">
-			<tbody>
-				<tr>
-					<td class="propName">Version</td>
-					<td>1.0-RC1<td>
-				</tr>
-				<tr>
-					<td class="propName">Grails Version</td>
-					<td>2.0 > *</td>
-				</tr>
-				<tr>
-					<td class="propName">Author</td>
-					<td>Burt Beckwith</td>
-				</tr>
-			</tbody>
-		</table>
-
-		<hr />
-
-		<h2>Current Documentation</h2>
-		<ul>
-			<li><a href="/grails-spring-security-ui/docs/manual/">User guide</a></li>
-		</ul>
-
-		<h2>Documentation (version 0.2)</h2>
-		<ul>
-			<li><a href="/grails-spring-security-ui/docs/manual.1273/">User guide</a></li>
-		</ul>
-
-		</ul>
-
-		<hr />
-
-		<div class="download">
-			<a href="http://github.com/grails-plugins/grails-spring-security-ui/zipball/master">
-				<img width="90" src="http://github.com/images/modules/download/zip.png">
-			</a>
-			<a href="http://github.com/grails-plugins/grails-spring-security-ui/tarball/master">
-				<img width="90" src="http://github.com/images/modules/download/tar.png">
-			</a>
-		</div>
-
-		<h2>Download Source</h2>
-		<p>
-			You can download this project in either
-			<a href="http://github.com/grails-plugins/grails-spring-security-ui/zipball/master">zip</a> or
-			<a href="http://github.com/grails-plugins/grails-spring-security-ui/tarball/master">tar</a> formats.
-		</p>
-		<p>You can also clone the project with <a href="http://git-scm.com">Git</a> by running:
-			<pre>$ git clone git://github.com/grails-plugins/grails-spring-security-ui</pre>
-		</p>
-
-  </div>
-
-<script type="text/javascript">
-	var _gaq = _gaq || [];
-	_gaq.push(['_setAccount', 'UA-16219500-1']);
-	_gaq.push(['_trackPageview']);
-
-	(function() {
-		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	})();
-</script>
-</body>
+    </body>
 </html>
