@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/grails-plugins/grails-spring-security-ui.svg)](https://travis-ci.org/grails-plugins/grails-spring-security-ui)
+
 Spring Security UI Plugin
 =========================
 
