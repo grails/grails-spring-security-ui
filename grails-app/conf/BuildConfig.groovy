@@ -23,8 +23,8 @@ grails.project.dependency.resolution = {
 	plugins {
 		compile ':spring-security-core:2.0-RC3'
 		compile ':mail:1.0.5'
-		compile ':jquery:1.10.2'
-		compile ':jquery-ui:1.8.24'
+		compile ':jquery:1.11.1'
+		compile ':jquery-ui:1.10.3'
 		compile ':famfamfam:1.0.1'
 
 		compile ':spring-security-acl:2.0-RC1', {
