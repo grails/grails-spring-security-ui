@@ -2,7 +2,7 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title>Security Configuration</title>
+	<title><g:message code='spring.security.ui.appinfo.config' default='Security Configuration'</title>
 
 <g:javascript>
 	$(document).ready(function() {
@@ -13,6 +13,8 @@
 </head>
 
 <body>
+
+<h3><g:message code="spring.security.ui.appinfo.config" default="Security Configuration"/></h3>
 
 <div id="configHolder">
 <table id="config" cellpadding="0" cellspacing="0" border="0" class="display">

@@ -2,10 +2,12 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title>Mappings</title>
+	<title><g:message code="spring.security.ui.appinfo.mappings" default="Mappings"/></title>
 </head>
 
 <body>
+
+<h3><g:message code="spring.security.ui.appinfo.mappings" default="Mappings"/></h3>
 
 <br/>
 

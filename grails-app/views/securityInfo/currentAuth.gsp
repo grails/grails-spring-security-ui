@@ -2,10 +2,14 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title>Current Auth</title>
+	<title><g:message code="spring.security.ui.appinfo.auth" default="Current Authentication"/></title>
 </head>
 
 <body>
+
+<h3><g:message code="spring.security.ui.appinfo.auth" default="Current Authentication"/></h3>
+
+<br/>
 
 <table>
 	<thead>
