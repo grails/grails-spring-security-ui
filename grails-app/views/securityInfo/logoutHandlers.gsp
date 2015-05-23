@@ -2,12 +2,12 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title><g:message code="spring.security.ui.appinfo.logout" default="Logout Handlers"/></title>
+	<title><g:message code="spring.security.ui.appinfo.title.logout" default="Logout Handlers"/></title>
 </head>
 
 <body>
 
-<h3><g:message code="spring.security.ui.appinfo.logout" default="Logout Handlers"/></h3>
+<h3><g:message code="spring.security.ui.appinfo.title.logout" default="Logout Handlers"/></h3>
 
 <br/>
 

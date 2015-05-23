@@ -2,19 +2,19 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title><g:message code="spring.security.ui.appinfo.auth" default="Current Authentication"/></title>
+	<title><g:message code="spring.security.ui.appinfo.title.auth" default="Current Authentication"/></title>
 </head>
 
 <body>
 
-<h3><g:message code="spring.security.ui.appinfo.auth" default="Current Authentication"/></h3>
+<h3><g:message code="spring.security.ui.appinfo.title.auth" default="Current Authentication"/></h3>
 
 <br/>
 
 <table>
 	<thead>
 	<tr>
-		<th>Name</th>
+		<th><g:message code='spring.security.ui.appinfo.label.name' default='Name'/></th>
 		<th>Value</th>
 	</tr>
 	</thead>
@@ -32,7 +32,7 @@
 		<td>${auth.principal}</td>
 	</tr>
 	<tr>
-		<td>Name</td>
+		<td><g:message code='spring.security.ui.appinfo.label.name' default='Name'/></td>
 		<td>${auth.name}</td>
 	</tr>
 	</tbody>

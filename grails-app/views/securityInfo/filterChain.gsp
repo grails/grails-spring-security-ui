@@ -2,12 +2,12 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title><g:message code="spring.security.ui.appinfo.filters" default="Filter Chains"/></title>
+	<title><g:message code="spring.security.ui.appinfo.title.filters" default="Filter Chains"/></title>
 </head>
 
 <body>
 
-<h3><g:message code="spring.security.ui.appinfo.filters" default="Filter Chains"/></h3>
+<h3><g:message code="spring.security.ui.appinfo.title.filters" default="Filter Chains"/></h3>
 
 <br/>
 

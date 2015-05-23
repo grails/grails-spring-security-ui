@@ -2,7 +2,7 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title>User Cache</title>
+	<title><g:message code='spring.security.ui.menu.appinfo.titleusercache' default='User Cache'/></title>
 </head>
 
 <body>
@@ -39,7 +39,7 @@
 					<td>Cache Hits</td>
 					<td>${cache.statistics.cacheHits}</td>
 				</tr>
-				<tr>
+				<tr>n
 					<td>In-memory Hits</td>
 					<td>${cache.statistics.inMemoryHits}</td>
 				</tr>

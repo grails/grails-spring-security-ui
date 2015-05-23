@@ -2,12 +2,12 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title><g:message code="spring.security.ui.appinfo.providers" default="Authentication Providers"/></title>
+	<title><g:message code="spring.security.ui.appinfo.title.providers" default="Authentication Providers"/></title>
 </head>
 
 <body>
 
-<h3><g:message code="spring.security.ui.appinfo.providers" default="Authentication Providers"/></h3>
+<h3><g:message code="spring.security.ui.appinfo.title.providers" default="Authentication Providers"/></h3>
 
 <br/>
 

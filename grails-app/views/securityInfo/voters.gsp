@@ -2,7 +2,7 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title>Voters</title>
+	<title><g:message code='spring.security.ui.menu.appinfo.title.voters' default='Voters'/></title>
 </head>
 
 <body>
@@ -11,7 +11,7 @@
 
 <table>
 	<thead>
-	<tr><th>Voters</th></tr>
+	<tr><th><g:message code='spring.security.ui.menu.appinfo.title.voters' default='Voters'/></th></tr>
 	</thead>
 	<tbody>
 	<g:each var='voter' in='${voters}'>
