@@ -160,15 +160,15 @@ the explicit tags above and edit those, not the taglib code.
 				<nobr>
 				<div id='loginLinkContainer'>
 				<sec:ifLoggedIn>
-				Logged in as <sec:username/> (<g:link controller='logout'>Logout</g:link>)
+				<g:message code="spring.security.ui.label.loggedInAs" default="Logged in as"/> <sec:username/> (<g:link controller='logout'><g:message code="spring.security.ui.label.logout" default="Logout"/></g:link>)
 				</sec:ifLoggedIn>
 				<sec:ifNotLoggedIn>
-					<a href='#' id='loginLink'>Login</a>
+					<a href='#' id='loginLink'><g:message code="spring.security.ui.label.login" default="Login"/></a>
 				</sec:ifNotLoggedIn>
 
 				<sec:ifSwitched>
 				<a href='${request.contextPath}/j_spring_security_exit_user'>
-					Resume as <sec:switchedUserOriginalUsername/>
+					<g:message code="spring.security.ui.label.resumeAs" default="Resume as"/> <sec:switchedUserOriginalUsername/>
 				</a>
 				</sec:ifSwitched>
 				</div>
