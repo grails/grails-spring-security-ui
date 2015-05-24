@@ -14,8 +14,8 @@
 <table>
 	<thead>
 	<tr>
-		<th>URL Pattern</th>
-		<th>Filters</th>
+		<th><g:message code='spring.security.ui.appinfo.label.URLPattern' default='URL Pattern'/></th>
+		<th><g:message code='spring.security.ui.appinfo.label.filters' default='Filters'/></th>
 	</tr>
 	</thead>
 	<tbody>

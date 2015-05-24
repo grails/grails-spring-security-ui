@@ -20,8 +20,8 @@
 <table id="config" cellpadding="0" cellspacing="0" border="0" class="display">
 	<thead>
 	<tr>
-		<th><g:message code='spring.security.ui.appinfo.label.name' default='Name'/></th>
-		<th><g:message code='spring.security.ui.appinfo.label.value' default='Value'/></th>
+		<th><g:message code="spring.security.ui.appinfo.label.name" default="Name"/></th>
+		<th><g:message code="spring.security.ui.appinfo.label.value" default="Value"/></th>
 	</tr>
 	</thead>
 	<tbody>
