@@ -31,33 +31,28 @@ class RequestmapController extends AbstractS2UiController {
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
 
-		def hql = new StringBuilder('FROM ').append(lookupRequestmapClassName()).append(' r WHERE 1=1 ')
-		def queryParams = [:]
+		Integer max = params.int('max')
+		Integer offset = params.int('offset')
+
 
 		String urlField = SpringSecurityUtils.securityConfig.requestMap.urlField
 		String configAttributeField = SpringSecurityUtils.securityConfig.requestMap.configAttributeField
 
-		for (name in [url: urlField, configAttribute: configAttributeField]) {
-			if (params[name.key]) {
-				hql.append " AND LOWER(r.${name.value}) LIKE :$name.key"
-				queryParams[name.key] = '%' + params[name.key].toLowerCase() + '%'
+
+		def cs = lookupRequestmapClass().createCriteria()
+		def results = cs.list(max: params.max,offset: offset) {
+			firstResult: offset
+			maxResults: params.max
+			for (name in [url: urlField, configAttribute: configAttributeField]) {
+				if (params[name.key]) {
+					ilike(name.value,'%' + params[name.key] + '%')
+				}
+			}
+			if (params.sort) {
+				order(params.sort,params.order ?: 'ASC')
 			}
 		}
-
-		int totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT r) $hql", queryParams)[0]
-
-		Integer max = params.int('max')
-		Integer offset = params.int('offset')
-
-		String orderBy = ''
-		if (params.sort) {
-			orderBy = " ORDER BY r.$params.sort ${params.order ?: 'ASC'}"
-		}
-
-		def results = lookupRequestmapClass().executeQuery(
-				"SELECT DISTINCT r $hql $orderBy",
-				queryParams, [max: max, offset: offset])
-		def model = [results: results, totalCount: totalCount, searched: true]
+		def model = [results: results, totalCount: results.totalCount, searched: true]
 
 		// add query params to model for paging
 		for (name in ['url', 'configAttribute', 'sort', 'order']) {
@@ -74,8 +69,8 @@ class RequestmapController extends AbstractS2UiController {
 	def save() {
 		def requestmap = lookupRequestmapClass().newInstance(params)
 		if (!requestmap.save(flush: true)) {
-         render view: 'create', model: [requestmap: requestmap]
-         return
+			render view: 'create', model: [requestmap: requestmap]
+			return
 		}
 
 		springSecurityService.clearCachedRequestmaps()
@@ -87,7 +82,7 @@ class RequestmapController extends AbstractS2UiController {
 		def requestmap = findById()
 		if (!requestmap) return
 
-		[requestmap: requestmap]
+			[requestmap: requestmap]
 	}
 
 	def update() {
@@ -108,16 +103,16 @@ class RequestmapController extends AbstractS2UiController {
 		def requestmap = findById()
 		if (!requestmap) return
 
-		try {
-			requestmap.delete(flush: true)
-			springSecurityService.clearCachedRequestmaps()
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
-			redirect action: 'search'
-		}
-		catch (DataIntegrityViolationException e) {
-			flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
-			redirect action: 'edit', id: params.id
-		}
+			try {
+				requestmap.delete(flush: true)
+				springSecurityService.clearCachedRequestmaps()
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
+				redirect action: 'search'
+			}
+			catch (DataIntegrityViolationException e) {
+				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
+				redirect action: 'edit', id: params.id
+			}
 	}
 
 	protected findById() {

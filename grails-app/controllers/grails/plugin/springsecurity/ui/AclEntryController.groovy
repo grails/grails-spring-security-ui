@@ -92,56 +92,51 @@ class AclEntryController extends AbstractS2UiController {
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
 
-		def hql = new StringBuilder('FROM ').append(lookupClassName()).append(' e WHERE 1=1 ')
-		def queryParams = [:]
-
-		for (name in ['aceOrder', 'mask']) {
-			if (params[name]) {
-				hql.append " AND e.${name}=:$name"
-				queryParams[name] = params.int(name)
-			}
-		}
-
-		for (name in ['sid', 'aclObjectIdentity']) {
-			if (params[name] && params[name] != 'null') {
-				hql.append " AND e.${name}.id=:$name"
-				queryParams[name] = params.long(name)
-			}
-		}
-
-		for (name in ['granting', 'auditSuccess', 'auditFailure']) {
-			Integer value = params.int(name)
-			if (value) {
-				hql.append " AND e.$name=:$name"
-				queryParams[name] = value == 1
-			}
-		}
-
-		if (params.aclClass) {
-			// special case for external search
-			hql.append " AND e.aclObjectIdentity.aclClass.id=:aclClass"
-			queryParams.aclClass = params.aclClass.toLong()
-		}
-
-		int totalCount = lookupClass().executeQuery("SELECT COUNT(DISTINCT e) $hql", queryParams)[0]
-
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
 
-		String orderBy = ''
-		if (params.sort) {
-			orderBy = " ORDER BY e.$params.sort ${params.order ?: 'ASC'}"
-		}
+		def cs = lookupClass().createCriteria()
 
-		def results = lookupClass().executeQuery(
-				"SELECT DISTINCT e $hql $orderBy",
-				queryParams, [max: max, offset: offset])
-		def model = [results: results, totalCount: totalCount, searched: true,
-		             sids: lookupAclSidClass().list(), permissionFactory: aclPermissionFactory]
+		def results = cs.list(max: max, offset: offset) {
+			firstResult: offset
+			maxResults: max
+			for (name in ['aceOrder', 'mask']) {
+				if (params[name]) {
+					eq(name,params.int(name))
+				}
+			}
+			for (name in ['sid', 'aclObjectIdentity']) {
+				if (params[name] && params[name] != 'null') {
+					eq(name,params.long(name))
+				}
+			}
+			for (name in ['granting', 'auditSuccess', 'auditFailure']) {
+				Integer value = params.int(name)
+				if (value) {
+					eq(name,value == 1)
+				}
+			}
+
+			if (params.aclClass) {
+				// special case for external search
+				//hql.append " AND e.aclObjectIdentity.aclClass.id=:aclClass"
+				AclObjectIdentity{
+					AclClass{
+						eq('id',params.long('aclClass'))
+					}
+				}
+			}
+			if (params.sort) {
+				order(params.sort,params.order ?: 'ASC')
+			}
+		}
+		
+		def model = [results: results, totalCount: results.totalCount, searched: true,
+			sids: lookupAclSidClass().list(), permissionFactory: aclPermissionFactory]
 		// add query params to model for paging
 		for (name in ['granting', 'auditSuccess', 'auditFailure', 'sid',
-		              'aclObjectIdentity', 'aceOrder', 'mask']) {
-		 	model[name] = params[name]
+			'aclObjectIdentity', 'aceOrder', 'mask']) {
+			model[name] = params[name]
 		}
 
 		render view: 'search', model: model
