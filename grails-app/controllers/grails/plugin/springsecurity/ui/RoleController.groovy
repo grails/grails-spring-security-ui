@@ -139,6 +139,7 @@ class RoleController extends AbstractS2UiController {
 		def c = lookupRoleClass().createCriteria()
 		c.list(max: max, offset: offset) {
 			firstResult: offset
+			maxResults: max
 			ilike(authorityField,'%'+name+'%')
 			order(authorityField,'DESC')
 			if(nameOnly) {

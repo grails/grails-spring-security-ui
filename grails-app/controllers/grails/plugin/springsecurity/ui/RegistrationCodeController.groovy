@@ -114,8 +114,8 @@ class RegistrationCodeController extends AbstractS2UiController {
 			setIfMissing 'max', 10, 100
 
 			def cs = RegistrationCode.createCriteria()
-			def results = cs.list(max: params.max) {
-				maxResults: params.max
+			def results = cs.list(max: params.int('max')) {
+				maxResults: params.int('max')
 				ilike('username', '%'+username + '%')
 				order('username','DESC')
 				projections{
