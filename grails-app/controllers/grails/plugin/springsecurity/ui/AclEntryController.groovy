@@ -118,10 +118,21 @@ class AclEntryController extends AbstractS2UiController {
 			}
 
 			if (params.aclClass) {
-				// special case for external search
-				//hql.append " AND e.aclObjectIdentity.aclClass.id=:aclClass"
-				AclObjectIdentity{
-					AclClass{
+				/*
+				 *  special case for external search - original query was
+				 *  hql.append " AND e.aclObjectIdentity.aclClass.id=:aclClass"
+				 *  
+				 *  Looking up current version of the plugin ( 2.0-RC2)
+				 *  AclEntry has a AclObjectIdentity aclObjectIdentity
+				 *   AclObjectIdentity is created by extending AbstractAclObjectIdentity 
+				 *   AbstractAclObjectIdentity contains AclClass aclClass 
+				 *      
+				 *   AbstractAclObjectIdentity is located in the grails-spring-security-acl at
+				 *   /src/groovy/grails/plugin/springsecurity/acl/AbstractAclObjectIdentity.groovy
+				 */
+				
+				aclObjectIdentity{
+					aclClass{
 						eq('id',params.long('aclClass'))
 					}
 				}
