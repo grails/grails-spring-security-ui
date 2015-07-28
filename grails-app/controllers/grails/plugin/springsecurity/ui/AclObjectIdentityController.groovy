@@ -97,50 +97,40 @@ class AclObjectIdentityController extends AbstractS2UiController {
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
 
-		def hql = new StringBuilder('FROM ').append(lookupClassName()).append(' oid WHERE 1=1 ')
-		def queryParams = [:]
-
-		if (params.objectId) {
-			hql.append " AND oid.objectId=:objectId"
-			queryParams.objectId = params.long('objectId')
-		}
-
-		for (name in ['ownerSid', 'parent', 'aclClass']) {
-			if (params[name] && params[name] != 'null') {
-				long id = params.long(name)
-				if (name == 'ownerSid') name = 'owner'
-				hql.append " AND oid.${name}.id=:$name"
-				queryParams[name] = id
-			}
-		}
-
-		for (name in ['entriesInheriting']) {
-			Integer value = params.int(name)
-			if (value) {
-				hql.append " AND oid.$name=:$name"
-				queryParams[name] = value == 1
-			}
-		}
-
-		int totalCount = lookupClass().executeQuery("SELECT COUNT(DISTINCT oid) $hql", queryParams)[0]
-
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
 
-		String orderBy = ''
-		if (params.sort) {
-			orderBy = " ORDER BY oid.$params.sort ${params.order ?: 'ASC'}"
-		}
+		def cs = lookupClass().createCriteria()
 
-		def results = lookupClass().executeQuery(
-				"SELECT DISTINCT oid $hql $orderBy",
-				queryParams, [max: max, offset: offset])
-		def model = [results: results, totalCount: totalCount, searched: true,
-		             classes: lookupAclClassClass().list(), sids: lookupAclSidClass().list()]
+		def results = cs.list(max: max, offset: offset) {
+			firstResult: offset
+			maxResults: max
+			if (params.objectId) {
+				eq('objectId',params.long('objectId'))
+			}
+			for (name in ['ownerSid', 'parent', 'aclClass']) {
+				if (params[name] && params[name] != 'null') {
+					long id = params.long(name)
+					if (name == 'ownerSid') name = 'owner'
+					eq(name,id)					
+				}
+			}
+			for (name in ['entriesInheriting']) {
+				Integer value = params.int(name)
+				if (value) {
+					eq(name,value)
+				}
+			}
+			if (params.sort) {
+				order(params.sort,params.order ?: 'ASC')
+			}
+		}
+		def model = [results: results, totalCount: results.totalCount, searched: true,
+			classes: lookupAclClassClass().list(), sids: lookupAclSidClass().list()]
 
 		// add query params to model for paging
 		for (name in ['aclClass', 'objectId', 'entriesInheriting', 'ownerSid', 'parent']) {
-		 	model[name] = params[name]
+			model[name] = params[name]
 		}
 
 		render view: 'search', model: model

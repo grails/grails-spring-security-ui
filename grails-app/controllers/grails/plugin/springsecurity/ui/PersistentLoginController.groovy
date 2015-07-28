@@ -28,15 +28,15 @@ class PersistentLoginController extends AbstractS2UiController {
 		def persistentLogin = findById()
 		if (!persistentLogin) return
 
-		[persistentLogin: persistentLogin]
+			[persistentLogin: persistentLogin]
 	}
 
 	def update() {
 		def persistentLogin = findById()
 		if (!persistentLogin) return
-		if (!versionCheck('persistentLogin.label', 'PersistentLogin', persistentLogin, [persistentLogin: persistentLogin])) {
-			return
-		}
+			if (!versionCheck('persistentLogin.label', 'PersistentLogin', persistentLogin, [persistentLogin: persistentLogin])) {
+				return
+			}
 
 		if (!springSecurityUiService.updatePersistentLogin(persistentLogin, params)) {
 			render view: 'edit', model: [persistentLogin: persistentLogin]
@@ -51,15 +51,15 @@ class PersistentLoginController extends AbstractS2UiController {
 		def persistentLogin = findById()
 		if (!persistentLogin) return
 
-		try {
-			springSecurityUiService.deletePersistentLogin persistentLogin
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), params.id])}"
-			redirect action: 'search'
-		}
-		catch (DataIntegrityViolationException e) {
-			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), params.id])}"
-			redirect action: 'edit', id: params.id
-		}
+			try {
+				springSecurityUiService.deletePersistentLogin persistentLogin
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), params.id])}"
+				redirect action: 'search'
+			}
+			catch (DataIntegrityViolationException e) {
+				flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), params.id])}"
+				redirect action: 'edit', id: params.id
+			}
 	}
 
 	def search() {}
@@ -70,37 +70,30 @@ class PersistentLoginController extends AbstractS2UiController {
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
 
-		def hql = new StringBuilder('FROM ').append(lookupPersistentLoginClassName()).append(' pl WHERE 1=1 ')
-		def queryParams = [:]
-
-		for (name in ['username', 'series', 'token']) {
-			String param = params[name]
-			if (param) {
-				if (name == 'series') name = 'id' // aliased primary key
-				queryParams[name] = '%' + param.toLowerCase() + '%'
-				hql.append " AND LOWER(pl.$name) LIKE :$name"
-			}
-		}
-
-		int totalCount = lookupPersistentLoginClass().executeQuery(
-			"SELECT COUNT(DISTINCT pl) $hql", queryParams)[0]
-
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
 
-		String orderBy = ''
-		if (params.sort) {
-			orderBy = " ORDER BY pl.$params.sort ${params.order ?: 'ASC'}"
+		def cs = lookupPersistentLoginClass().createCriteria()
+		def results = cs.list(max: max, offset: offset) {
+			firstResult: offset
+			maxResults: max
+			for (name in ['username', 'series', 'token']) {
+				String param = params[name]
+				if (param) {
+					if (name == 'series') name = 'id' // aliased primary key
+					ilike(name,'%' + param + '%')
+				}
+			}
+			
+			if (params.sort) {
+				order(params.sort,params.order ?: 'ASC')
+			}
 		}
-
-		def results = lookupPersistentLoginClass().executeQuery(
-				"SELECT DISTINCT pl $hql $orderBy",
-				queryParams, [max: max, offset: offset])
-		def model = [results: results, totalCount: totalCount, searched: true]
+		def model = [results: results, totalCount: results.totalCount, searched: true]
 
 		// add query params to model for paging
 		for (name in ['username', 'series', 'token']) {
-		 	model[name] = params[name]
+			model[name] = params[name]
 		}
 
 		render view: 'search', model: model
@@ -117,15 +110,16 @@ class PersistentLoginController extends AbstractS2UiController {
 			String username = params.term
 
 			setIfMissing 'max', 10, 100
-
-			def results = lookupPersistentLoginClass().executeQuery(
-					"SELECT DISTINCT pl.username " +
-					"FROM ${lookupPersistentLoginClassName()} pl " +
-					"WHERE LOWER(pl.username) LIKE :name " +
-					"ORDER BY pl.username",
-					[name: "%${username.toLowerCase()}%"],
-					[max: params.max])
-
+			
+			def cs = lookupPersistentLoginClass().createCriteria()
+			def results = cs.list(max: params.int('max')) {
+				maxResults: params.int('max')
+				ilike('username','%' + username + '%')			
+				order('username','DESC')
+				projections{
+					distinct('username')
+				}
+			}	
 			for (result in results) {
 				jsonData << [value: result]
 			}

@@ -27,15 +27,15 @@ class RegistrationCodeController extends AbstractS2UiController {
 		def registrationCode = findById()
 		if (!registrationCode) return
 
-		[registrationCode: registrationCode]
+			[registrationCode: registrationCode]
 	}
 
 	def update() {
 		def registrationCode = findById()
 		if (!registrationCode) return
-		if (!versionCheck('registrationCode.label', 'RegistrationCode', registrationCode, [registrationCode: registrationCode])) {
-			return
-		}
+			if (!versionCheck('registrationCode.label', 'RegistrationCode', registrationCode, [registrationCode: registrationCode])) {
+				return
+			}
 
 		if (!springSecurityUiService.updateRegistrationCode(registrationCode, params.username, params.token)) {
 			render view: 'edit', model: [registrationCode: registrationCode]
@@ -50,15 +50,15 @@ class RegistrationCodeController extends AbstractS2UiController {
 		def registrationCode = findById()
 		if (!registrationCode) return
 
-		try {
-			springSecurityUiService.deleteRegistrationCode registrationCode
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"
-			redirect action: 'search'
-		}
-		catch (DataIntegrityViolationException e) {
-			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"
-			redirect action: 'edit', id: params.id
-		}
+			try {
+				springSecurityUiService.deleteRegistrationCode registrationCode
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"
+				redirect action: 'search'
+			}
+			catch (DataIntegrityViolationException e) {
+				flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"
+				redirect action: 'edit', id: params.id
+			}
 	}
 
 	def search() {}
@@ -69,37 +69,33 @@ class RegistrationCodeController extends AbstractS2UiController {
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
 
-		def hql = new StringBuilder('FROM RegistrationCode rc WHERE 1=1 ')
-		def queryParams = [:]
-
-		if (params.token) {
-			hql.append " AND LOWER(rc.token) LIKE :token"
-			queryParams.token = params.token.toLowerCase() + '%'
-		}
-
-		if (params.username) {
-			hql.append " AND LOWER(rc.username) LIKE :username"
-			queryParams.username = params.username.toLowerCase() + '%'
-		}
-
-		int totalCount = RegistrationCode.executeQuery("SELECT COUNT(DISTINCT rc) $hql", queryParams)[0]
-
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
 
-		String orderBy = ''
-		if (params.sort) {
-			orderBy = " ORDER BY rc.$params.sort ${params.order ?: 'ASC'}"
+		def cs = RegistrationCode.createCriteria()
+		def results = cs.list(max: max, offset: offset) {
+			firstResult: offset
+			maxResults: max
+
+			if (params.token) {
+				ilike('token', '%'+params.token + '%')
+			}
+
+			if (params.username) {
+				ilike('username', '%'+params.username + '%')
+			}
+
+			if (params.sort) {
+				order(params.sort,params.order ?: 'ASC')
+			}
 		}
 
-		def results = RegistrationCode.executeQuery(
-				"SELECT DISTINCT rc $hql $orderBy",
-				queryParams, [max: max, offset: offset])
-		def model = [results: results, totalCount: totalCount, searched: true]
+
+		def model = [results: results, totalCount: results.totalCount, searched: true]
 
 		// add query params to model for paging
 		for (name in ['username', 'token']) {
-		 	model[name] = params[name]
+			model[name] = params[name]
 		}
 
 		render view: 'search', model: model
@@ -114,16 +110,19 @@ class RegistrationCodeController extends AbstractS2UiController {
 
 		if (params.term?.length() > 2) {
 			String username = params.term
-
+			
 			setIfMissing 'max', 10, 100
 
-			def results = RegistrationCode.executeQuery(
-					"SELECT DISTINCT rc.username " +
-					"FROM RegistrationCode rc " +
-					"WHERE LOWER(rc.username) LIKE :name " +
-					"ORDER BY rc.username ",
-					[name: "%${username.toLowerCase()}%"],
-					[max: params.max])
+			def cs = RegistrationCode.createCriteria()
+			def results = cs.list(max: params.int('max')) {
+				maxResults: params.int('max')
+				ilike('username', '%'+username + '%')
+				order('username','DESC')
+				projections{
+					distinct('username')
+				}
+				
+			}
 
 			for (result in results) {
 				jsonData << [value: result]
