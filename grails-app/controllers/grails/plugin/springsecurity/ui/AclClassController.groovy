@@ -88,7 +88,7 @@ class AclClassController extends AbstractS2UiController {
 		Integer offset = params.int('offset')
 		
 		def cs = lookupClass().createCriteria()
-		def results = cs.list(max: params.max,offset: offset) {
+		def results = cs.list(max: max,offset: offset) {
 			firstResult: offset
 			maxResults: max
 			if (params['className']) {
