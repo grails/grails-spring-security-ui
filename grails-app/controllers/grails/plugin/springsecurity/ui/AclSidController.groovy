@@ -128,8 +128,8 @@ class AclSidController extends AbstractS2UiController {
 
 			def cs = lookupClass().createCriteria()
 			
-			def results = cs.list(max: max) {
-				maxResults: max
+			def results = cs.list(max: params.int('max')) {
+				maxResults: params.int('max')
 				ilike('sid','%' + sid + '%')
 				order('sid','DESC')
 				projections{

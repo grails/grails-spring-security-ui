@@ -91,8 +91,8 @@ class AclClassController extends AbstractS2UiController {
 		def results = cs.list(max: params.max,offset: offset) {
 			firstResult: offset
 			maxResults: max
-			if (params[name]) {
-				ilike('className','%' + params[name] + '%')
+			if (params['className']) {
+				ilike('className','%' + params['className'] + '%')
 			}
 			if (params.sort) {
 				order(params.sort,params.order ?: 'ASC')
@@ -119,8 +119,8 @@ class AclClassController extends AbstractS2UiController {
 			String className = params.term
 			setIfMissing 'max', 10, 100
 			def cs = lookupClass().createCriteria()
-			def results = cs.list(max: params.max) {
-				maxResults: max
+			def results = cs.list(max: params.int('max')) {
+				maxResults: params.int('max')
 				ilike('className','%' + className + '%')
 				order('className','DESC')
 				projections{

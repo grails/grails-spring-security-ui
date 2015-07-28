@@ -112,7 +112,7 @@ class UserController extends AbstractS2UiController {
 		[enabled: 0, accountExpired: 0, accountLocked: 0, passwordExpired: 0]
 	}
 
-def userSearch = {
+	def userSearch() {
 
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
@@ -127,7 +127,7 @@ def userSearch = {
 		String usernameFieldName = userLookup.usernamePropertyName
 		def cs = lookupUserClass().createCriteria()
 		
-		def rs = cs.list(max: max, offset: offset) {
+		def results = cs.list(max: max, offset: offset) {
 			firstResult: offset
 			maxResults: max
 			if(params['username']) {
@@ -147,7 +147,7 @@ def userSearch = {
 			}
 		}
 		
-		def model = [results: rs, totalCount: rs.totalCount, searched: true]
+		def model = [results: results, totalCount: results.totalCount, searched: true]
 
 		// add query params to model for paging
 		for (name in ['username', 'enabled', 'accountExpired', 'accountLocked',
@@ -161,7 +161,7 @@ def userSearch = {
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def ajaxUserSearch = {
+	def ajaxUserSearch() {
 
 		def jsonData = []
 
@@ -170,8 +170,8 @@ def userSearch = {
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			setIfMissing 'max', 10, 100
 			def cs = lookupUserClass().createCriteria()
-			def results = cs.list(max: params.max) {
-				maxResults: params.max
+			def results = cs.list(max: params.int('max')) {
+				maxResults: params.int('max')
 				ilike(usernameFieldName,'%' + username + '%')
 				order(usernameFieldName,'DESC')
 				projections{

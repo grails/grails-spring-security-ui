@@ -40,9 +40,9 @@ class RequestmapController extends AbstractS2UiController {
 
 
 		def cs = lookupRequestmapClass().createCriteria()
-		def results = cs.list(max: params.max,offset: offset) {
+		def results = cs.list(max: max,offset: offset) {
 			firstResult: offset
-			maxResults: params.max
+			maxResults: max
 			for (name in [url: urlField, configAttribute: configAttributeField]) {
 				if (params[name.key]) {
 					ilike(name.value,'%' + params[name.key] + '%')
