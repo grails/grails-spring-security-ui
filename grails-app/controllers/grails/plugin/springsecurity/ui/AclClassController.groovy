@@ -83,31 +83,22 @@ class AclClassController extends AbstractS2UiController {
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
-
-		def hql = new StringBuilder('FROM ').append(lookupClassName()).append(' c WHERE 1=1 ')
-		def queryParams = [:]
-
-		for (name in ['className']) {
-			if (params[name]) {
-				hql.append " AND LOWER(c.$name) LIKE :$name"
-				queryParams[name] = '%' + params[name].toLowerCase() + '%'
-			}
-		}
-
-		int totalCount = lookupClass().executeQuery("SELECT COUNT(DISTINCT c) $hql", queryParams)[0]
-
+		
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
-
-		String orderBy = ''
-		if (params.sort) {
-			orderBy = " ORDER BY c.$params.sort ${params.order ?: 'ASC'}"
+		
+		def cs = lookupClass().createCriteria()
+		def results = cs.list(max: params.max,offset: offset) {
+			firstResult: offset
+			maxResults: max
+			if (params[name]) {
+				ilike('className','%' + params[name] + '%')
+			}
+			if (params.sort) {
+				order(params.sort,params.order ?: 'ASC')
+			}
 		}
-
-		def results = lookupClass().executeQuery(
-				"SELECT DISTINCT c $hql $orderBy",
-				queryParams, [max: max, offset: offset])
-		def model = [results: results, totalCount: totalCount, searched: true]
+		def model = [results: results, totalCount: results.totalCount, searched: true]
 
 		// add query params to model for paging
 		for (name in ['className']) {
@@ -127,14 +118,16 @@ class AclClassController extends AbstractS2UiController {
 		if (params.term?.length() > 2) {
 			String className = params.term
 			setIfMissing 'max', 10, 100
-
-			def results = lookupClass().executeQuery(
-					"SELECT DISTINCT c.className " +
-					"FROM ${lookupClassName()} c " +
-					"WHERE LOWER(c.className) LIKE :name " +
-					"ORDER BY c.className ",
-					[name: "%${className.toLowerCase()}%"],
-					[max: params.max])
+			def cs = lookupClass().createCriteria()
+			def results = cs.list(max: params.max) {
+				maxResults: max
+				ilike('className','%' + className + '%')
+				order('className','DESC')
+				projections{
+					distinct('className')
+				}
+			}
+			
 			for (result in results) {
 				jsonData << [value: result]
 			}

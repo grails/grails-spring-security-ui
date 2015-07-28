@@ -85,39 +85,27 @@ class AclSidController extends AbstractS2UiController {
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
-
-		def hql = new StringBuilder('FROM ').append(lookupClassName()).append(' s WHERE 1=1 ')
-		def queryParams = [:]
-
-		for (name in ['sid']) {
-			if (params[name]) {
-				hql.append " AND LOWER(s.$name) LIKE :$name"
-				queryParams[name] = params[name].toLowerCase() + '%'
-			}
-		}
-
-		for (name in ['principal']) {
-			Integer value = params.int(name)
-			if (value) {
-				hql.append " AND s.$name=:$name"
-				queryParams[name] = value == 1
-			}
-		}
-
-		int totalCount = lookupClass().executeQuery("SELECT COUNT(DISTINCT s) $hql", queryParams)[0]
-
+		
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
-
-		String orderBy = ''
-		if (params.sort) {
-			orderBy = " ORDER BY s.$params.sort ${params.order ?: 'ASC'}"
+		
+		def cs = lookupClass().createCriteria()
+		
+		def results = cs.list(max: max, offset: offset) {
+			firstResult: offset
+			maxResults: max
+			if(params['sid']) {
+				ilike('sid','%' + params['sid'] + '%')
+			}
+			Integer value = params.int('principal')
+			if (value) {
+				eq('principal',value == 1)
+			}
+			if (params.sort) {
+				order(params.sort,params.order ?: 'ASC')
+			}
 		}
-
-		def results = lookupClass().executeQuery(
-				"SELECT DISTINCT s $hql $orderBy",
-				queryParams, [max: max, offset: offset])
-		def model = [results: results, totalCount: totalCount, searched: true]
+		def model = [results: results, totalCount: results.totalCount, searched: true]
 
 		// add query params to model for paging
 		for (name in ['sid', 'principal']) {
@@ -138,13 +126,16 @@ class AclSidController extends AbstractS2UiController {
 			String sid = params.term
 			setIfMissing 'max', 10, 100
 
-			def results = lookupClass().executeQuery(
-					"SELECT DISTINCT s.sid " +
-					"FROM ${lookupClassName()} s " +
-					"WHERE LOWER(s.sid) LIKE :name " +
-					"ORDER BY s.sid ",
-					[name: "%${sid.toLowerCase()}%"],
-					[max: params.max])
+			def cs = lookupClass().createCriteria()
+			
+			def results = cs.list(max: max) {
+				maxResults: max
+				ilike('sid','%' + sid + '%')
+				order('sid','DESC')
+				projections{
+					distinct('sid')
+				}
+			}
 			for (result in results) {
 				jsonData << [value: result]
 			}

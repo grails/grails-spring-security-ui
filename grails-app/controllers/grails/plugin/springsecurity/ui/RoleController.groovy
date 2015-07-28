@@ -104,21 +104,14 @@ class RoleController extends AbstractS2UiController {
 
 		String name = params.authority ?: 'ROLE_'
 		def roles = doSearch(name, false, 10, params.int('offset'))
-		if (roles.size() == 1 && !useOffset) {
+		if (roles.totalCount == 1 && !useOffset) {
 			forward action: 'edit', params: [name: roles[0][authorityField]]
 			return
 		}
-
-		String hql =
-			"SELECT COUNT(DISTINCT r) " +
-			"FROM ${lookupRoleClassName()} r " +
-			"WHERE LOWER(r.${authorityField}) LIKE :name"
-		int total = lookupRoleClass().executeQuery(hql, [name: "%${name.toLowerCase()}%"])[0]
-
 		render view: 'search', model: [results: roles,
-		                               totalCount: total,
-		                               authority: params.authority,
-		                               searched: true]
+			totalCount: roles.totalCount,
+			authority: params.authority,
+			searched: true]
 	}
 
 	/**
@@ -143,12 +136,17 @@ class RoleController extends AbstractS2UiController {
 
 	protected doSearch(String name, boolean nameOnly, Integer max, Integer offset) {
 		String authorityField = SpringSecurityUtils.securityConfig.authority.nameField
-		String hql =
-			"SELECT DISTINCT ${nameOnly ? 'r.' + authorityField : 'r'} " +
-			"FROM ${lookupRoleClassName()} r " +
-			"WHERE LOWER(r.${authorityField}) LIKE :name " +
-			"ORDER BY r.${authorityField}"
-		lookupRoleClass().executeQuery hql, [name: "%${name.toLowerCase()}%"], [max: max, offset: offset]
+		def c = lookupRoleClass().createCriteria()
+		c.list(max: max, offset: offset) {
+			firstResult: offset
+			ilike(authorityField,'%'+name+'%')
+			order(authorityField,'DESC')
+			if(nameOnly) {
+				projections{
+					distinct(authorityField)
+				}
+			}
+		}
 	}
 
 	protected findById() {
