@@ -62,6 +62,36 @@ the explicit tags above and edit those, not the taglib code.
 }
 </style>
 
+<g:javascript type='text/javascript'>
+        function postLogout(){
+
+            var logoutURL = '${createLink(controller: 'logout')}';
+            jQuery.ajax({
+                type:'POST',
+                url: logoutURL,
+                statusCode: {
+                404: function() {
+                  window.location.replace('${createLink(uri: '/error')}');
+                },
+                500: function() {
+                  window.location.replace('${createLink(uri: '/error')}');
+                }
+            }
+
+            }).done(function(data, textStatus, request) {
+                if(request.getResponseHeader("Location") != null) {
+                    window.location = request.getResponseHeader("Location");
+                }
+                else { // We guess
+                    window.location = "${createLink(uri: '/')}";
+                }
+
+            });
+
+        }
+
+    </g:javascript>
+
 <g:layoutHead/>
 
 </head>
@@ -160,7 +190,7 @@ the explicit tags above and edit those, not the taglib code.
 				<nobr>
 				<div id='loginLinkContainer'>
 				<sec:ifLoggedIn>
-				Logged in as <sec:username/> (<g:link controller='logout'>Logout</g:link>)
+				Logged in as <sec:username/> (<g:link onclick='postLogout(); return false;'>Logout</g:link>)
 				</sec:ifLoggedIn>
 				<sec:ifNotLoggedIn>
 					<a href='#' id='loginLink'>Login</a>
