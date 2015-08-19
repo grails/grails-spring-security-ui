@@ -14,7 +14,7 @@ spring:
             check-template-location: false
 
 ---
-grails: 				
+grails:
     mime:
         disable:
             accept:
