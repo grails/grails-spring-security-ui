@@ -1,0 +1,22 @@
+{
+  "name": "spring-security-ui",
+  "version": "3.0.0.M1",
+  "homepage": "https://github.com/grails-plugins/grails-spring-security-ui",
+  "authors": [
+    "Burt Beckwith <burt@burtbeckwith.com>"
+  ],
+  "description": "Spring Security UI Bower Dependencies",
+  "license": "Apache",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "jquery-ui": "~1.11.4",
+    "famfamfam-silk": "~0.3.3"
+  }
+}

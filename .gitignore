@@ -9,3 +9,4 @@
 .DS_Store
 build
 .gradle
+grails-app/assets/bower_components/
