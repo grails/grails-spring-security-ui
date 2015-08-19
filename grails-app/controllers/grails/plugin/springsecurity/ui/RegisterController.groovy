@@ -37,6 +37,7 @@ class RegisterController extends AbstractS2UiController {
 		def copy = [:] + (flash.chainedParams ?: [:])
 		copy.remove 'controller'
 		copy.remove 'action'
+		copy.remove 'format'
 		[command: new RegisterCommand(copy)]
 	}
 
@@ -114,9 +115,7 @@ class RegisterController extends AbstractS2UiController {
 			redirect uri: defaultTargetUrl
 			return
 		}
-
-		springSecurityService.reauthenticate user.username
-
+		springSecurityService.reauthenticate user[SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName]
 		flash.message = message(code: 'spring.security.ui.register.complete')
 		redirect uri: conf.ui.register.postRegisterUrl ?: defaultTargetUrl
 	}

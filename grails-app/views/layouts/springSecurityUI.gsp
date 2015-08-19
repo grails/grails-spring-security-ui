@@ -41,19 +41,19 @@ the explicit tags above and edit those, not the taglib code.
 <%-- tab icons --%>
 <style>
 .icon_role {
-	background-image: url('${fam.icon(name: 'lock')}');
+	background-image: url('${resource(dir: 'assets/famfamfam-silk/dist/png', file: 'lock.png')}');
 }
 .icon_users {
-	background-image: url('${fam.icon(name: 'group')}');
+	background-image: url('${resource(dir: 'assets/famfamfam-silk/dist/png', file: 'group.png')}');
 }
 .icon_user {
-	background-image: url('${fam.icon(name: 'user')}');
+	background-image: url('${resource(dir: 'assets/famfamfam-silk/dist/png', file: 'user')}');
 }
 .icon_error {
-	background-image: url('${fam.icon(name: 'exclamation')}');
+	background-image: url('${resource(dir: 'assets/famfamfam-silk/dist/png', file: 'exclamation')}');
 }
 .icon_info {
-	background-image: url('${fam.icon(name: 'information')}');
+	background-image: url('${resource(dir: 'assets/famfamfam-silk/dist/png', file: 'information')}');
 }
 .icon, .ui-tabs .ui-tabs-nav li a.icon {
 	background-repeat: no-repeat;
@@ -198,7 +198,7 @@ the explicit tags above and edit those, not the taglib code.
 
 	</div>
 
-<g:render template='/includes/ajaxLogin' plugin='spring-security-ui'/>
+<g:render template='/includes/ajaxLogin' />
 
 <s2ui:showFlash/>
 

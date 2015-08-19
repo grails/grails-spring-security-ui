@@ -6,3 +6,6 @@
 /plugin.xml
 /.settings
 /web-app/WEB-INF
+.DS_Store
+build
+.gradle
