@@ -37,13 +37,14 @@ class RegisterController extends AbstractS2UiController {
 		def copy = [:] + (flash.chainedParams ?: [:])
 		copy.remove 'controller'
 		copy.remove 'action'
-		[command: new RegisterCommand(copy)]
+		copy.remove 'format'
+		respond new RegisterCommand(copy)
 	}
 
 	def register(RegisterCommand command) {
 
 		if (command.hasErrors()) {
-			render view: 'index', model: [command: command]
+            respond command, view: 'index'
 			return
 		}
 
@@ -56,7 +57,7 @@ class RegisterController extends AbstractS2UiController {
 			// null means problem creating the user
 			flash.error = message(code: 'spring.security.ui.register.miscError')
 			flash.chainedParams = params
-			redirect action: 'index'
+            redirect action: 'index'
 			return
 		}
 
@@ -73,8 +74,8 @@ class RegisterController extends AbstractS2UiController {
 			subject conf.ui.register.emailSubject
 			html body.toString()
 		}
-
-		render view: 'index', model: [emailSent: true]
+        
+        render view: 'index', model: [emailSent: true]
 	}
 
 	def verifyRegistration() {
@@ -114,9 +115,7 @@ class RegisterController extends AbstractS2UiController {
 			redirect uri: defaultTargetUrl
 			return
 		}
-
-		springSecurityService.reauthenticate user.username
-
+		springSecurityService.reauthenticate user[SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName]
 		flash.message = message(code: 'spring.security.ui.register.complete')
 		redirect uri: conf.ui.register.postRegisterUrl ?: defaultTargetUrl
 	}
@@ -131,7 +130,10 @@ class RegisterController extends AbstractS2UiController {
 		String username = params.username
 		if (!username) {
 			flash.error = message(code: 'spring.security.ui.forgotPassword.username.missing')
-			redirect action: 'forgotPassword'
+            withFormat {
+                json { def resp = [error:flash.error]; respond resp }
+                '*' { redirect action: 'forgotPassword' }
+            }            
 			return
 		}
 
@@ -139,7 +141,10 @@ class RegisterController extends AbstractS2UiController {
 		def user = lookupUserClass().findWhere((usernameFieldName): username)
 		if (!user) {
 			flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
-			redirect action: 'forgotPassword'
+            withFormat {
+                json { def resp = [error:flash.error]; respond resp }
+                '*' { redirect action: 'forgotPassword' }
+            }
 			return
 		}
 
@@ -160,7 +165,7 @@ class RegisterController extends AbstractS2UiController {
 			html body.toString()
 		}
 
-		[emailSent: true]
+		 def resp = [emailSent: true]; respond resp
 	}
 
 	def resetPassword(ResetPasswordCommand command) {

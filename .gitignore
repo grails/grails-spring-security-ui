@@ -6,3 +6,7 @@
 /plugin.xml
 /.settings
 /web-app/WEB-INF
+.DS_Store
+build
+.gradle
+grails-app/assets/bower_components/

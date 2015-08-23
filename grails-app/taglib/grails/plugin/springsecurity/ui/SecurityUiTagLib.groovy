@@ -32,20 +32,17 @@ class SecurityUiTagLib {
 				out << r.layoutResources()
 			}
 			else {
-				out << g.javascript(library: 'jquery', plugin: 'jquery')
-				out << jqui.resources()
-
-				out << """
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css/smoothness',file:'jquery-ui-1.10.3.custom.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'date_input.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.slate.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'table.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
-"""
+				out << asset.javascript(src: 'jquery/dist/jquery')
+				out << asset.javascript(src: 'jquery-ui/jquery-ui')				
+				out << asset.stylesheet(src: 'reset')
+				out << asset.stylesheet(src: 'jquery-ui/themes/smoothness/jquery-ui')
+				out << asset.stylesheet(src: 'jquery.jgrowl.css')
+				out << asset.stylesheet(src: 'jquery.safari-checkbox.css')
+				out << asset.stylesheet(src: 'date_input')								
+				out << asset.stylesheet(src: 'jquery.jdMenu.css')
+				out << asset.stylesheet(src: 'jquery.jdMenu.slate.css')
+				out << asset.stylesheet(src: 'table')
+				out << asset.stylesheet(src: 'spring-security-ui')
 			}
 		}
 		else if ('register' == attrs.module) {
@@ -54,19 +51,14 @@ class SecurityUiTagLib {
 				out << r.layoutResources()
 			}
 			else {
-				out << g.javascript(library: 'jquery', plugin: 'jquery')
-				out << """
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
-"""
-				out << jqui.resources()
-
-				out << """
-<link rel="stylesheet" media="screen" href="${resource(dir:'css/smoothness',file:'jquery-ui-1.10.3.custom.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'auth.css',plugin:'spring-security-ui')}"/>
-"""
+				out << asset.javascript(src: 'jquery/dist/jquery')
+				out << asset.stylesheet(src: 'reset')
+				out << asset.stylesheet(src: 'spring-security-ui')
+				out << asset.javascript(src: 'jquery-ui/jquery-ui')
+				out << asset.stylesheet(src: 'jquery-ui/themes/smoothness/jquery-ui')
+				out << asset.stylesheet(src: 'jquery.jgrowl.css')
+				out << asset.stylesheet(src: 'jquery.safari-checkbox.css')
+				out << asset.stylesheet(src: 'auth')
 			}
 		}
 	}
@@ -83,7 +75,7 @@ class SecurityUiTagLib {
 				              'jquery/jquery.date_input', 'jquery/jquery.positionBy',
 				              'jquery/jquery.bgiframe', 'jquery/jquery.jdMenu',
 				              'jquery/jquery.dataTables.min', 'spring-security-ui']) {
-					out << g.javascript(src: name + '.js', plugin: 'spring-security-ui')
+					out << asset.javascript(src: "${name}.js")
 				}
 			}
 		}
@@ -93,7 +85,7 @@ class SecurityUiTagLib {
 			}
 			else {
 				for (name in ['jquery/jquery.jgrowl', 'jquery/jquery.checkbox', 'spring-security-ui']) {
-					out << g.javascript(src: name + '.js', plugin: 'spring-security-ui')
+					out << asset.javascript(src: "${name}.js")
 				}
 			}
 		}
