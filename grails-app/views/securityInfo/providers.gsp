@@ -2,16 +2,18 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title>Authentication Providers</title>
+	<title><g:message code="spring.security.ui.appinfo.title.providers" default="Authentication Providers"/></title>
 </head>
 
 <body>
+
+<h3><g:message code="spring.security.ui.appinfo.title.providers" default="Authentication Providers"/></h3>
 
 <br/>
 
 <table>
 	<thead>
-	<tr><th>Authentication Providers</th></tr>
+	<tr><th><g:message code="spring.security.ui.appinfo.label.providers" default="Authentication Providers"/></th></tr>
 	</thead>
 	<tbody>
 	<g:each var='provider' in='${providers}'>

@@ -79,8 +79,8 @@ if (isOpenId) {
 		</ul>
 	</g:if>
 	<g:else>
-	No OpenIDs registered
-	</g:else>
+	<g:message code="spring.security.ui.user.noOpenIDsRegistered" default="No OpenIDs registered"/>
+ 	</g:else>
 	</s2ui:tab>
 	</g:if>
 

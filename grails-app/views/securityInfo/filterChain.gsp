@@ -2,18 +2,20 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title>Filter Chains</title>
+	<title><g:message code="spring.security.ui.appinfo.title.filters" default="Filter Chains"/></title>
 </head>
 
 <body>
+
+<h3><g:message code="spring.security.ui.appinfo.title.filters" default="Filter Chains"/></h3>
 
 <br/>
 
 <table>
 	<thead>
 	<tr>
-		<th>URL Pattern</th>
-		<th>Filters</th>
+		<th><g:message code='spring.security.ui.appinfo.label.URLPattern' default='URL Pattern'/></th>
+		<th><g:message code='spring.security.ui.appinfo.label.filters' default='Filters'/></th>
 	</tr>
 	</thead>
 	<tbody>

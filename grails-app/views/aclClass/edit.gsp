@@ -27,12 +27,12 @@
 
 					<tr>
 						<td colspan='2'>
-							<g:link action='aclObjectIdentitySearch' controller='aclObjectIdentity' params='[aclClass: aclClass.id]'>View Associated OIDs</g:link>
+							<g:link action='aclObjectIdentitySearch' controller='aclObjectIdentity' params='[aclClass: aclClass.id]'><g:message code="spring.security.ui.aclClass.viewAssociatedOIDs" default="View Associated OIDs"/></g:link>
 						</td>
 					</tr>
 					<tr>
 						<td colspan='2'>
-							<g:link action='aclEntrySearch' controller='aclEntry' params='[aclClass: aclClass.id]'>View Associated ACL Entries</g:link>
+							<g:link action='aclEntrySearch' controller='aclEntry' params='[aclClass: aclClass.id]'><g:message code="spring.security.ui.aclClass.viewAssociatedACLEntries" default="View Associated ACL Entries"/></g:link>
 						</td>
 					</tr>
 

@@ -2,23 +2,25 @@
 
 <head>
 	<meta name='layout' content='springSecurityUI'/>
-	<title>Mappings</title>
+	<title><g:message code="spring.security.ui.appinfo.title.mappings" default="Mappings"/></title>
 </head>
 
 <body>
 
+<h3><g:message code="spring.security.ui.appinfo.title.mappings" default="Mappings"/></h3>
+
 <br/>
 
-<h4>SecurityConfigType: ${securityConfigType}</h4>
+<h4><g:message code="spring.security.ui.appinfo.label.SecurityConfigType" default="SecurityConfigType"/>: ${securityConfigType}</h4>
 
 <br/>
 
 <table>
 	<thead>
 	<tr>
-		<th>Pattern</th>
-		<th>ConfigAttributes</th>
-		<th>HTTP Method</th>
+		<th><g:message code="spring.security.ui.appinfo.label.pattern" default="Pattern"/></th>
+		<th><g:message code="spring.security.ui.appinfo.label.configAttrs" default="Config Attributes"/></th>
+		<th><g:message code="spring.security.ui.appinfo.label.HTTPMethod" default="HTTP Method"/></th>
 	</tr>
 	</thead>
 	<tbody>
