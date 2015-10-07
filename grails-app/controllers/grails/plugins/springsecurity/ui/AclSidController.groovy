@@ -36,12 +36,12 @@ class AclSidController extends AbstractS2UiController {
 			}
 
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclSid.label', default: 'AclSid'), aclSid.id])}"
-			redirect action: edit, id: aclSid.id
+			redirect action: 'edit', id: aclSid.id
 		}.invalidToken {
 			response.status = 500
 			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
 			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.className])}"
-			redirect action: create
+			redirect action: 'create'
 			return
 		}
 	}
@@ -67,12 +67,12 @@ class AclSidController extends AbstractS2UiController {
 			}
 
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclSid.label', default: 'AclSid'), aclSid.id])}"
-			redirect action: edit, id: aclSid.id
+			redirect action: 'edit', id: aclSid.id
 		}.invalidToken {
 			response.status = 500
 			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
 			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.className])}"
-			redirect action: search
+			redirect action: 'search'
 			return
 		}
 	}
@@ -85,17 +85,17 @@ class AclSidController extends AbstractS2UiController {
 			withForm {
 				springSecurityUiService.deleteAclSid aclSid
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclSid.label', default: 'AclSid'), params.id])}"
-				redirect action: search
+				redirect action: 'search'
 			}.invalidToken {
 				response.status = 500
 				log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
 				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.className])}"
-				redirect action: search
+				redirect action: 'search'
 			}
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'aclSid.label', default: 'AclSid'), params.id])}"
-			redirect action: edit, id: params.id
+			redirect action: 'edit', id: params.id
 		}
 	}
 

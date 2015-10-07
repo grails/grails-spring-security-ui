@@ -38,12 +38,12 @@ class RoleController extends AbstractS2UiController {
 			}
 
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'role.label', default: 'Role'), role.id])}"
-			redirect action: edit, id: role.id
+			redirect action: 'edit', id: role.id
 		}.invalidToken {
 			response.status = 500
 			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
 			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.className])}"
-			redirect action: create
+			redirect action: 'create'
 			return
 		}
 	}
@@ -82,12 +82,12 @@ class RoleController extends AbstractS2UiController {
 			}
 
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'role.label', default: 'Role'), role.id])}"
-			redirect action: edit, id: role.id
+			redirect action: 'edit', id: role.id
 		}.invalidToken {
 			response.status = 500
 			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
 			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.className])}"
-			redirect action: search
+			redirect action: 'search'
 			return
 		}
 	}
@@ -101,17 +101,17 @@ class RoleController extends AbstractS2UiController {
 				lookupUserRoleClass().removeAll role
 				springSecurityService.deleteRole(role)
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'role.label', default: 'Role'), params.id])}"
-				redirect action: search
+				redirect action: 'search'
 			}.invalidToken {
 				response.status = 500
 				log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
 				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.className])}"
-				redirect action: search
+				redirect action: 'search'
 			}
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'role.label', default: 'Role'), params.id])}"
-			redirect action: edit, id: params.id
+			redirect action: 'edit', id: params.id
 		}
 	}
 

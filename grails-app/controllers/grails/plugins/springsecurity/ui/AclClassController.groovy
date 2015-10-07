@@ -36,12 +36,12 @@ class AclClassController extends AbstractS2UiController {
 			}
 
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclClass.label', default: 'AclClass'), aclClass.id])}"
-			redirect action: edit, id: aclClass.id
+			redirect action: 'edit', id: aclClass.id
 		}.invalidToken {
 			response.status = 500
 			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
 			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.className])}"
-			redirect action: create
+			redirect action: 'create'
 			return
 		}
 	}
@@ -67,12 +67,12 @@ class AclClassController extends AbstractS2UiController {
 			}
 
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclClass.label', default: 'AclClass'), aclClass.id])}"
-			redirect action: edit, id: aclClass.id
+			redirect action: 'edit', id: aclClass.id
 		}.invalidToken {
 			response.status = 500
 			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
 			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.className])}"
-			redirect action: search
+			redirect action: 'search'
 			return
 		}
 	}
@@ -85,12 +85,12 @@ class AclClassController extends AbstractS2UiController {
 			withForm {
 				springSecurityUiService.deleteAclClass aclClass
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclClass.label', default: 'AclClass'), params.id])}"
-				redirect action: search
+				redirect action: 'search'
 			}.invalidToken {
 				response.status = 500
 				log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
 				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.className])}"
-				redirect action: search
+				redirect action: 'search'
 				return
 			}
 		}

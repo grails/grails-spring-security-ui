@@ -48,12 +48,12 @@ class UserController extends AbstractS2UiController {
 
 			addRoles(user)
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
-			redirect action: edit, id: user.id
+			redirect action: 'edit', id: user.id
 		}.invalidToken {
 			response.status = 500
 			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
 			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.className])}"
-			redirect action: create
+			redirect action: 'create'
 			return
 		}
 	}
@@ -96,12 +96,12 @@ class UserController extends AbstractS2UiController {
 			addRoles user
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
-			redirect action: edit, id: user.id
+			redirect action: 'edit', id: user.id
 		}.invalidToken {
 			response.status = 500
 			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
 			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.className])}"
-			redirect action: search
+			redirect action: 'search'
 			return
 		}
 	}
@@ -117,17 +117,17 @@ class UserController extends AbstractS2UiController {
 				user.delete flush: true
 				userCache.removeUserFromCache user[usernameFieldName]
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-				redirect action: search
+				redirect action: 'search'
 			}.invalidToken {
 				response.status = 500
 				log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
 				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.className])}"
-				redirect action: search
+				redirect action: 'search'
 			}
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-			redirect action: edit, id: params.id
+			redirect action: 'edit', id: params.id
 		}
 	}
 
