@@ -30,14 +30,22 @@ class RoleController extends AbstractS2UiController {
 	}
 
 	def save() {
-		def role = lookupRoleClass().newInstance(params)
-		if (!role.save(flush: true)) {
-         render view: 'create', model: [role: role]
-         return
-		}
+		withForm {
+			def role = lookupRoleClass().newInstance(params)
+			if (!role.save(flush: true)) {
+				render view: 'create', model: [role: role]
+				return
+			}
 
-		flash.message = "${message(code: 'default.created.message', args: [message(code: 'role.label', default: 'Role'), role.id])}"
-		redirect action: 'edit', id: role.id
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'role.label', default: 'Role'), role.id])}"
+			redirect action: 'edit', id: role.id
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.className])}"
+			redirect action: 'create'
+			return
+		}
 	}
 
 	def edit() {
@@ -61,19 +69,27 @@ class RoleController extends AbstractS2UiController {
 	}
 
 	def update() {
-		def role = findById()
-		if (!role) return
-		if (!versionCheck('role.label', 'Role', role, [role: role])) {
+		withForm {
+			def role = findById()
+			if (!role) return
+			if (!versionCheck('role.label', 'Role', role, [role: role])) {
+				return
+			}
+
+			if (!springSecurityService.updateRole(role, params)) {
+				render view: 'edit', model: [role: role]
+				return
+			}
+
+			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'role.label', default: 'Role'), role.id])}"
+			redirect action: 'edit', id: role.id
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.className])}"
+			redirect action: 'search'
 			return
 		}
-
-		if (!springSecurityService.updateRole(role, params)) {
-			render view: 'edit', model: [role: role]
-			return
-		}
-
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'role.label', default: 'Role'), role.id])}"
-		redirect action: 'edit', id: role.id
 	}
 
 	def delete() {
@@ -81,10 +97,17 @@ class RoleController extends AbstractS2UiController {
 		if (!role) return
 
 		try {
-			lookupUserRoleClass().removeAll role
-			springSecurityService.deleteRole(role)
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'role.label', default: 'Role'), params.id])}"
-			redirect action: 'search'
+			withForm {
+				lookupUserRoleClass().removeAll role
+				springSecurityService.deleteRole(role)
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'role.label', default: 'Role'), params.id])}"
+				redirect action: 'search'
+			}.invalidToken {
+				response.status = 500
+				log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.className])}"
+				redirect action: 'search'
+			}
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'role.label', default: 'Role'), params.id])}"

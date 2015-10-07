@@ -27,16 +27,24 @@ class AclObjectIdentityController extends AbstractS2UiController {
 	}
 
 	def save() {
-		def aclObjectIdentity = lookupClass().newInstance(params)
-		if (!aclObjectIdentity.save(flush: true)) {
-			render view: 'create', model: [aclObjectIdentity: aclObjectIdentity,
-			                               classes: lookupAclClassClass().list(),
-			                               sids: lookupAclSidClass().list()]
+		withForm {
+			def aclObjectIdentity = lookupClass().newInstance(params)
+			if (!aclObjectIdentity.save(flush: true)) {
+				render view: 'create', model: [aclObjectIdentity: aclObjectIdentity,
+											   classes: lookupAclClassClass().list(),
+											   sids: lookupAclSidClass().list()]
+				return
+			}
+
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), aclObjectIdentity.id])}"
+			redirect action: 'edit', id: aclObjectIdentity.id
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.className])}"
+			redirect action: 'create'
 			return
 		}
-
-		flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), aclObjectIdentity.id])}"
-		redirect action: 'edit', id: aclObjectIdentity.id
 	}
 
 	def edit() {
@@ -50,24 +58,32 @@ class AclObjectIdentityController extends AbstractS2UiController {
 
 	def update() {
 
-		def aclObjectIdentity = findById()
-		if (!aclObjectIdentity) return
-		if (!versionCheck('aclObjectIdentity.label', 'AclObjectIdentity', aclObjectIdentity, [aclObjectIdentity: aclObjectIdentity])) {
+		withForm {
+			def aclObjectIdentity = findById()
+			if (!aclObjectIdentity) return
+			if (!versionCheck('aclObjectIdentity.label', 'AclObjectIdentity', aclObjectIdentity, [aclObjectIdentity: aclObjectIdentity])) {
+				return
+			}
+
+			Long parentId = params.parent?.id ? params.parent.id.toLong() : null
+			Long ownerId = params.owner?.id ? params.owner.id.toLong() : null
+			if (!springSecurityUiService.updateAclObjectIdentity(aclObjectIdentity, params.long('objectId'),
+					params.aclClass.id.toLong(), parentId, ownerId, params.entriesInheriting == 'on')) {
+				render view: 'edit', model: [aclObjectIdentity: aclObjectIdentity,
+											 classes: lookupAclClassClass().list(),
+											 sids: lookupAclSidClass().list()]
 			return
 		}
 
-		Long parentId = params.parent?.id ? params.parent.id.toLong() : null
-		Long ownerId = params.owner?.id ? params.owner.id.toLong() : null
-		if (!springSecurityUiService.updateAclObjectIdentity(aclObjectIdentity, params.long('objectId'),
-				params.aclClass.id.toLong(), parentId, ownerId, params.entriesInheriting == 'on')) {
-			render view: 'edit', model: [aclObjectIdentity: aclObjectIdentity,
-			                             classes: lookupAclClassClass().list(),
-			                             sids: lookupAclSidClass().list()]
+			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), aclObjectIdentity.id])}"
+			redirect action: 'edit', id: aclObjectIdentity.id
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.className])}"
+			redirect action: 'search'
 			return
 		}
-
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), aclObjectIdentity.id])}"
-		redirect action: 'edit', id: aclObjectIdentity.id
 	}
 
 	def delete() {
@@ -75,11 +91,17 @@ class AclObjectIdentityController extends AbstractS2UiController {
 		if (!aclObjectIdentity) return
 
 		try {
-			springSecurityUiService.deleteAclObjectIdentity aclObjectIdentity
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), params.id])}"
-			redirect action: 'search'
-		}
-		catch (DataIntegrityViolationException e) {
+			withForm {
+				springSecurityUiService.deleteAclObjectIdentity aclObjectIdentity
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), params.id])}"
+				redirect action: 'search'
+			}.invalidToken {
+				response.status = 500
+				log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.className])}"
+				redirect action: 'search'
+			}
+		} catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), params.id])}"
 			redirect action: 'edit', id: params.id
 		}

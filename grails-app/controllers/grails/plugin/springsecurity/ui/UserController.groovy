@@ -35,19 +35,27 @@ class UserController extends AbstractS2UiController {
 	}
 
 	def save() {
-		def user = lookupUserClass().newInstance(params)
-		if (params.password) {
-			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user.password = springSecurityUiService.encodePassword(params.password, salt)
-		}
-		if (!user.save(flush: true)) {
-			render view: 'create', model: [user: user, authorityList: sortedRoles()]
+		withForm {
+			def user = lookupUserClass().newInstance(params)
+			if (params.password) {
+				String salt = saltSource instanceof NullSaltSource ? null : params.username
+				user.password = springSecurityUiService.encodePassword(params.password, salt)
+			}
+			if (!user.save(flush: true)) {
+				render view: 'create', model: [user: user, authorityList: sortedRoles()]
+				return
+			}
+
+			addRoles(user)
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
+			redirect action: 'edit', id: user.id
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.className])}"
+			redirect action: 'create'
 			return
 		}
-
-		addRoles(user)
-		flash.message = "${message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
-		redirect action: 'edit', id: user.id
 	}
 
 	def edit() {
@@ -61,33 +69,41 @@ class UserController extends AbstractS2UiController {
 	}
 
 	def update() {
-		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
+		withForm {
+			String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
 
-		def user = findById()
-		if (!user) return
-		if (!versionCheck('user.label', 'User', user, [user: user])) {
+			def user = findById()
+			if (!user) return
+			if (!versionCheck('user.label', 'User', user, [user: user])) {
+				return
+			}
+
+			def oldPassword = user."$passwordFieldName"
+			user.properties = params
+			if (params.password && !params.password.equals(oldPassword)) {
+				String salt = saltSource instanceof NullSaltSource ? null : params.username
+				user."$passwordFieldName" = springSecurityUiService.encodePassword(params.password, salt)
+			}
+
+			if (!user.save(flush: true)) {
+				render view: 'edit', model: buildUserModel(user)
+				return
+			}
+
+			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+
+			lookupUserRoleClass().removeAll user
+			addRoles user
+			userCache.removeUserFromCache user[usernameFieldName]
+			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
+			redirect action: 'edit', id: user.id
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.className])}"
+			redirect action: 'search'
 			return
 		}
-
-		def oldPassword = user."$passwordFieldName"
-		user.properties = params
-		if (params.password && !params.password.equals(oldPassword)) {
-			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user."$passwordFieldName" = springSecurityUiService.encodePassword(params.password, salt)
-		}
-
-		if (!user.save(flush: true)) {
-			render view: 'edit', model: buildUserModel(user)
-			return
-		}
-
-		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-
-		lookupUserRoleClass().removeAll user
-		addRoles user
-		userCache.removeUserFromCache user[usernameFieldName]
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
-		redirect action: 'edit', id: user.id
 	}
 
 	def delete() {
@@ -96,11 +112,18 @@ class UserController extends AbstractS2UiController {
 
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		try {
-			lookupUserRoleClass().removeAll user
-			user.delete flush: true
-			userCache.removeUserFromCache user[usernameFieldName]
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-			redirect action: 'search'
+			withForm {
+				lookupUserRoleClass().removeAll user
+				user.delete flush: true
+				userCache.removeUserFromCache user[usernameFieldName]
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+				redirect action: 'search'
+			}.invalidToken {
+				response.status = 500
+				log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.className])}"
+				redirect action: 'search'
+			}
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"

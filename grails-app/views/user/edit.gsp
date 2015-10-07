@@ -19,7 +19,7 @@
 
 <h3><g:message code="default.edit.label" args="[entityName]"/></h3>
 
-<g:form action="update" name='userEditForm' class="button-style">
+<g:form action="update" name='userEditForm' class="button-style" useToken="true">
 <g:hiddenField name="id" value="${user?.id}"/>
 <g:hiddenField name="version" value="${user?.version}"/>
 

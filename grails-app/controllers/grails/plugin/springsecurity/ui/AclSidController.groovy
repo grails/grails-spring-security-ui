@@ -28,14 +28,22 @@ class AclSidController extends AbstractS2UiController {
 	}
 
 	def save() {
-		def aclSid = lookupClass().newInstance(params)
-		if (!aclSid.save(flush: true)) {
-			render view: 'create', model: [aclSid: aclSid]
+		withForm {
+			def aclSid = lookupClass().newInstance(params)
+			if (!aclSid.save(flush: true)) {
+				render view: 'create', model: [aclSid: aclSid]
+				return
+			}
+
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclSid.label', default: 'AclSid'), aclSid.id])}"
+			redirect action: 'edit', id: aclSid.id
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.className])}"
+			redirect action: 'create'
 			return
 		}
-
-		flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclSid.label', default: 'AclSid'), aclSid.id])}"
-		redirect action: 'edit', id: aclSid.id
 	}
 
 	def edit() {
@@ -46,19 +54,27 @@ class AclSidController extends AbstractS2UiController {
 	}
 
 	def update() {
-		def aclSid = findById()
-		if (!aclSid) return
-		if (!versionCheck('aclSid.label', 'AclSid', aclSid, [aclSid: aclSid])) {
+		withForm {
+			def aclSid = findById()
+			if (!aclSid) return
+			if (!versionCheck('aclSid.label', 'AclSid', aclSid, [aclSid: aclSid])) {
+				return
+			}
+
+			if (!springSecurityUiService.updateAclSid(aclSid, params.sid, params.principal == 'on')) {
+				render view: 'edit', model: [aclSid: aclSid]
+				return
+			}
+
+			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclSid.label', default: 'AclSid'), aclSid.id])}"
+			redirect action: 'edit', id: aclSid.id
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.className])}"
+			redirect action: 'search'
 			return
 		}
-
-		if (!springSecurityUiService.updateAclSid(aclSid, params.sid, params.principal == 'on')) {
-			render view: 'edit', model: [aclSid: aclSid]
-			return
-		}
-
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclSid.label', default: 'AclSid'), aclSid.id])}"
-		redirect action: 'edit', id: aclSid.id
 	}
 
 	def delete() {
@@ -66,9 +82,16 @@ class AclSidController extends AbstractS2UiController {
 		if (!aclSid) return
 
 		try {
-			springSecurityUiService.deleteAclSid aclSid
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclSid.label', default: 'AclSid'), params.id])}"
-			redirect action: 'search'
+			withForm {
+				springSecurityUiService.deleteAclSid aclSid
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclSid.label', default: 'AclSid'), params.id])}"
+				redirect action: 'search'
+			}.invalidToken {
+				response.status = 500
+				log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.className])}"
+				redirect action: 'search'
+			}
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'aclSid.label', default: 'AclSid'), params.id])}"

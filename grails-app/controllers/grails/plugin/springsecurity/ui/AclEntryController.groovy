@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,14 +30,22 @@ class AclEntryController extends AbstractS2UiController {
 	}
 
 	def save() {
-		def aclEntry = lookupClass().newInstance(params)
-		if (!aclEntry.save(flush: true)) {
-			render view: 'create', model: [aclEntry: aclEntry, sids: lookupAclSidClass().list()]
+		withForm {
+			def aclEntry = lookupClass().newInstance(params)
+			if (!aclEntry.save(flush: true)) {
+				render view: 'create', model: [aclEntry: aclEntry, sids: lookupAclSidClass().list()]
+				return
+			}
+
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), aclEntry.id])}"
+			redirect action: 'edit', id: aclEntry.id
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.className])}"
+			redirect action: 'create'
 			return
 		}
-
-		flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), aclEntry.id])}"
-		redirect action: 'edit', id: aclEntry.id
 	}
 
 	def edit() {
@@ -48,24 +56,31 @@ class AclEntryController extends AbstractS2UiController {
 	}
 
 	def update() {
+		withForm {
+			def aclEntry = findById()
+			if (!aclEntry) return
+			if (!versionCheck('aclEntry.label', 'AclEntry', aclEntry, [aclEntry: aclEntry])) {
+				return
+			}
 
-		def aclEntry = findById()
-		if (!aclEntry) return
-		if (!versionCheck('aclEntry.label', 'AclEntry', aclEntry, [aclEntry: aclEntry])) {
+			Long parentId = params.parent?.id ? params.parent.id.toLong() : null
+			Long ownerId = params.owner?.id ? params.owner.id.toLong() : null
+			if (!springSecurityUiService.updateAclEntry(aclEntry, params.aclObjectIdentity.id.toLong(),
+					params.sid.id.toLong(), params.int('aceOrder'), params.int('mask'),
+					params.granting == 'on', params.auditSuccess == 'on', params.auditFailure == 'on')) {
+				render view: 'edit', model: [aclEntry: aclEntry, sids: lookupAclSidClass().list()]
+				return
+			}
+
+			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), aclEntry.id])}"
+			redirect action: 'edit', id: aclEntry.id
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.className])}"
+			redirect action: 'search'
 			return
 		}
-
-		Long parentId = params.parent?.id ? params.parent.id.toLong() : null
-		Long ownerId = params.owner?.id ? params.owner.id.toLong() : null
-		if (!springSecurityUiService.updateAclEntry(aclEntry, params.aclObjectIdentity.id.toLong(),
-				params.sid.id.toLong(), params.int('aceOrder'), params.int('mask'),
-				params.granting == 'on', params.auditSuccess == 'on', params.auditFailure == 'on')) {
-			render view: 'edit', model: [aclEntry: aclEntry, sids: lookupAclSidClass().list()]
-			return
-		}
-
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), aclEntry.id])}"
-		redirect action: 'edit', id: aclEntry.id
 	}
 
 	def delete() {
@@ -73,9 +88,17 @@ class AclEntryController extends AbstractS2UiController {
 		if (!aclEntry) return
 
 		try {
-			springSecurityUiService.deleteAclEntry aclEntry
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), params.id])}"
-			redirect action: 'search'
+			withForm {
+				springSecurityUiService.deleteAclEntry aclEntry
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), params.id])}"
+				redirect action: 'search'
+			}.invalidToken {
+				response.status = 500
+				log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.className])}"
+				redirect action: 'search'
+				return
+			}
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), params.id])}"
@@ -141,7 +164,7 @@ class AclEntryController extends AbstractS2UiController {
 				order(params.sort,params.order ?: 'ASC')
 			}
 		}
-		
+
 		def model = [results: results, totalCount: results.totalCount, searched: true,
 			sids: lookupAclSidClass().list(), permissionFactory: aclPermissionFactory]
 		// add query params to model for paging
