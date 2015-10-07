@@ -41,40 +41,47 @@ class RegisterController extends AbstractS2UiController {
 	}
 
 	def register(RegisterCommand command) {
+		withForm {
+			if (command.hasErrors()) {
+				render view: 'index', model: [command: command]
+				return
+			}
 
-		if (command.hasErrors()) {
-			render view: 'index', model: [command: command]
-			return
-		}
+			String salt = saltSource instanceof NullSaltSource ? null : command.username
+			def user = lookupUserClass().newInstance(email: command.email, username: command.username,
+					accountLocked: true, enabled: true)
 
-		String salt = saltSource instanceof NullSaltSource ? null : command.username
-		def user = lookupUserClass().newInstance(email: command.email, username: command.username,
-				accountLocked: true, enabled: true)
+			RegistrationCode registrationCode = springSecurityUiService.register(user, command.password, salt)
+			if (registrationCode == null || registrationCode.hasErrors()) {
+				// null means problem creating the user
+				flash.error = message(code: 'spring.security.ui.register.miscError')
+				flash.chainedParams = params
+				redirect action: 'index'
+				return
+			}
 
-		RegistrationCode registrationCode = springSecurityUiService.register(user, command.password, salt)
-		if (registrationCode == null || registrationCode.hasErrors()) {
-			// null means problem creating the user
-			flash.error = message(code: 'spring.security.ui.register.miscError')
-			flash.chainedParams = params
+			String url = generateLink('verifyRegistration', [t: registrationCode.token])
+
+			def conf = SpringSecurityUtils.securityConfig
+			def body = conf.ui.register.emailBody
+			if (body.contains('$')) {
+				body = evaluate(body, [user: user, url: url])
+			}
+			mailService.sendMail {
+				to command.email
+				from conf.ui.register.emailFrom
+				subject conf.ui.register.emailSubject
+				html body.toString()
+			}
+
+			render view: 'index', model: [emailSent: true]
+		}.invalidToken {
+			response.status = 500
+			log.warn("User registration, effective user: ${springSecurityService.currentUser?.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.register.form', args: [params.username])}"
 			redirect action: 'index'
 			return
 		}
-
-		String url = generateLink('verifyRegistration', [t: registrationCode.token])
-
-		def conf = SpringSecurityUtils.securityConfig
-		def body = conf.ui.register.emailBody
-		if (body.contains('$')) {
-			body = evaluate(body, [user: user, url: url])
-		}
-		mailService.sendMail {
-			to command.email
-			from conf.ui.register.emailFrom
-			subject conf.ui.register.emailSubject
-			html body.toString()
-		}
-
-		render view: 'index', model: [emailSent: true]
 	}
 
 	def verifyRegistration() {
@@ -129,44 +136,51 @@ class RegisterController extends AbstractS2UiController {
 		}
 
 		String username = params.username
-		if (!username) {
-			flash.error = message(code: 'spring.security.ui.forgotPassword.username.missing')
+		withForm {
+			if (!username) {
+				flash.error = message(code: 'spring.security.ui.forgotPassword.username.missing')
+				redirect action: 'forgotPassword'
+				return
+			}
+
+			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+			def user = lookupUserClass().findWhere((usernameFieldName): username)
+			if (!user) {
+				flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
+				redirect action: 'forgotPassword'
+				return
+			}
+
+			def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
+			registrationCode.save(flush: true)
+
+			String url = generateLink('resetPassword', [t: registrationCode.token])
+
+			def conf = SpringSecurityUtils.securityConfig
+			def body = conf.ui.forgotPassword.emailBody
+			if (body.contains('$')) {
+				body = evaluate(body, [user: user, url: url])
+			}
+			mailService.sendMail {
+				to user.email
+				from conf.ui.forgotPassword.emailFrom
+				subject conf.ui.forgotPassword.emailSubject
+				html body.toString()
+			}
+
+			[emailSent: true]
+		}.invalidToken {
+			response.status = 500
+			log.warn("Password reset token generation, effective user: ${springSecurityService.currentUser?.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.forgotPassword.form', args: [username])}"
 			redirect action: 'forgotPassword'
 			return
 		}
-
-		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-		def user = lookupUserClass().findWhere((usernameFieldName): username)
-		if (!user) {
-			flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
-			redirect action: 'forgotPassword'
-			return
-		}
-
-		def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
-		registrationCode.save(flush: true)
-
-		String url = generateLink('resetPassword', [t: registrationCode.token])
-
-		def conf = SpringSecurityUtils.securityConfig
-		def body = conf.ui.forgotPassword.emailBody
-		if (body.contains('$')) {
-			body = evaluate(body, [user: user, url: url])
-		}
-		mailService.sendMail {
-			to user.email
-			from conf.ui.forgotPassword.emailFrom
-			subject conf.ui.forgotPassword.emailSubject
-			html body.toString()
-		}
-
-		[emailSent: true]
 	}
 
 	def resetPassword(ResetPasswordCommand command) {
 
 		String token = params.t
-
 		def registrationCode = token ? RegistrationCode.findByToken(token) : null
 		if (!registrationCode) {
 			flash.error = message(code: 'spring.security.ui.resetPassword.badCode')
@@ -178,29 +192,37 @@ class RegisterController extends AbstractS2UiController {
 			return [token: token, command: new ResetPasswordCommand()]
 		}
 
-		command.username = registrationCode.username
-		command.validate()
+		withForm {
+			command.username = registrationCode.username
+			command.validate()
 
-		if (command.hasErrors()) {
-			return [token: token, command: command]
+			if (command.hasErrors()) {
+				return [token: token, command: command]
+			}
+
+			String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
+			RegistrationCode.withTransaction { status ->
+				String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+				def user = lookupUserClass().findWhere((usernameFieldName): registrationCode.username)
+				user.password = springSecurityUiService.encodePassword(command.password, salt)
+				user.save()
+				registrationCode.delete()
+			}
+
+			springSecurityService.reauthenticate registrationCode.username
+
+			flash.message = message(code: 'spring.security.ui.resetPassword.success')
+
+			def conf = SpringSecurityUtils.securityConfig
+			String postResetUrl = conf.ui.register.postResetUrl ?: conf.successHandler.defaultTargetUrl
+			redirect uri: postResetUrl
+		}.invalidToken {
+			response.status = 500
+			log.warn("Password reset, effective user: ${springSecurityService.currentUser?.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.resetPassword.form', args: [token])}"
+			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			return
 		}
-
-		String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
-		RegistrationCode.withTransaction { status ->
-			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			def user = lookupUserClass().findWhere((usernameFieldName): registrationCode.username)
-			user.password = springSecurityUiService.encodePassword(command.password, salt)
-			user.save()
-			registrationCode.delete()
-		}
-
-		springSecurityService.reauthenticate registrationCode.username
-
-		flash.message = message(code: 'spring.security.ui.resetPassword.success')
-
-		def conf = SpringSecurityUtils.securityConfig
-		String postResetUrl = conf.ui.register.postResetUrl ?: conf.successHandler.defaultTargetUrl
-		redirect uri: postResetUrl
 	}
 
 	protected String generateLink(String action, linkParams) {

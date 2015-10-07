@@ -12,7 +12,7 @@
 <s2ui:form width='475' height='250' elementId='resetPasswordFormContainer'
            titleCode='spring.security.ui.resetPassword.header' center='true'>
 
-	<g:form action='resetPassword' name='resetPasswordForm' autocomplete='off'>
+	<g:form action='resetPassword' name='resetPasswordForm' autocomplete='off' useToken="true">
 	<g:hiddenField name='t' value='${token}'/>
 	<div class="sign-in">
 
