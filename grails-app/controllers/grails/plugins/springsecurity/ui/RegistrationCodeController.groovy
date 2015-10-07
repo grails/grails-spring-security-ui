@@ -24,14 +24,14 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class RegistrationCodeController extends AbstractS2UiController {
 
-	def edit = {
+	def edit() {
 		def registrationCode = findById()
 		if (!registrationCode) return
 
 		[registrationCode: registrationCode]
 	}
 
-	def update = {
+	def update() {
 		withForm {
 			def registrationCode = findById()
 			if (!registrationCode) return
@@ -55,7 +55,7 @@ class RegistrationCodeController extends AbstractS2UiController {
 		}
 	}
 
-	def delete = {
+	def delete() {
 		def registrationCode = findById()
 		if (!registrationCode) return
 
@@ -77,9 +77,9 @@ class RegistrationCodeController extends AbstractS2UiController {
 		}
 	}
 
-	def search = {}
+	def search() {}
 
-	def registrationCodeSearch = {
+	def registrationCodeSearch() {
 
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
@@ -124,7 +124,7 @@ class RegistrationCodeController extends AbstractS2UiController {
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def ajaxRegistrationCodeSearch = {
+	def ajaxRegistrationCodeSearch() {
 
 		def jsonData = []
 

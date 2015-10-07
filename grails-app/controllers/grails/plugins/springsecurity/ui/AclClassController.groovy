@@ -23,11 +23,11 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class AclClassController extends AbstractS2UiController {
 
-	def create = {
+	def create() {
 		[aclClass: lookupClass().newInstance(params)]
 	}
 
-	def save = {
+	def save() {
 		withForm {
 		def aclClass = lookupClass().newInstance(params)
 			if (!aclClass.save(flush: true)) {
@@ -46,14 +46,14 @@ class AclClassController extends AbstractS2UiController {
 		}
 	}
 
-	def edit = {
+	def edit() {
 		def aclClass = findById()
 		if (!aclClass) return
 
 		[aclClass: aclClass]
 	}
 
-	def update = {
+	def update() {
 		withForm {
 			def aclClass = findById()
 			if (!aclClass) return
@@ -77,7 +77,7 @@ class AclClassController extends AbstractS2UiController {
 		}
 	}
 
-	def delete = {
+	def delete() {
 		def aclClass = findById()
 		if (!aclClass) return
 
@@ -100,9 +100,9 @@ class AclClassController extends AbstractS2UiController {
 		}
 	}
 
-	def search = {}
+	def search() {}
 
-	def aclClassSearch = {
+	def aclClassSearch() {
 
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
@@ -144,7 +144,7 @@ class AclClassController extends AbstractS2UiController {
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def ajaxAclClassSearch = {
+	def ajaxAclClassSearch() {
 
 		def jsonData = []
 

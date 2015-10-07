@@ -29,12 +29,12 @@ class UserController extends AbstractS2UiController {
 	def saltSource
 	def userCache
 
-	def create = {
+	def create() {
 		def user = lookupUserClass().newInstance(params)
 		[user: user, authorityList: sortedRoles()]
 	}
 
-	def save = {
+	def save() {
 		withForm {
 			def user = lookupUserClass().newInstance(params)
 			if (params.password) {
@@ -58,7 +58,7 @@ class UserController extends AbstractS2UiController {
 		}
 	}
 
-	def edit = {
+	def edit() {
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
 		def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
@@ -68,7 +68,7 @@ class UserController extends AbstractS2UiController {
 		return buildUserModel(user)
 	}
 
-	def update = {
+	def update() {
 		withForm {
 			String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
 
@@ -106,7 +106,7 @@ class UserController extends AbstractS2UiController {
 		}
 	}
 
-	def delete = {
+	def delete() {
 		def user = findById()
 		if (!user) return
 
@@ -131,11 +131,11 @@ class UserController extends AbstractS2UiController {
 		}
 	}
 
-	def search = {
+	def search() {
 		[enabled: 0, accountExpired: 0, accountLocked: 0, passwordExpired: 0]
 	}
 
-	def userSearch = {
+	def userSearch() {
 
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
@@ -197,7 +197,7 @@ class UserController extends AbstractS2UiController {
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def ajaxUserSearch = {
+	def ajaxUserSearch() {
 
 		def jsonData = []
 

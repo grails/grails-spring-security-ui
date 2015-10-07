@@ -23,13 +23,13 @@ class AclEntryController extends AbstractS2UiController {
 
 	def aclPermissionFactory
 
-	def create = {
+	def create() {
 		def aclEntry = lookupClass().newInstance(params)
 		aclEntry.granting = true
 		[aclEntry: aclEntry, sids: lookupAclSidClass().list()]
 	}
 
-	def save = {
+	def save() {
 		withForm {
 			def aclEntry = lookupClass().newInstance(params)
 			if (!aclEntry.save(flush: true)) {
@@ -48,14 +48,14 @@ class AclEntryController extends AbstractS2UiController {
 		}
 	}
 
-	def edit = {
+	def edit() {
 		def aclEntry = findById()
 		if (!aclEntry) return
 
 		[aclEntry: aclEntry, sids: lookupAclSidClass().list()]
 	}
 
-	def update = {
+	def update() {
 		withForm {
 			def aclEntry = findById()
 			if (!aclEntry) return
@@ -83,7 +83,7 @@ class AclEntryController extends AbstractS2UiController {
 		}
 	}
 
-	def delete = {
+	def delete() {
 		def aclEntry = findById()
 		if (!aclEntry) return
 
@@ -106,11 +106,11 @@ class AclEntryController extends AbstractS2UiController {
 		}
 	}
 
-	def search = {
+	def search() {
 		[granting: 0, auditSuccess: 0, auditFailure: 0, sids: lookupAclSidClass().list()]
 	}
 
-	def aclEntrySearch = {
+	def aclEntrySearch() {
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0

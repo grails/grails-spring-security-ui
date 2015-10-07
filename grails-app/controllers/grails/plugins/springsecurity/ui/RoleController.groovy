@@ -25,11 +25,11 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class RoleController extends AbstractS2UiController {
 
-	def create = {
+	def create() {
 		[role: lookupRoleClass().newInstance(params)]
 	}
 
-	def save = {
+	def save() {
 		withForm {
 			def role = lookupRoleClass().newInstance(params)
 			if (!role.save(flush: true)) {
@@ -48,7 +48,7 @@ class RoleController extends AbstractS2UiController {
 		}
 	}
 
-	def edit = {
+	def edit() {
 
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
 			SpringSecurityUtils.securityConfig.authority.nameField, null)
@@ -68,7 +68,7 @@ class RoleController extends AbstractS2UiController {
 		[role: role, users: users, userCount: userCount]
 	}
 
-	def update = {
+	def update() {
 		withForm {
 			def role = findById()
 			if (!role) return
@@ -92,7 +92,7 @@ class RoleController extends AbstractS2UiController {
 		}
 	}
 
-	def delete = {
+	def delete() {
 		def role = findById()
 		if (!role) return
 
@@ -115,9 +115,9 @@ class RoleController extends AbstractS2UiController {
 		}
 	}
 
-	def search = {}
+	def search() {}
 
-	def roleSearch = {
+	def roleSearch() {
 
 		String authorityField = SpringSecurityUtils.securityConfig.authority.nameField
 
@@ -147,7 +147,7 @@ class RoleController extends AbstractS2UiController {
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def ajaxRoleSearch = {
+	def ajaxRoleSearch() {
 
 		def jsonData = []
 

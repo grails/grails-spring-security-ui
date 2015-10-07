@@ -21,12 +21,12 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class AclObjectIdentityController extends AbstractS2UiController {
 
-	def create = {
+	def create() {
 		[aclObjectIdentity: lookupClass().newInstance(params),
 		 classes: lookupAclClassClass().list(), sids: lookupAclSidClass().list()]
 	}
 
-	def save = {
+	def save() {
 		withForm{
 			def aclObjectIdentity = lookupClass().newInstance(params)
 			if (!aclObjectIdentity.save(flush: true)) {
@@ -47,7 +47,7 @@ class AclObjectIdentityController extends AbstractS2UiController {
 		}
 	}
 
-	def edit = {
+	def edit() {
 		def aclObjectIdentity = findById()
 		if (!aclObjectIdentity) return
 
@@ -56,7 +56,7 @@ class AclObjectIdentityController extends AbstractS2UiController {
 		 sids: lookupAclSidClass().list()]
 	}
 
-	def update = {
+	def update() {
 
 		withForm {
 			def aclObjectIdentity = findById()
@@ -86,7 +86,7 @@ class AclObjectIdentityController extends AbstractS2UiController {
 		}
 	}
 
-	def delete = {
+	def delete() {
 		def aclObjectIdentity = findById()
 		if (!aclObjectIdentity) return
 
@@ -107,13 +107,13 @@ class AclObjectIdentityController extends AbstractS2UiController {
 		}
 	}
 
-	def search = {
+	def search() {
 		[entriesInheriting: 0,
 		 classes: lookupAclClassClass().list(),
 		 sids: lookupAclSidClass().list()]
 	}
 
-	def aclObjectIdentitySearch = {
+	def aclObjectIdentitySearch() {
 
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
