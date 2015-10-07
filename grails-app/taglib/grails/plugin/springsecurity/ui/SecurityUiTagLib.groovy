@@ -269,11 +269,15 @@ class SecurityUiTagLib {
 		def id = getRequiredAttribute(attrs, 'instanceId', 'deleteButton')
 
 		attrs.action = 'delete'
+		attrs.method = 'POST'
+		attrs.useToken = true
+		attrs.name = 'deleteForm'
+
+		out << g.form(attrs) {
+			g.hiddenField(name:'id', value:id)
+		}
 
 		out << """
-			<form action='${createLink(attrs)}' method='POST' name='deleteForm'>
-				<input type="hidden" name="id" value="${id}" />
-			</form>
 			<div id="deleteConfirmDialog" title="Are you sure?"></div>
 
 			<script>
