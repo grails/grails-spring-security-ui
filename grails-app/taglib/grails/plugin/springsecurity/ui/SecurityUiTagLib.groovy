@@ -326,7 +326,7 @@ class SecurityUiTagLib {
 		def bean = attrs.remove('bean')
 		if (bean) {
 			out << eachError(attrs, {
-				out << "<span class='s2ui_error'>${message(error:it)}</span>"
+				out << "<span class='s2ui_error'>${message(error:it, encodeAs:'html')}</span>"
 			})
 		}
 	}
