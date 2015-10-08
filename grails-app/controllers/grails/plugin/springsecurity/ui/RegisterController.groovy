@@ -31,6 +31,7 @@ class RegisterController extends AbstractS2UiController {
 
 	def mailService
 	def messageSource
+	def userCache
 	def saltSource
 
 	def index() {
@@ -209,7 +210,7 @@ class RegisterController extends AbstractS2UiController {
 				registrationCode.delete()
 			}
 
-			springSecurityService.reauthenticate registrationCode.username
+			userCache.removeUserFromCache registrationCode.username
 
 			flash.message = message(code: 'spring.security.ui.resetPassword.success')
 
