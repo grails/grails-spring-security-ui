@@ -76,10 +76,10 @@ class RegisterController extends AbstractS2UiController {
 
 			render view: 'index', model: [emailSent: true]
 		}.invalidToken {
-			response.status = 500
+			response.status = 400
 			log.warn("User registration, effective user: ${springSecurityService.currentUser?.id} possible CSRF or double submit: $params")
 			flash.message = "${message(code: 'spring.security.ui.invalid.register.form', args: [params.username])}"
-			redirect action: 'index'
+			forward action: 'index', model:[]
 			return
 		}
 	}
@@ -170,10 +170,10 @@ class RegisterController extends AbstractS2UiController {
 
 			[emailSent: true]
 		}.invalidToken {
-			response.status = 500
+			response.status = 400
 			log.warn("Password reset token generation, effective user: ${springSecurityService.currentUser?.id} possible CSRF or double submit: $params")
 			flash.message = "${message(code: 'spring.security.ui.invalid.forgotPassword.form', args: [username])}"
-			redirect action: 'forgotPassword'
+			forward action: 'forgotPassword', model:[]
 			return
 		}
 	}
@@ -217,7 +217,6 @@ class RegisterController extends AbstractS2UiController {
 			String postResetUrl = conf.ui.register.postResetUrl ?: conf.successHandler.defaultTargetUrl
 			redirect uri: postResetUrl
 		}.invalidToken {
-			response.status = 500
 			log.warn("Password reset, effective user: ${springSecurityService.currentUser?.id} possible CSRF or double submit: $params")
 			flash.message = "${message(code: 'spring.security.ui.invalid.resetPassword.form', args: [token])}"
 			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl

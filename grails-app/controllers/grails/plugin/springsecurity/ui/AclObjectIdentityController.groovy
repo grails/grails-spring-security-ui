@@ -39,10 +39,10 @@ class AclObjectIdentityController extends AbstractS2UiController {
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), aclObjectIdentity.id])}"
 			redirect action: 'edit', id: aclObjectIdentity.id
 		}.invalidToken {
-			response.status = 500
+			response.status = 400
 			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
-			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.className])}"
-			redirect action: 'create'
+			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [lookupClassName()])}"
+			forward action: 'create', model: []
 			return
 		}
 	}
@@ -78,10 +78,10 @@ class AclObjectIdentityController extends AbstractS2UiController {
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), aclObjectIdentity.id])}"
 			redirect action: 'edit', id: aclObjectIdentity.id
 		}.invalidToken {
-			response.status = 500
+			response.status = 400
 			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
-			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.className])}"
-			redirect action: 'search'
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [lookupClassName()])}"
+			forward action: 'search', model: []
 			return
 		}
 	}
@@ -96,10 +96,10 @@ class AclObjectIdentityController extends AbstractS2UiController {
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), params.id])}"
 				redirect action: 'search'
 			}.invalidToken {
-				response.status = 500
+				response.status = 400
 				log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
-				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.className])}"
-				redirect action: 'search'
+				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [lookupClassName()])}"
+				forward action: 'search', model: []
 			}
 		} catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'aclObjectIdentity.label', default: 'AclObjectIdentity'), params.id])}"
