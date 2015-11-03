@@ -63,7 +63,7 @@ if (isOpenId) {
 	<s2ui:tab name='roles' height='275'>
 		<g:each var="entry" in="${roleMap}">
 		<div>
-			<g:checkBox name="${entry.key.authority}" value="${entry.value}"/>
+			<g:checkBox name="${entry.key.authority.encodeAsHTML()}" value="${entry.value}"/>
 			<g:link controller='role' action='edit' id='${entry.key.id}'>${entry.key.authority.encodeAsHTML()}</g:link>
 		</div>
 		</g:each>

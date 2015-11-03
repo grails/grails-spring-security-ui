@@ -48,7 +48,7 @@ tabData << [name: 'roles',    icon: 'icon_role', messageCode: 'spring.security.u
 	<s2ui:tab name='roles' height='280'>
 		<g:each var="auth" in="${authorityList}">
 		<div>
-			<g:checkBox name="${auth.authority}" />
+			<g:checkBox name="${auth.authority.encodeAsHTML()}" />
 			<g:link controller='role' action='edit' id='${auth.id}'>${auth.authority.encodeAsHTML()}</g:link>
 		</div>
 		</g:each>
