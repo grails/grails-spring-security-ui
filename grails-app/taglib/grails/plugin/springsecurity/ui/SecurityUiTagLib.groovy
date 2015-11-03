@@ -269,11 +269,15 @@ class SecurityUiTagLib {
 		def id = getRequiredAttribute(attrs, 'instanceId', 'deleteButton')
 
 		attrs.action = 'delete'
+		attrs.method = 'POST'
+		attrs.useToken = true
+		attrs.name = 'deleteForm'
+
+		out << g.form(attrs) {
+			g.hiddenField(name:'id', value:id)
+		}
 
 		out << """
-			<form action='${createLink(attrs)}' method='POST' name='deleteForm'>
-				<input type="hidden" name="id" value="${id}" />
-			</form>
 			<div id="deleteConfirmDialog" title="Are you sure?"></div>
 
 			<script>
@@ -326,7 +330,7 @@ class SecurityUiTagLib {
 		def bean = attrs.remove('bean')
 		if (bean) {
 			out << eachError(attrs, {
-				out << "<span class='s2ui_error'>${message(error:it)}</span>"
+				out << "<span class='s2ui_error'>${message(error:it, encodeAs:'html')}</span>"
 			})
 		}
 	}

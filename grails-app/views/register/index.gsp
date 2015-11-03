@@ -12,7 +12,7 @@
 <s2ui:form width='650' height='300' elementId='loginFormContainer'
            titleCode='spring.security.ui.register.description' center='true'>
 
-<g:form action='register' name='registerForm'>
+<g:form action='register' name='registerForm' useToken="true">
 
 	<g:if test='${emailSent}'>
 	<br/>

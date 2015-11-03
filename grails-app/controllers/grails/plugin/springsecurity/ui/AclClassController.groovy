@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,14 +28,22 @@ class AclClassController extends AbstractS2UiController {
 	}
 
 	def save() {
-		def aclClass = lookupClass().newInstance(params)
-		if (!aclClass.save(flush: true)) {
-			render view: 'create', model: [aclClass: aclClass]
+		withForm {
+			def aclClass = lookupClass().newInstance(params)
+			if (!aclClass.save(flush: true)) {
+				render view: 'create', model: [aclClass: aclClass]
+				return
+			}
+
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclClass.label', default: 'AclClass'), aclClass.id])}"
+			redirect action: 'edit', id: aclClass.id
+		}.invalidToken {
+			response.status = 400
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [lookupClassName()])}"
+			forward action: 'create', model: []
 			return
 		}
-
-		flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclClass.label', default: 'AclClass'), aclClass.id])}"
-		redirect action: 'edit', id: aclClass.id
 	}
 
 	def edit() {
@@ -46,19 +54,27 @@ class AclClassController extends AbstractS2UiController {
 	}
 
 	def update() {
-		def aclClass = findById()
-		if (!aclClass) return
-		if (!versionCheck('aclClass.label', 'AclClass', aclClass, [aclClass: aclClass])) {
+		withForm {
+			def aclClass = findById()
+			if (!aclClass) return
+			if (!versionCheck('aclClass.label', 'AclClass', aclClass, [aclClass: aclClass])) {
+				return
+			}
+
+			if (!springSecurityUiService.updateAclClass(aclClass, params.className)) {
+				render view: 'edit', model: [aclClass: aclClass]
+				return
+			}
+
+			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclClass.label', default: 'AclClass'), aclClass.id])}"
+			redirect action: 'edit', id: aclClass.id
+		}.invalidToken {
+			response.status = 400
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [lookupClassName()])}"
+			forward action: 'search', model: []
 			return
 		}
-
-		if (!springSecurityUiService.updateAclClass(aclClass, params.className)) {
-			render view: 'edit', model: [aclClass: aclClass]
-			return
-		}
-
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclClass.label', default: 'AclClass'), aclClass.id])}"
-		redirect action: 'edit', id: aclClass.id
 	}
 
 	def delete() {
@@ -66,9 +82,17 @@ class AclClassController extends AbstractS2UiController {
 		if (!aclClass) return
 
 		try {
-			springSecurityUiService.deleteAclClass aclClass
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclClass.label', default: 'AclClass'), params.id])}"
-			redirect action: 'search'
+			withForm {
+				springSecurityUiService.deleteAclClass aclClass
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclClass.label', default: 'AclClass'), params.id])}"
+				redirect action: 'search'
+			}.invalidToken {
+				response.status = 400
+				log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+				flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [lookupClassName()])}"
+				forward action: 'search', model: []
+				return
+			}
 		}
 		catch (DataIntegrityViolationException e) {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'aclClass.label', default: 'AclClass'), params.id])}"
