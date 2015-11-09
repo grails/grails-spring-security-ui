@@ -2,69 +2,60 @@ package grails.spring.security.ui
 
 import grails.plugins.*
 
+/* Copyright 2009-2013 SpringSource.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import grails.plugin.springsecurity.SpringSecurityUtils
+
+/**
+ * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
+ */
 class GrailsSpringSecurityUiGrailsPlugin extends Plugin {
 
-    // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "3.0.9 > *"
-    // resources that are excluded from plugin packaging
-    def pluginExcludes = [
-        "grails-app/views/error.gsp"
-    ]
+	String version = '1.0-RC2'
+	String grailsVersion = '2.0.0 > *'
+	List loadAfter = ['springSecurityCore']
+	List pluginExcludes = [
+		'docs/**',
+		'src/docs/**',
+		'scripts/CreateS2UiTestApps.groovy',
+		'scripts/Fixpdf.groovy',
+		'lib/**'
+	]
 
-    // TODO Fill in these fields
-    def title = "Grails Spring Security Ui" // Headline display name of the plugin
-    def author = "Your name"
-    def authorEmail = ""
-    def description = '''\
-Brief summary/description of the plugin.
-'''
-    def profiles = ['web']
+	String author = 'Burt Beckwith'
+	String authorEmail = 'burt@burtbeckwith.com'
+	String title = 'Spring Security UI'
+	String description = 'User interface extensions for the Spring Security plugin'
+	String documentation = 'http://grails-plugins.github.io/grails-spring-security-ui/'
 
-    // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/grails-spring-security-ui"
+	String license = 'APACHE'
+	def organization = [name: 'SpringSource', url: 'http://www.springsource.org/']
+	def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPSPRINGSECURITYUI']
+	def scm = [url: 'https://github.com/grails-plugins/grails-spring-security-ui/']
 
-    // Extra (optional) plugin metadata
+	def doWithSpring = {
 
-    // License: one of 'APACHE', 'GPL2', 'GPL3'
-//    def license = "APACHE"
+		def conf = SpringSecurityUtils.securityConfig
+		if (!conf || !conf.active) {
+			return
+		}
 
-    // Details of company behind the plugin (if there is one)
-//    def organization = [ name: "My Company", url: "http://www.my-company.com/" ]
+		println '\nConfiguring Spring Security UI ...'
 
-    // Any additional developers beyond the author specified above.
-//    def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]
+		SpringSecurityUtils.loadSecondaryConfig 'DefaultUiSecurityConfig'
 
-    // Location of the plugin's issue tracker.
-//    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
-
-    // Online location of the plugin's browseable source code.
-//    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
-
-    Closure doWithSpring() { {->
-            // TODO Implement runtime spring config (optional)
-        }
-    }
-
-    void doWithDynamicMethods() {
-        // TODO Implement registering dynamic methods to classes (optional)
-    }
-
-    void doWithApplicationContext() {
-        // TODO Implement post initialization spring config (optional)
-    }
-
-    void onChange(Map<String, Object> event) {
-        // TODO Implement code that is executed when any artefact that this plugin is
-        // watching is modified and reloaded. The event contains: event.source,
-        // event.application, event.manager, event.ctx, and event.plugin.
-    }
-
-    void onConfigChange(Map<String, Object> event) {
-        // TODO Implement code that is executed when the project configuration changes.
-        // The event is the same as for 'onChange'.
-    }
-
-    void onShutdown(Map<String, Object> event) {
-        // TODO Implement code that is executed when the application shuts down (optional)
-    }
+		println '... finished configuring Spring Security UI\n'
+	}
 }
