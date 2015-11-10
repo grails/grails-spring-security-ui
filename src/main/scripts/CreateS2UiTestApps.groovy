@@ -220,7 +220,7 @@ private void deleteDir(String path) {
 	ant.delete dir: path
 }
 
-private void error(String message) {
+void error(String message) {
 	errorMessage "\n\nERROR: $message\n\n"
 	exit 1
 }
