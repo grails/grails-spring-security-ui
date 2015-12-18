@@ -38,7 +38,7 @@ class SpringSecurityUiGrailsPlugin {
 
 	String license = 'APACHE'
 	def organization = [name: 'Grails', url: 'http://www.grails.org/']
-	def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPSPRINGSECURITYUI']
+	def issueManagement = [url: 'https://github.com/grails-plugins/grails-spring-security-ui/issues']
 	def scm = [url: 'https://github.com/grails-plugins/grails-spring-security-ui/']
 
 	def doWithSpring = {
