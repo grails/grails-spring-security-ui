@@ -14,90 +14,12 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.util.Holders
-
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
 class SecurityUiTagLib {
 
 	static namespace = 's2ui'
-
-	def resources = { attrs ->
-		boolean hasResourcesPlugin = Holders.pluginManager.hasGrailsPlugin('resources')
-
-		if ('spring-security-ui' == attrs.module) {
-			if (hasResourcesPlugin) {
-				r.require(module: attrs.module)
-				out << r.layoutResources()
-			}
-			else {
-				out << g.javascript(library: 'jquery', plugin: 'jquery')
-				out << jqui.resources()
-
-				out << """
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css/smoothness',file:'jquery-ui-1.10.3.custom.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'date_input.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.slate.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'table.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
-"""
-			}
-		}
-		else if ('register' == attrs.module) {
-			if (hasResourcesPlugin) {
-				r.require(module: attrs.module)
-				out << r.layoutResources()
-			}
-			else {
-				out << g.javascript(library: 'jquery', plugin: 'jquery')
-				out << """
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
-"""
-				out << jqui.resources()
-
-				out << """
-<link rel="stylesheet" media="screen" href="${resource(dir:'css/smoothness',file:'jquery-ui-1.10.3.custom.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'auth.css',plugin:'spring-security-ui')}"/>
-"""
-			}
-		}
-	}
-
-	def layoutResources = { attrs ->
-		boolean hasResourcesPlugin = Holders.pluginManager.hasGrailsPlugin('resources')
-
-		if ('spring-security-ui' == attrs.module) {
-			if (hasResourcesPlugin) {
-				out << r.layoutResources()
-			}
-			else {
-				for (name in ['jquery/jquery.jgrowl', 'jquery/jquery.checkbox',
-				              'jquery/jquery.date_input', 'jquery/jquery.positionBy',
-				              'jquery/jquery.bgiframe', 'jquery/jquery.jdMenu',
-				              'jquery/jquery.dataTables.min', 'spring-security-ui']) {
-					out << g.javascript(src: name + '.js', plugin: 'spring-security-ui')
-				}
-			}
-		}
-		else if ('register' == attrs.module) {
-			if (hasResourcesPlugin) {
-				out << r.layoutResources()
-			}
-			else {
-				for (name in ['jquery/jquery.jgrowl', 'jquery/jquery.checkbox', 'spring-security-ui']) {
-					out << g.javascript(src: name + '.js', plugin: 'spring-security-ui')
-				}
-			}
-		}
-	}
 
 	// TODO check required attrs
 
