@@ -1,9 +1,37 @@
+<%@ page import="grails.plugin.springsecurity.SpringSecurityUtils" %>
 <style>
 input.login {
 	display: block;
 	width: 400px;
 }
 </style>
+
+<span id='s2ui_login_link_container'>
+
+<nobr>
+
+<span id="logoutLink" style="display:none">
+<g:link elementId='_logout' controller='logout'/>
+<a href="${request.contextPath}${SpringSecurityUtils.securityConfig.logout.afterLogoutUrl}" id="_afterLogout"></a>
+</span>
+
+<div id='loginLinkContainer'>
+<sec:ifLoggedIn>
+Logged in as <sec:username/> (<g:link controller='logout' elementId='logout'>Logout</g:link>)
+</sec:ifLoggedIn>
+<sec:ifNotLoggedIn>
+	<a href='#' id='loginLink'>Login</a>
+</sec:ifNotLoggedIn>
+
+<sec:ifSwitched>
+<a href='${request.contextPath}/j_spring_security_exit_user'>
+	Resume as <sec:switchedUserOriginalUsername/>
+</a>
+</sec:ifSwitched>
+</div>
+</nobr>
+
+</span>
 
 <div class='s2ui_center'>
 
@@ -31,6 +59,5 @@ input.login {
 
 <script>
 var loginButtonCaption = "<g:message code='spring.security.ui.login.login'/>";
-var logoutLink = '<%=link(controller: 'logout') { 'Logout' }%>';
 var loggingYouIn = "<g:message code='spring.security.ui.login.loggingYouIn'/>";
 </script>

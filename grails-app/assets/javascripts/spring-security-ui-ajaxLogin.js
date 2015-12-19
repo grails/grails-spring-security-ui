@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(function() {
 	var buttons = {
 		Cancel: function() {
 			$(this).dialog('close');
@@ -30,7 +30,9 @@ $(document).ready(function() {
 					}
 					else {
 						$('#loginFormContainer').dialog('close');
-						$('#loginLinkContainer').html('Logged in as ' + json.username + ' (' + logoutLink + ')');
+						$('#loginLinkContainer').html('Logged in as ' + json.username +
+							' (<a href="' + $("#_logout").attr("href") + '" id="logout">Logout</a>)');
+						$("#logout").click(logout);
 					}
 				}
 				else if (json.error) {
@@ -49,4 +51,20 @@ $(document).ready(function() {
 		$('#loginFormContainer').show().dialog('open');
 		$('#username').focus();
 	});
+
+   $("#logout").click(logout);
 });
+
+function logout(event) {
+   event.preventDefault();
+   $.ajax({
+      url: $("#_logout").attr("href"),
+      method: "post",
+      success: function(data, textStatus, jqXHR) {
+         window.location = $("#_afterLogout").attr("href");
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+         console.log("Logout error, textStatus: " + textStatus + ", errorThrown: " + errorThrown);
+      }
+   });
+}
