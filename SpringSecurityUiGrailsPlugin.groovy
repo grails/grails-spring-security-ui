@@ -14,6 +14,9 @@
  */
 import grails.plugin.springsecurity.SpringSecurityUtils
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
@@ -38,6 +41,8 @@ class SpringSecurityUiGrailsPlugin {
 	def issueManagement = [url: 'https://github.com/grails-plugins/grails-spring-security-ui/issues']
 	def scm = [url: 'https://github.com/grails-plugins/grails-spring-security-ui/']
 
+	private Logger log = LoggerFactory.getLogger('grails.plugin.springsecurity.ui.SpringSecurityUiGrailsPlugin')
+
 	def doWithSpring = {
 
 		def conf = SpringSecurityUtils.securityConfig
@@ -55,6 +60,32 @@ class SpringSecurityUiGrailsPlugin {
 
 		if (printStatusMessages) {
 			println '... finished configuring Spring Security UI\n'
+		}
+	}
+
+	def doWithApplicationContext = { ctx ->
+		def conf = SpringSecurityUtils.securityConfig
+		if (conf.active && log.traceEnabled) {
+			// redisplay here to show the merged config
+			def sb = new StringBuilder('Spring Security configuration:\n')
+			def flatConf = conf.flatten()
+			for (key in flatConf.keySet().sort()) {
+				def value = flatConf[key]
+				sb << '\t' << key << ': '
+				if (value instanceof Closure) {
+					sb << '(closure)'
+				}
+				else {
+					try {
+						sb << value.toString() // eagerly convert to string to catch individual exceptions
+					}
+					catch (e) {
+						sb << '(an error occurred: ' << e.message << ')'
+					}
+				}
+				sb << '\n'
+			}
+			log.trace sb.toString()
 		}
 	}
 }
