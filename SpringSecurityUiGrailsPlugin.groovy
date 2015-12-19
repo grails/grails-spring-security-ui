@@ -13,6 +13,16 @@
  * limitations under the License.
  */
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.ui.strategy.DefaultAclStrategy
+import grails.plugin.springsecurity.ui.strategy.DefaultErrorsStrategy
+import grails.plugin.springsecurity.ui.strategy.DefaultPersistentLoginStrategy
+import grails.plugin.springsecurity.ui.strategy.DefaultPropertiesStrategy
+import grails.plugin.springsecurity.ui.strategy.DefaultQueryStrategy
+import grails.plugin.springsecurity.ui.strategy.DefaultRegistrationCodeStrategy
+import grails.plugin.springsecurity.ui.strategy.DefaultRequestmapStrategy
+import grails.plugin.springsecurity.ui.strategy.DefaultRoleStrategy
+import grails.plugin.springsecurity.ui.strategy.DefaultUserStrategy
+import grails.plugin.springsecurity.ui.strategy.MailPluginMailStrategy
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -57,6 +67,23 @@ class SpringSecurityUiGrailsPlugin {
 		}
 
 		SpringSecurityUtils.loadSecondaryConfig 'DefaultUiSecurityConfig'
+
+		def serviceRef = { springSecurityUiService = ref('springSecurityUiService') }
+		uiAclStrategy DefaultAclStrategy, serviceRef
+		uiErrorsStrategy DefaultErrorsStrategy, serviceRef
+		uiPersistentLoginStrategy DefaultPersistentLoginStrategy, serviceRef
+		uiPropertiesStrategy DefaultPropertiesStrategy, serviceRef
+		uiQueryStrategy DefaultQueryStrategy, serviceRef
+		uiRegistrationCodeStrategy DefaultRegistrationCodeStrategy, serviceRef
+		uiRequestmapStrategy DefaultRequestmapStrategy, serviceRef
+		uiRoleStrategy DefaultRoleStrategy, serviceRef
+		uiUserStrategy DefaultUserStrategy, serviceRef
+
+		uiMailStrategy(MailPluginMailStrategy) { bean ->
+			// can't explicitly add a dependency for the mailService bean (mailService = ref('mailService'))
+			// since the mail plugin might not be installed
+			bean.autowire = 'byName'
+		}
 
 		if (printStatusMessages) {
 			println '... finished configuring Spring Security UI\n'
