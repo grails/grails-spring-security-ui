@@ -17,21 +17,19 @@ grails.project.dependency.resolution = {
 		mavenLocal()
 		mavenCentral()
 		mavenRepo 'http://download.java.net/maven/2/'
-		mavenRepo 'http://repo.spring.io/milestone'
 	}
 
 	plugins {
-		compile ':spring-security-core:2.0-RC3'
-		compile ':mail:1.0.5'
+		compile ':spring-security-core:2.0.0'
 		compile ':jquery:1.11.1'
 		compile ':jquery-ui:1.10.3'
 		compile ':famfamfam:1.0.1'
 
-		compile ':spring-security-acl:2.0-RC1', {
+		compile ':spring-security-acl:2.0.0', {
 			export = false
 		}
 
-		build ':release:3.0.1', ':rest-client-builder:2.0.1', {
+		build ':release:3.1.2', ':rest-client-builder:2.1.1', {
 			export = false
 		}
 	}

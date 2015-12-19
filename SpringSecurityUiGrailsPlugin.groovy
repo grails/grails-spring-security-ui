@@ -20,8 +20,8 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 class SpringSecurityUiGrailsPlugin {
 
 	String version = '1.0-RC2'
-	String grailsVersion = '2.0.0 > *'
-	List loadAfter = ['springSecurityCore']
+	String grailsVersion = '2.3.0 > *'
+	List loadAfter = ['springSecurityCore', 'springSecurityAcl']
 	List pluginExcludes = [
 		'docs/**',
 		'src/docs/**',
@@ -45,10 +45,16 @@ class SpringSecurityUiGrailsPlugin {
 			return
 		}
 
-		println '\nConfiguring Spring Security UI ...'
+		boolean printStatusMessages = (conf.printStatusMessages instanceof Boolean) ? conf.printStatusMessages : true
+
+		if (printStatusMessages) {
+			println '\nConfiguring Spring Security UI ...'
+		}
 
 		SpringSecurityUtils.loadSecondaryConfig 'DefaultUiSecurityConfig'
 
-		println '... finished configuring Spring Security UI\n'
+		if (printStatusMessages) {
+			println '... finished configuring Spring Security UI\n'
+		}
 	}
 }
