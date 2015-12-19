@@ -21,8 +21,6 @@ grails.project.dependency.resolution = {
 
 	plugins {
 		compile ':spring-security-core:2.0.0'
-		compile ':jquery:1.11.1'
-		compile ':jquery-ui:1.10.3'
 
 		compile ':spring-security-acl:2.0.0', {
 			export = false
