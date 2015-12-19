@@ -114,5 +114,8 @@ class SpringSecurityUiGrailsPlugin {
 			}
 			log.trace sb.toString()
 		}
+
+		// can't use InitializingBean because of circular references with the strategy classes
+		ctx.springSecurityUiService.initialize()
 	}
 }
