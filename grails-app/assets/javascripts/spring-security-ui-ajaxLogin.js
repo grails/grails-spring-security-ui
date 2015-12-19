@@ -10,8 +10,8 @@ $(document).ready(function() {
 
 	$("#loginFormContainer").dialog({
 		autoOpen: false,
-		height: 270,
-		width: 300,
+		height: 450,
+		width: 450,
 		modal: true,
 		buttons: buttons
 	});

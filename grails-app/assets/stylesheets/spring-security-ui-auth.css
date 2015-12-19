@@ -1,12 +1,9 @@
-.login_message {
-	color: red;
-}
-
 .login {
 	background-color: #F1F1F1;
 	margin-bottom: 15px;
 	overflow: hidden;
-	width: 310px;
+	width: 550px;
+	height: 350px;
 }
 
 .login-inner {
@@ -20,4 +17,8 @@
 	font-weight: bold;
 	margin-bottom: 5px;
 	padding-bottom: 0;
+}
+
+input.formLogin {
+	width: 300px;
 }
