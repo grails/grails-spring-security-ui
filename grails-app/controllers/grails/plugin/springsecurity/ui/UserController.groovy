@@ -126,7 +126,7 @@ class UserController extends AbstractS2UiController {
 		String passwordExpiredPropertyName = userLookup.passwordExpiredPropertyName
 		String usernameFieldName = userLookup.usernamePropertyName
 		def cs = lookupUserClass().createCriteria()
-		
+
 		def results = cs.list(max: max, offset: offset) {
 			firstResult: offset
 			maxResults: max
@@ -146,7 +146,7 @@ class UserController extends AbstractS2UiController {
 				order(params.sort,params.order ?: 'ASC')
 			}
 		}
-		
+
 		def model = [results: results, totalCount: results.totalCount, searched: true]
 
 		// add query params to model for paging
@@ -178,7 +178,7 @@ class UserController extends AbstractS2UiController {
 					distinct(usernameFieldName)
 				}
 			}
-			
+
 			for (result in results) {
 				jsonData << [value: result]
 			}

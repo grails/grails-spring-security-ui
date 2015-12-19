@@ -18,20 +18,6 @@ security {
 
 		encodePassword = false
 
-		register {
-			emailBody = '''\
-Hi $user.username,<br/>
-<br/>
-You (or someone pretending to be you) created an account with this email address.<br/>
-<br/>
-If you made the request, please click&nbsp;<a href="$url">here</a> to finish the registration.
-'''
-			emailFrom = 'do.not.reply@localhost'
-			emailSubject = 'New Account'
-			defaultRoleNames = ['ROLE_USER']
-			postRegisterUrl = null // use defaultTargetUrl if not set
-		}
-
 		forgotPassword {
 			emailBody = '''\
 Hi $user.username,<br/>
@@ -45,6 +31,20 @@ If you did make the request, then click <a href="$url">here</a> to reset your pa
 			emailFrom = 'do.not.reply@localhost'
 			emailSubject = 'Password Reset'
 			postResetUrl = null // use defaultTargetUrl if not set
+		}
+
+		register {
+			defaultRoleNames = ['ROLE_USER']
+			emailBody = '''\
+Hi $user.username,<br/>
+<br/>
+You (or someone pretending to be you) created an account with this email address.<br/>
+<br/>
+If you made the request, please click&nbsp;<a href="$url">here</a> to finish the registration.
+'''
+			emailFrom = 'do.not.reply@localhost'
+			emailSubject = 'New Account'
+			postRegisterUrl = null // use defaultTargetUrl if not set
 		}
 	}
 }

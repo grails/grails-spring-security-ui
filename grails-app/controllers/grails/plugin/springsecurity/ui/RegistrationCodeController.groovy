@@ -110,7 +110,7 @@ class RegistrationCodeController extends AbstractS2UiController {
 
 		if (params.term?.length() > 2) {
 			String username = params.term
-			
+
 			setIfMissing 'max', 10, 100
 
 			def cs = RegistrationCode.createCriteria()
@@ -121,7 +121,7 @@ class RegistrationCodeController extends AbstractS2UiController {
 				projections{
 					distinct('username')
 				}
-				
+
 			}
 
 			for (result in results) {

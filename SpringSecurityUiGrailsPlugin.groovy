@@ -25,9 +25,7 @@ class SpringSecurityUiGrailsPlugin {
 	List pluginExcludes = [
 		'docs/**',
 		'src/docs/**',
-		'scripts/CreateS2UiTestApps.groovy',
-		'scripts/Fixpdf.groovy',
-		'lib/**'
+		'scripts/CreateS2UiTestApps.groovy'
 	]
 
 	String author = 'Burt Beckwith'
@@ -35,7 +33,6 @@ class SpringSecurityUiGrailsPlugin {
 	String title = 'Spring Security UI'
 	String description = 'User interface extensions for the Spring Security plugin'
 	String documentation = 'http://grails-plugins.github.io/grails-spring-security-ui/'
-
 	String license = 'APACHE'
 	def organization = [name: 'Grails', url: 'http://www.grails.org/']
 	def issueManagement = [url: 'https://github.com/grails-plugins/grails-spring-security-ui/issues']

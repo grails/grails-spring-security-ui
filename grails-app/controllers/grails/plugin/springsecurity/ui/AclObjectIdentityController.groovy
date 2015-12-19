@@ -112,7 +112,7 @@ class AclObjectIdentityController extends AbstractS2UiController {
 				if (params[name] && params[name] != 'null') {
 					long id = params.long(name)
 					if (name == 'ownerSid') name = 'owner'
-					eq(name,id)					
+					eq(name,id)
 				}
 			}
 			for (name in ['entriesInheriting']) {

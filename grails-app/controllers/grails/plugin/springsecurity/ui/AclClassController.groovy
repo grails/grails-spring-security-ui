@@ -83,10 +83,10 @@ class AclClassController extends AbstractS2UiController {
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 10, 100
 		setIfMissing 'offset', 0
-		
+
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
-		
+
 		def cs = lookupClass().createCriteria()
 		def results = cs.list(max: max,offset: offset) {
 			firstResult: offset
@@ -127,7 +127,7 @@ class AclClassController extends AbstractS2UiController {
 					distinct('className')
 				}
 			}
-			
+
 			for (result in results) {
 				jsonData << [value: result]
 			}

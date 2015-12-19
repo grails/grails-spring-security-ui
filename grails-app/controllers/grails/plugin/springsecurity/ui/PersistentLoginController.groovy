@@ -84,7 +84,7 @@ class PersistentLoginController extends AbstractS2UiController {
 					ilike(name,'%' + param + '%')
 				}
 			}
-			
+
 			if (params.sort) {
 				order(params.sort,params.order ?: 'ASC')
 			}
@@ -110,16 +110,16 @@ class PersistentLoginController extends AbstractS2UiController {
 			String username = params.term
 
 			setIfMissing 'max', 10, 100
-			
+
 			def cs = lookupPersistentLoginClass().createCriteria()
 			def results = cs.list(max: params.int('max')) {
 				maxResults: params.int('max')
-				ilike('username','%' + username + '%')			
+				ilike('username','%' + username + '%')
 				order('username','DESC')
 				projections{
 					distinct('username')
 				}
-			}	
+			}
 			for (result in results) {
 				jsonData << [value: result]
 			}

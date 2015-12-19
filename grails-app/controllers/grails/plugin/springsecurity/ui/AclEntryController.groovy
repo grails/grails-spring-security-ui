@@ -121,16 +121,16 @@ class AclEntryController extends AbstractS2UiController {
 				/*
 				 *  special case for external search - original query was
 				 *  hql.append " AND e.aclObjectIdentity.aclClass.id=:aclClass"
-				 *  
+				 *
 				 *  Looking up current version of the plugin ( 2.0-RC2)
 				 *  AclEntry has a AclObjectIdentity aclObjectIdentity
-				 *   AclObjectIdentity is created by extending AbstractAclObjectIdentity 
-				 *   AbstractAclObjectIdentity contains AclClass aclClass 
-				 *      
+				 *   AclObjectIdentity is created by extending AbstractAclObjectIdentity
+				 *   AbstractAclObjectIdentity contains AclClass aclClass
+				 *
 				 *   AbstractAclObjectIdentity is located in the grails-spring-security-acl at
 				 *   /src/groovy/grails/plugin/springsecurity/acl/AbstractAclObjectIdentity.groovy
 				 */
-				
+
 				aclObjectIdentity{
 					aclClass{
 						eq('id',params.long('aclClass'))
@@ -141,7 +141,7 @@ class AclEntryController extends AbstractS2UiController {
 				order(params.sort,params.order ?: 'ASC')
 			}
 		}
-		
+
 		def model = [results: results, totalCount: results.totalCount, searched: true,
 			sids: lookupAclSidClass().list(), permissionFactory: aclPermissionFactory]
 		// add query params to model for paging
