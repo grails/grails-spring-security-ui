@@ -1,8 +1,7 @@
 <html>
-<%@ page import="grails.util.Holders" %>
 
 <sec:ifNotSwitched>
-	<sec:ifAllGranted roles='ROLE_SWITCH_USER'>
+	<sec:ifAllGranted roles='${applicationContext.springSecurityService.securityConfig.switchUserRoleName}'>
 	<g:if test='${user.username}'>
 	<g:set var='canRunAs' value='${true}'/>
 	</g:if>

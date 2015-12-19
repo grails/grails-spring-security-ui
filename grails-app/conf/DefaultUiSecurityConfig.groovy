@@ -52,5 +52,7 @@ If you made the request, please click&nbsp;<a href="$url">here</a> to finish the
 			emailSubject = 'New Account'
 			postRegisterUrl = null // use defaultTargetUrl if not set
 		}
+
+		switchUserRoleName = 'ROLE_SWITCH_USER'
 	}
 }
