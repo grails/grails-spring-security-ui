@@ -1,7 +1,7 @@
 <html>
 
 <head>
-	<meta name='layout' content='springSecurityUI'/>
+	<meta name="layout" content="${layoutUi}"/>
 	<title>Authentication Providers</title>
 </head>
 

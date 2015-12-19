@@ -1,7 +1,7 @@
 <html>
 
 <head>
-	<meta name='layout' content='register'/>
+	<meta name="layout" content="${layoutRegister}"/>
 	<title><g:message code='spring.security.ui.register.title'/></title>
 </head>
 

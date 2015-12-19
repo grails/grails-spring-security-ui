@@ -1,7 +1,7 @@
 <html>
 
 <head>
-	<meta name='layout' content='springSecurityUI'/>
+	<meta name="layout" content="${layoutUi}"/>
 	<title>Current Auth</title>
 </head>
 

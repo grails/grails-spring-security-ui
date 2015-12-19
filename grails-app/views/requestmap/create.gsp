@@ -1,7 +1,7 @@
 <html>
 
 <head>
-	<meta name='layout' content='springSecurityUI'/>
+	<meta name="layout" content="${layoutUi}"/>
 	<g:set var="entityName" value="${message(code: 'requestmap.label', default: 'Requestmap')}"/>
 	<title><g:message code="default.create.label" args="[entityName]"/></title>
 </head>

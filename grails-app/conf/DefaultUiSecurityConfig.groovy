@@ -33,6 +33,12 @@ If you did make the request, then click <a href="$url">here</a> to reset your pa
 			postResetUrl = null // use defaultTargetUrl if not set
 		}
 
+		gsp {
+			layoutAuth     = 'register'
+			layoutRegister = 'register'
+			layoutUi       = 'springSecurityUI'
+		}
+
 		register {
 			defaultRoleNames = ['ROLE_USER']
 			emailBody = '''\
