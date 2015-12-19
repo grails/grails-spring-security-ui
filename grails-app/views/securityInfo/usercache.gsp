@@ -1,101 +1,84 @@
 <html>
-
-<head>
-	<meta name="layout" content="${layoutUi}"/>
-	<title>User Cache</title>
-</head>
-
-<body>
-
-<br/>
-
-<g:if test='${cache}'>
-<h4>UserCache: ${cache.getClass().name}</h4>
-
-<br/>
-
-<table>
-	<tr>
-		<td>Size</td>
-		<td>${cache.size}</td>
-	</tr>
-	<tr>
-		<td>Status</td>
-		<td>${cache.status}</td>
-	</tr>
-	<tr>
-		<td>Name</td>
-		<td>${cache.name}</td>
-	</tr>
-	<tr>
-		<td>GUID</td>
-		<td>${cache.guid}</td>
-	</tr>
-	<tr>
-		<td>Statistics</td>
-		<td>
-			<table>
-				<tr>
-					<td>Cache Hits</td>
-					<td>${cache.statistics.cacheHits}</td>
-				</tr>
-				<tr>
-					<td>In-memory Hits</td>
-					<td>${cache.statistics.inMemoryHits}</td>
-				</tr>
-				<tr>
-					<td>On-disk Hits</td>
-					<td>${cache.statistics.onDiskHits}</td>
-				</tr>
-				<tr>
-					<td>Cache Misses</td>
-					<td>${cache.statistics.cacheMisses}</td>
-				</tr>
-				<tr>
-					<td>Object Count</td>
-					<td>${cache.statistics.objectCount}</td>
-				</tr>
-				<tr>
-					<td>Memory Store Object Count</td>
-					<td>${cache.statistics.memoryStoreObjectCount}</td>
-				</tr>
-				<tr>
-					<td>Disk Store Object Count</td>
-					<td>${cache.statistics.diskStoreObjectCount}</td>
-				</tr>
-				<tr>
-					<td>Statistics Accuracy Description</td>
-					<td>${cache.statistics.statisticsAccuracyDescription}</td>
-				</tr>
-				<tr>
-					<td>Average Get Time</td>
-					<td>${cache.statistics.averageGetTime}</td>
-				</tr>
-				<tr>
-					<td>Eviction Count</td>
-					<td>${cache.statistics.evictionCount}</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-
-	<tr><th colspan='2'>${cache.size} user${cache.size == 1 ? '' : 's'}</th></tr>
-	<tr>
-		<th>Username</th>
-		<th>User</th>
-	</tr>
-	<g:each var='k' in='${cache.keys}'>
-	<tr>
-		<td>${k}</td>
-		<td>${cache.get(k)?.value}</td>
-	</tr>
-	</g:each>
-</table>
-</g:if>
-<g:else>
-<h4>Not Caching Users</h4>
-</g:else>
-
-</body>
-
+	<head>
+		<meta name="layout" content="${layoutUi}"/>
+		<title><g:message code='spring.security.ui.menu.securityInfo.usercache'/></title>
+	</head>
+	<body>
+		<br/>
+		<g:if test='${cache}'>
+		<h4><g:message code='spring.security.ui.info.usercache.classname' args='[cache.getClass().name]'/></h4>
+		<br/>
+		<table>
+			<tr>
+				<td><g:message code='spring.security.ui.info.usercache.label.size'/></td>
+				<td>${cache.size}</td>
+			</tr>
+			<tr>
+				<td><g:message code='spring.security.ui.info.usercache.label.status'/></td>
+				<td>${cache.status}</td>
+			</tr>
+			<tr>
+				<td><g:message code='spring.security.ui.info.usercache.label.name'/></td>
+				<td>${cache.name}</td>
+			</tr>
+			<tr>
+				<td><g:message code='spring.security.ui.info.usercache.label.guid'/></td>
+				<td>${cache.guid}</td>
+			</tr>
+			<tr>
+				<td><g:message code='spring.security.ui.info.usercache.label.stats'/></td>
+				<td>
+					<table>
+						<tr>
+							<td><g:message code='spring.security.ui.info.usercache.label.stats.cacheHits'/></td>
+							<td>${cache.statistics.cacheHitCount()}</td>
+						</tr>
+						<tr>
+							<td><g:message code='spring.security.ui.info.usercache.label.stats.memoryHits'/></td>
+							<td>${cache.statistics.localHeapHitCount()}</td>
+						</tr>
+						<tr>
+							<td><g:message code='spring.security.ui.info.usercache.label.stats.diskHits'/></td>
+							<td>${cache.statistics.localDiskHitCount()}</td>
+						</tr>
+						<tr>
+							<td><g:message code='spring.security.ui.info.usercache.label.stats.cacheMisses'/></td>
+							<td>${cache.statistics.cacheMissCount()}</td>
+						</tr>
+						<tr>
+							<td><g:message code='spring.security.ui.info.usercache.label.stats.objectCount'/></td>
+							<td>${cache.statistics.size}</td>
+						</tr>
+						<tr>
+							<td><g:message code='spring.security.ui.info.usercache.label.stats.memoryObjectCount'/></td>
+							<td>${cache.statistics.localHeapSize}</td>
+						</tr>
+						<tr>
+							<td><g:message code='spring.security.ui.info.usercache.label.stats.diskObjectCount'/></td>
+							<td>${cache.statistics.localDiskSize}</td>
+						</tr>
+						<tr>
+							<td><g:message code='spring.security.ui.info.usercache.label.stats.evictionCount'/></td>
+							<td>${cache.statistics.cacheEvictedCount()}</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr><th colspan='2'><g:message code='spring.security.ui.info.usercache.header.userCount' args='[cache.size]'/></th></tr>
+			<tr>
+				<th><g:message code='spring.security.ui.info.usercache.header.username'/></th>
+				<th><g:message code='spring.security.ui.info.usercache.header.user'/></th>
+			</tr>
+			<g:each var='k' in='${cache.keys}'>
+			<tr>
+				<td>${k}</td>
+				<td>${cache.get(k)?.value}</td>
+			</tr>
+			</g:each>
+		</table>
+		</g:if>
+		<g:else>
+		<h4><g:message code='spring.security.ui.info.usercache.disabled'/></h4>
+		</g:else>
+	</body>
 </html>

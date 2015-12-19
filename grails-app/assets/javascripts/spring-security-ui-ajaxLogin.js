@@ -1,8 +1,7 @@
 $(function() {
-	var buttons = {
-		Cancel: function() {
-			$(this).dialog('close');
-		}
+	var buttons = {};
+	buttons[cancelButtonCaption] = function() {
+		$(this).dialog('close');
 	};
 	buttons[loginButtonCaption] = function() {
 		$('#loginForm').submit();
@@ -30,7 +29,8 @@ $(function() {
 					}
 					else {
 						$('#loginFormContainer').dialog('close');
-						$('#loginLinkContainer').html('Logged in as ' + json.username +
+						$('#loginLinkContainer').html(
+							loggedInAsWithPlaceholder.replace(/\{0\}/, json.username) +
 							' (<a href="' + $("#_logout").attr("href") + '" id="logout">Logout</a>)');
 						$("#logout").click(logout);
 					}
@@ -49,7 +49,7 @@ $(function() {
 
 	$('#loginLink').click(function() {
 		$('#loginFormContainer').show().dialog('open');
-		$('#username').focus();
+		$('#ajaxUsername').focus();
 	});
 
    $("#logout").click(logout);
