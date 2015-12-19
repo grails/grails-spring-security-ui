@@ -25,23 +25,20 @@ class SecurityInfoController {
 
 	def accessDecisionManager
 	def authenticationManager
-	def channelProcessingFilter
-	def logoutFilter
+	def channelFilterInvocationSecurityMetadataSource
 	def logoutHandlers
 	def objectDefinitionSource
 	def springSecurityFilterChain
 	def userCache
 
-	def index() {}
-
 	def config() {
-		[conf: new TreeMap(SpringSecurityUtils.securityConfig.flatten())]
+		[conf: new TreeMap(conf.flatten())]
 	}
 
 	def mappings() {
 		// List<InterceptedUrl>
 		[configAttributes: objectDefinitionSource.configAttributeMap,
-		 securityConfigType: SpringSecurityUtils.securityConfig.securityConfigType]
+		 securityConfigType: conf.securityConfigType]
 	}
 
 	def currentAuth() {
@@ -49,15 +46,15 @@ class SecurityInfoController {
 	}
 
 	def usercache() {
-		[cache: SpringSecurityUtils.securityConfig.cacheUsers ? userCache.cache : false]
+		[cache: conf.cacheUsers ? userCache.cache : false]
 	}
 
-	def filterChain() {
+	def filterChains() {
 		[filterChainMap: springSecurityFilterChain.filterChainMap]
 	}
 
-	def logoutHandler() {
-		render view: 'logoutHandlers', model: [handlers: logoutHandlers]
+	def logoutHandlers() {
+		[handlers: logoutHandlers]
 	}
 
 	def voters() {
@@ -67,10 +64,12 @@ class SecurityInfoController {
 	def providers() {
 		[providers: authenticationManager.providers]
 	}
-/*
+
 	def secureChannel() {
-		def securityMetadataSource = channelProcessingFilter?.securityMetadataSource
-		render securityMetadataSource.getClass().name
+		[requestMap: channelFilterInvocationSecurityMetadataSource?.requestMap]
 	}
-*/
+
+	protected ConfigObject getConf() {
+		SpringSecurityUtils.securityConfig
+	}
 }
