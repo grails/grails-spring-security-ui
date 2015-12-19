@@ -1,9 +1,9 @@
+.classpath
+.project
+.settings
 *.log
-/target
+target
 /grails-spring-security-ui-*.zip
 /grails-spring-security-ui-*.zip.sha1
 /plugin.xml
-/.classpath
-/.project
-/.settings
 /web-app/WEB-INF
