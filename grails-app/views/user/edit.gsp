@@ -27,10 +27,6 @@
 def tabData = []
 tabData << [name: 'userinfo', icon: 'icon_user', messageCode: 'spring.security.ui.user.info']
 tabData << [name: 'roles',    icon: 'icon_role', messageCode: 'spring.security.ui.user.roles']
-boolean isOpenId = Holders.pluginManager.hasGrailsPlugin('springSecurityOpenid')
-if (isOpenId) {
-	tabData << [name: 'openIds', icon: 'icon_role', messageCode: 'spring.security.ui.user.openIds']
-}
 %>
 
 <s2ui:tabs elementId='tabs' height='375' data="${tabData}">
@@ -68,21 +64,6 @@ if (isOpenId) {
 		</div>
 		</g:each>
 	</s2ui:tab>
-
-	<g:if test='${isOpenId}'>
-	<s2ui:tab name='openIds' height='275'>
-	<g:if test='${user?.openIds}'>
-		<ul>
-		<g:each var="openId" in="${user.openIds}">
-		<li>${openId.url}</li>
-		</g:each>
-		</ul>
-	</g:if>
-	<g:else>
-	No OpenIDs registered
-	</g:else>
-	</s2ui:tab>
-	</g:if>
 
 </s2ui:tabs>
 
