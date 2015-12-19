@@ -14,131 +14,47 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.converters.JSON
-
-import org.springframework.dao.DataIntegrityViolationException
+import grails.plugin.springsecurity.ui.strategy.RegistrationCodeStrategy
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-class RegistrationCodeController extends AbstractS2UiController {
+class RegistrationCodeController extends AbstractS2UiDomainController {
 
-	def edit() {
-		def registrationCode = findById()
-		if (!registrationCode) return
-
-			[registrationCode: registrationCode]
-	}
+	/** Dependency injection for the 'uiRegistrationCodeStrategy' bean. */
+	RegistrationCodeStrategy uiRegistrationCodeStrategy
 
 	def update() {
-		def registrationCode = findById()
-		if (!registrationCode) return
-			if (!versionCheck('registrationCode.label', 'RegistrationCode', registrationCode, [registrationCode: registrationCode])) {
-				return
-			}
-
-		if (!springSecurityUiService.updateRegistrationCode(registrationCode, params.username, params.token)) {
-			render view: 'edit', model: [registrationCode: registrationCode]
-			return
+		doUpdate { registrationCode ->
+			uiRegistrationCodeStrategy.updateRegistrationCode params, registrationCode
 		}
-
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), registrationCode.id])}"
-		redirect action: 'edit', id: registrationCode.id
 	}
 
 	def delete() {
-		def registrationCode = findById()
-		if (!registrationCode) return
-
-			try {
-				springSecurityUiService.deleteRegistrationCode registrationCode
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"
-				redirect action: 'search'
-			}
-			catch (DataIntegrityViolationException e) {
-				flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"
-				redirect action: 'edit', id: params.id
-			}
+		tryDelete { registrationCode ->
+			uiRegistrationCodeStrategy.deleteRegistrationCode registrationCode
+		}
 	}
 
-	def search() {}
-
-	def registrationCodeSearch() {
-
-		boolean useOffset = params.containsKey('offset')
-		setIfMissing 'max', 10, 100
-		setIfMissing 'offset', 0
-
-		Integer max = params.int('max')
-		Integer offset = params.int('offset')
-
-		def cs = RegistrationCode.createCriteria()
-		def results = cs.list(max: max, offset: offset) {
-			firstResult: offset
-			maxResults: max
-
-			if (params.token) {
-				ilike('token', '%'+params.token + '%')
-			}
-
-			if (params.username) {
-				ilike('username', '%'+params.username + '%')
-			}
-
-			if (params.sort) {
-				order(params.sort,params.order ?: 'ASC')
-			}
+	def search() {
+		if (!isSearch()) {
+			// show the form
+			return
 		}
 
-
-		def model = [results: results, totalCount: results.totalCount, searched: true]
-
-		// add query params to model for paging
-		for (name in ['username', 'token']) {
-			model[name] = params[name]
+		def results = doSearch { ->
+			like 'token', delegate
+			like 'username', delegate
 		}
 
-		render view: 'search', model: model
+		renderSearch([results: results, totalCount: results.totalCount],
+		             'token', 'username')
 	}
 
-	/**
-	 * Ajax call used by autocomplete textfield.
-	 */
-	def ajaxRegistrationCodeSearch() {
-
-		def jsonData = []
-
-		if (params.term?.length() > 2) {
-			String username = params.term
-
-			setIfMissing 'max', 10, 100
-
-			def cs = RegistrationCode.createCriteria()
-			def results = cs.list(max: params.int('max')) {
-				maxResults: params.int('max')
-				ilike('username', '%'+username + '%')
-				order('username','DESC')
-				projections{
-					distinct('username')
-				}
-
-			}
-
-			for (result in results) {
-				jsonData << [value: result]
-			}
-		}
-
-		render text: jsonData as JSON, contentType: 'text/plain'
-	}
-
-	protected RegistrationCode findById() {
-		def registrationCode = RegistrationCode.get(params.id)
-		if (!registrationCode) {
-			flash.error = "${message(code: 'default.not.found.message', args: [message(code: 'registrationCode.label', default: 'RegistrationCode'), params.id])}"
-			redirect action: 'search'
-		}
-
-		registrationCode
+	protected Class<?> getClazz() { RegistrationCode }
+	protected String getClassLabelCode() { 'registrationCode.label' }
+	protected String getSimpleClassName() { 'RegistrationCode' }
+	protected Map model(registrationCode, String action) {
+		[registrationCode: registrationCode]
 	}
 }

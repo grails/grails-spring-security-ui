@@ -14,151 +14,46 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.converters.JSON
-
-import org.springframework.dao.DataIntegrityViolationException
-
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-class AclSidController extends AbstractS2UiController {
-
-	def create() {
-		[aclSid: lookupClass().newInstance(params)]
-	}
+class AclSidController extends AbstractS2UiDomainController {
 
 	def save() {
-		def aclSid = lookupClass().newInstance(params)
-		if (!aclSid.save(flush: true)) {
-			render view: 'create', model: [aclSid: aclSid]
-			return
-		}
-
-		flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclSid.label', default: 'AclSid'), aclSid.id])}"
-		redirect action: 'edit', id: aclSid.id
-	}
-
-	def edit() {
-		def aclSid = findById()
-		if (!aclSid) return
-
-		[aclSid: aclSid]
+		doSave uiAclStrategy.saveAclSid(params)
 	}
 
 	def update() {
-		def aclSid = findById()
-		if (!aclSid) return
-		if (!versionCheck('aclSid.label', 'AclSid', aclSid, [aclSid: aclSid])) {
-			return
+		doUpdate { aclSid ->
+			uiAclStrategy.updateAclSid params, aclSid
 		}
-
-		if (!springSecurityUiService.updateAclSid(aclSid, params.sid, params.principal == 'on')) {
-			render view: 'edit', model: [aclSid: aclSid]
-			return
-		}
-
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclSid.label', default: 'AclSid'), aclSid.id])}"
-		redirect action: 'edit', id: aclSid.id
 	}
 
 	def delete() {
-		def aclSid = findById()
-		if (!aclSid) return
-
-		try {
-			springSecurityUiService.deleteAclSid aclSid
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclSid.label', default: 'AclSid'), params.id])}"
-			redirect action: 'search'
-		}
-		catch (DataIntegrityViolationException e) {
-			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'aclSid.label', default: 'AclSid'), params.id])}"
-			redirect action: 'edit', id: params.id
+		tryDelete { aclSid ->
+			uiAclStrategy.deleteAclSid aclSid
 		}
 	}
 
 	def search() {
-		[principal: 0]
-	}
-
-	def aclSidSearch() {
-
-		boolean useOffset = params.containsKey('offset')
-		setIfMissing 'max', 10, 100
-		setIfMissing 'offset', 0
-
-		Integer max = params.int('max')
-		Integer offset = params.int('offset')
-
-		def cs = lookupClass().createCriteria()
-
-		def results = cs.list(max: max, offset: offset) {
-			firstResult: offset
-			maxResults: max
-			if(params['sid']) {
-				ilike('sid','%' + params['sid'] + '%')
-			}
-			Integer value = params.int('principal')
-			if (value) {
-				eq('principal',value == 1)
-			}
-			if (params.sort) {
-				order(params.sort,params.order ?: 'ASC')
-			}
-		}
-		def model = [results: results, totalCount: results.totalCount, searched: true]
-
-		// add query params to model for paging
-		for (name in ['sid', 'principal']) {
-		 	model[name] = params[name]
+		if (!isSearch()) {
+			// show the form
+			return
 		}
 
-		render view: 'search', model: model
-	}
-
-	/**
-	 * Ajax call used by autocomplete textfield.
-	 */
-	def ajaxAclSidSearch() {
-
-		def jsonData = []
-
-		if (params.term?.length() > 2) {
-			String sid = params.term
-			setIfMissing 'max', 10, 100
-
-			def cs = lookupClass().createCriteria()
-
-			def results = cs.list(max: params.int('max')) {
-				maxResults: params.int('max')
-				ilike('sid','%' + sid + '%')
-				order('sid','DESC')
-				projections{
-					distinct('sid')
-				}
-			}
-			for (result in results) {
-				jsonData << [value: result]
-			}
+		def results = doSearch { ->
+			eqBoolean 'principal', delegate
+			like 'sid', delegate
 		}
 
-		render text: jsonData as JSON, contentType: 'text/plain'
+		renderSearch([results: results, totalCount: results.totalCount],
+		             'principal', 'sid')
 	}
 
-	protected findById() {
-		def aclSid = lookupClass().get(params.id)
-		if (!aclSid) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'aclSid.label', default: 'AclSid'), params.id])}"
-			redirect action: 'search'
-		}
-
-		aclSid
-	}
-
-	protected String lookupClassName() {
-		'grails.plugin.springsecurity.acl.AclSid'
-	}
-
-	protected Class<?> lookupClass() {
-		grailsApplication.getDomainClass(lookupClassName()).clazz
+	protected Class<?> getClazz() { AclSid }
+	protected String getClassLabelCode() { 'aclSid.label' }
+	protected String getSimpleClassName() { 'AclSid' }
+	protected Map model(aclSid, String action) {
+		[aclSid: aclSid]
 	}
 }

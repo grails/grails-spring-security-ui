@@ -14,8 +14,10 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.authentication.dao.NullSaltSource
+import grails.plugin.springsecurity.ui.strategy.MailStrategy
+import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
+import grails.plugin.springsecurity.ui.strategy.RegistrationCodeStrategy
 import groovy.text.SimpleTemplateEngine
 
 /**
@@ -23,198 +25,215 @@ import groovy.text.SimpleTemplateEngine
  */
 class RegisterController extends AbstractS2UiController {
 
-	// override default value from base class
-	static defaultAction = 'index'
-
-	// override default value from base class
 	static allowedMethods = [register: 'POST']
 
-	def mailService
-	def messageSource
+	static defaultAction = 'index'
+
+	/** Dependency injection for the 'saltSource' bean. */
 	def saltSource
+
+	/** Dependency injection for the 'uiMailStrategy' bean. */
+	MailStrategy uiMailStrategy
+
+	/** Dependency injection for the 'uiRegistrationCodeStrategy' bean. */
+	RegistrationCodeStrategy uiRegistrationCodeStrategy
+
+	/** Dependency injection for the 'uiPropertiesStrategy' bean. */
+	PropertiesStrategy uiPropertiesStrategy
 
 	def index() {
 		def copy = [:] + (flash.chainedParams ?: [:])
-		copy.remove 'controller'
 		copy.remove 'action'
-		[command: new RegisterCommand(copy)]
+		copy.remove 'controller'
+		copy.remove 'format'
+		[registerCommand: new RegisterCommand(copy)]
 	}
 
-	def register(RegisterCommand command) {
+	def register(RegisterCommand registerCommand) {
 
-		if (command.hasErrors()) {
-			render view: 'index', model: [command: command]
+		if (registerCommand.hasErrors()) {
+			render view: 'index', model: [registerCommand: registerCommand]
 			return
 		}
 
-		String salt = saltSource instanceof NullSaltSource ? null : command.username
-		def user = lookupUserClass().newInstance(email: command.email, username: command.username,
-				accountLocked: true, enabled: true)
+		def user = uiRegistrationCodeStrategy.createUser(registerCommand)
+		RegistrationCode registrationCode = doRegister(registerCommand, user)
+		if (!registrationCode) {
+			return
+		}
 
-		RegistrationCode registrationCode = springSecurityUiService.register(user, command.password, salt)
+		sendVerifyRegistrationMail registrationCode, user, registerCommand.email
+
+		render view: 'index', model: [emailSent: true]
+	}
+
+	protected RegistrationCode doRegister(RegisterCommand registerCommand, user) {
+		String salt = saltSource instanceof NullSaltSource ? null : registerCommand.username
+
+		RegistrationCode registrationCode = uiRegistrationCodeStrategy.register(user, registerCommand.password, salt)
 		if (registrationCode == null || registrationCode.hasErrors()) {
 			// null means problem creating the user
 			flash.error = message(code: 'spring.security.ui.register.miscError')
 			flash.chainedParams = params
 			redirect action: 'index'
-			return
+			return null
 		}
 
+		registrationCode
+	}
+
+	protected void sendVerifyRegistrationMail(RegistrationCode registrationCode, user, String email) {
 		String url = generateLink('verifyRegistration', [t: registrationCode.token])
 
-		def conf = SpringSecurityUtils.securityConfig
-		def body = conf.ui.register.emailBody
+		def body = registerEmailBody
 		if (body.contains('$')) {
 			body = evaluate(body, [user: user, url: url])
 		}
-		mailService.sendMail {
-			to command.email
-			from conf.ui.register.emailFrom
-			subject conf.ui.register.emailSubject
-			html body.toString()
-		}
 
-		render view: 'index', model: [emailSent: true]
+		uiMailStrategy.sendVerifyRegistrationMail(
+			to: email,
+			from: registerEmailFrom,
+			subject: registerEmailSubject,
+			html: body.toString())
 	}
 
 	def verifyRegistration() {
 
-		def conf = SpringSecurityUtils.securityConfig
-		String defaultTargetUrl = conf.successHandler.defaultTargetUrl
-
 		String token = params.t
 
-		def registrationCode = token ? RegistrationCode.findByToken(token) : null
+		RegistrationCode registrationCode = token ? RegistrationCode.findByToken(token) : null
 		if (!registrationCode) {
 			flash.error = message(code: 'spring.security.ui.register.badCode')
-			redirect uri: defaultTargetUrl
+			redirect uri: successHandlerDefaultTargetUrl
 			return
 		}
 
-		def user
-		// TODO to ui service
-		RegistrationCode.withTransaction { status ->
-			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			user = lookupUserClass().findWhere((usernameFieldName): registrationCode.username)
-			if (!user) {
-				return
-			}
-			user.accountLocked = false
-			user.save(flush:true)
-			def UserRole = lookupUserRoleClass()
-			def Role = lookupRoleClass()
-			for (roleName in conf.ui.register.defaultRoleNames) {
-				UserRole.create user, Role.findByAuthority(roleName)
-			}
-			registrationCode.delete()
-		}
+		def user = uiRegistrationCodeStrategy.finishRegistration(registrationCode)
 
 		if (!user) {
 			flash.error = message(code: 'spring.security.ui.register.badCode')
-			redirect uri: defaultTargetUrl
+			redirect uri: successHandlerDefaultTargetUrl
 			return
 		}
 
-		springSecurityService.reauthenticate user.username
+		if (user.hasErrors()) {
+			// expected to be handled already by ErrorsStrategy.handleValidationErrors
+			return
+		}
 
 		flash.message = message(code: 'spring.security.ui.register.complete')
-		redirect uri: conf.ui.register.postRegisterUrl ?: defaultTargetUrl
+		redirect uri: registerPostRegisterUrl ?: successHandlerDefaultTargetUrl
 	}
 
-	def forgotPassword() {
+	def forgotPassword(ForgotPasswordCommand forgotPasswordCommand) {
+
+		if (forgotPasswordCommand.hasErrors()) {
+			return [forgotPasswordCommand: forgotPasswordCommand]
+		}
 
 		if (!request.post) {
 			// show the form
-			return
+			return [forgotPasswordCommand: forgotPasswordCommand]
 		}
 
-		String username = params.username
-		if (!username) {
-			flash.error = message(code: 'spring.security.ui.forgotPassword.username.missing')
-			redirect action: 'forgotPassword'
-			return
-		}
-
-		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-		def user = lookupUserClass().findWhere((usernameFieldName): username)
+		def user = findUserByUsername(forgotPasswordCommand.username)
 		if (!user) {
-			flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
+			forgotPasswordCommand.errors.rejectValue('username', 'spring.security.ui.forgotPassword.user.notFound')
 			redirect action: 'forgotPassword'
 			return
 		}
 
-		def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
-		registrationCode.save(flush: true)
+		String email = uiPropertiesStrategy.getProperty(user, 'email')
 
-		String url = generateLink('resetPassword', [t: registrationCode.token])
+		RegistrationCode registrationCode = uiRegistrationCodeStrategy.sendForgotPasswordMail(
+				forgotPasswordCommand.username, email) { String registrationCodeToken ->
 
-		def conf = SpringSecurityUtils.securityConfig
-		def body = conf.ui.forgotPassword.emailBody
-		if (body.contains('$')) {
-			body = evaluate(body, [user: user, url: url])
-		}
-		mailService.sendMail {
-			to user.email
-			from conf.ui.forgotPassword.emailFrom
-			subject conf.ui.forgotPassword.emailSubject
-			html body.toString()
+			String url = generateLink('resetPassword', [t: registrationCodeToken])
+
+			String body = forgotPasswordEmailBody
+			if (body.contains('$')) {
+				body = evaluate(body, [user: user, url: url])
+			}
+
+			body
 		}
 
 		[emailSent: true]
 	}
 
-	def resetPassword(ResetPasswordCommand command) {
+	def resetPassword(ResetPasswordCommand resetPasswordCommand) {
 
 		String token = params.t
 
 		def registrationCode = token ? RegistrationCode.findByToken(token) : null
 		if (!registrationCode) {
 			flash.error = message(code: 'spring.security.ui.resetPassword.badCode')
-			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			redirect uri: successHandlerDefaultTargetUrl
 			return
 		}
 
 		if (!request.post) {
-			return [token: token, command: new ResetPasswordCommand()]
+			return [token: token, resetPasswordCommand: resetPasswordCommand]
 		}
 
-		command.username = registrationCode.username
-		command.validate()
-
-		if (command.hasErrors()) {
-			return [token: token, command: command]
+		resetPasswordCommand.username = registrationCode.username
+		resetPasswordCommand.validate()
+		if (resetPasswordCommand.hasErrors()) {
+			return [token: token, resetPasswordCommand: resetPasswordCommand]
 		}
 
-		String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
-		RegistrationCode.withTransaction { status ->
-			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			def user = lookupUserClass().findWhere((usernameFieldName): registrationCode.username)
-			user.password = springSecurityUiService.encodePassword(command.password, salt)
-			user.save()
-			registrationCode.delete()
+		def user = uiRegistrationCodeStrategy.resetPassword(resetPasswordCommand, registrationCode)
+		if (user.hasErrors()) {
+			// expected to be handled already by ErrorsStrategy.handleValidationErrors
 		}
-
-		springSecurityService.reauthenticate registrationCode.username
 
 		flash.message = message(code: 'spring.security.ui.resetPassword.success')
 
-		def conf = SpringSecurityUtils.securityConfig
-		String postResetUrl = conf.ui.register.postResetUrl ?: conf.successHandler.defaultTargetUrl
-		redirect uri: postResetUrl
+		redirect uri: registerPostResetUrl ?: successHandlerDefaultTargetUrl
 	}
 
 	protected String generateLink(String action, linkParams) {
 		createLink(base: "$request.scheme://$request.serverName:$request.serverPort$request.contextPath",
-				controller: 'register', action: action,
-				params: linkParams)
+		           controller: 'register', action: action, params: linkParams)
 	}
 
 	protected String evaluate(s, binding) {
 		new SimpleTemplateEngine().createTemplate(s).make(binding)
 	}
 
+	protected String forgotPasswordEmailBody
+	protected String registerEmailBody
+	protected String registerEmailFrom
+	protected String registerEmailSubject
+	protected String registerPostRegisterUrl
+	protected String registerPostResetUrl
+	protected String successHandlerDefaultTargetUrl
+
+	protected static int passwordMaxLength
+	protected static int passwordMinLength
+	protected static String passwordValidationRegex
+
+	void afterPropertiesSet() {
+		super.afterPropertiesSet()
+
+		RegisterCommand.User = User
+		RegisterCommand.usernamePropertyName = usernamePropertyName
+
+		forgotPasswordEmailBody = conf.ui.forgotPassword.emailBody
+		registerEmailBody = conf.ui.register.emailBody
+		registerEmailFrom = conf.ui.register.emailFrom
+		registerEmailSubject = conf.ui.register.emailSubject
+		registerPostRegisterUrl = conf.ui.register.postRegisterUrl
+		registerPostResetUrl = conf.ui.register.postResetUrl
+		successHandlerDefaultTargetUrl = conf.successHandler.defaultTargetUrl
+
+		passwordMaxLength = conf.ui.password.maxLength instanceof Number ? conf.ui.password.maxLength : 64
+		passwordMinLength = conf.ui.password.minLength instanceof Number ? conf.ui.password.minLength : 8
+		passwordValidationRegex = conf.ui.password.validationRegex ?: '^.*(?=.*\\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&]).*$'
+	}
+
 	static final passwordValidator = { String password, command ->
-		if (command.username && command.username.equals(password)) {
+		if (command.username && command.username == password) {
 			return 'command.password.error.username'
 		}
 
@@ -226,28 +245,15 @@ class RegisterController extends AbstractS2UiController {
 	}
 
 	static boolean checkPasswordMinLength(String password, command) {
-		def conf = SpringSecurityUtils.securityConfig
-
-		int minLength = conf.ui.password.minLength instanceof Number ? conf.ui.password.minLength : 8
-
-		password && password.length() >= minLength
+		password && password.length() >= passwordMinLength
 	}
 
 	static boolean checkPasswordMaxLength(String password, command) {
-		def conf = SpringSecurityUtils.securityConfig
-
-		int maxLength = conf.ui.password.maxLength instanceof Number ? conf.ui.password.maxLength : 64
-
-		password && password.length() <= maxLength
+		password && password.length() <= passwordMaxLength
 	}
 
 	static boolean checkPasswordRegex(String password, command) {
-		def conf = SpringSecurityUtils.securityConfig
-
-		String passValidationRegex = conf.ui.password.validationRegex ?:
-				'^.*(?=.*\\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&]).*$'
-
-		password && password.matches(passValidationRegex)
+		password && password.matches(passwordValidationRegex)
 	}
 
 	static final password2Validator = { value, command ->
@@ -257,38 +263,44 @@ class RegisterController extends AbstractS2UiController {
 	}
 }
 
-class RegisterCommand {
+class ForgotPasswordCommand implements CommandObject {
+	String username
+}
+
+class RegisterCommand implements CommandObject {
+
+	protected static Class<?> User
+	protected static String usernamePropertyName
 
 	String username
 	String email
 	String password
 	String password2
 
-	def grailsApplication
-
 	static constraints = {
-		username blank: false, validator: { value, command ->
-			if (value) {
-				def User = command.grailsApplication.getDomainClass(
-					SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).clazz
-				if (User.findByUsername(value)) {
-					return 'registerCommand.username.unique'
-				}
+		username validator: { value, command ->
+			if (!value) {
+				return
+			}
+
+			if (User.findWhere((usernamePropertyName): value)) {
+				return 'registerCommand.username.unique'
 			}
 		}
-		email blank: false, email: true
-		password blank: false, validator: RegisterController.passwordValidator
+		email email: true
+		password validator: RegisterController.passwordValidator
 		password2 validator: RegisterController.password2Validator
 	}
 }
 
-class ResetPasswordCommand {
+class ResetPasswordCommand implements CommandObject {
+
 	String username
 	String password
 	String password2
 
 	static constraints = {
-		password blank: false, validator: RegisterController.passwordValidator
+		password validator: RegisterController.passwordValidator
 		password2 validator: RegisterController.password2Validator
 	}
 }

@@ -14,201 +14,65 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.converters.JSON
-import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.plugin.springsecurity.authentication.dao.NullSaltSource
-import grails.util.GrailsNameUtils
-
-import org.springframework.dao.DataIntegrityViolationException
+import grails.plugin.springsecurity.ui.strategy.UserStrategy
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-class UserController extends AbstractS2UiController {
+class UserController extends AbstractS2UiDomainController {
 
-	def saltSource
-	def userCache
-
-	def create() {
-		def user = lookupUserClass().newInstance(params)
-		[user: user, authorityList: sortedRoles()]
-	}
+	/** Dependency injection for the 'uiUserStrategy' bean. */
+	UserStrategy uiUserStrategy
 
 	def save() {
-		def user = lookupUserClass().newInstance(params)
-		if (params.password) {
-			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user.password = springSecurityUiService.encodePassword(params.password, salt)
-		}
-		if (!user.save(flush: true)) {
-			render view: 'create', model: [user: user, authorityList: sortedRoles()]
-			return
-		}
-
-		addRoles(user)
-		flash.message = "${message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
-		redirect action: 'edit', id: user.id
-	}
-
-	def edit() {
-		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-
-		def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
-		if (!user) user = findById()
-		if (!user) return
-
-		return buildUserModel(user)
+		doSave uiUserStrategy.saveUser(params, roleNamesFromParams(), params.password)
 	}
 
 	def update() {
-		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
-
-		def user = findById()
-		if (!user) return
-		if (!versionCheck('user.label', 'User', user, [user: user])) {
-			return
+		doUpdate { user ->
+			uiUserStrategy.updateUser params, user, roleNamesFromParams()
 		}
-
-		def oldPassword = user."$passwordFieldName"
-		user.properties = params
-		if (params.password && !params.password.equals(oldPassword)) {
-			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user."$passwordFieldName" = springSecurityUiService.encodePassword(params.password, salt)
-		}
-
-		if (!user.save(flush: true)) {
-			render view: 'edit', model: buildUserModel(user)
-			return
-		}
-
-		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-
-		lookupUserRoleClass().removeAll user
-		addRoles user
-		userCache.removeUserFromCache user[usernameFieldName]
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
-		redirect action: 'edit', id: user.id
 	}
 
 	def delete() {
-		def user = findById()
-		if (!user) return
-
-		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-		try {
-			lookupUserRoleClass().removeAll user
-			user.delete flush: true
-			userCache.removeUserFromCache user[usernameFieldName]
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-			redirect action: 'search'
-		}
-		catch (DataIntegrityViolationException e) {
-			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-			redirect action: 'edit', id: params.id
+		tryDelete { user ->
+			uiUserStrategy.deleteUser user
 		}
 	}
 
 	def search() {
-		[enabled: 0, accountExpired: 0, accountLocked: 0, passwordExpired: 0]
+		if (!isSearch()) {
+			// show the form
+			return
+		}
+
+		def results = doSearch { ->
+			like 'username', delegate
+			eqBoolean 'accountExpired', delegate
+			eqBoolean 'accountLocked', delegate
+			eqBoolean 'enabled', delegate
+			eqBoolean 'passwordExpired', delegate
+		}
+
+		renderSearch results: results, totalCount: results.totalCount,
+		            'accountExpired', 'accountLocked', 'enabled', 'passwordExpired', 'username'
 	}
 
-	def userSearch() {
-
-		boolean useOffset = params.containsKey('offset')
-		setIfMissing 'max', 10, 100
-		setIfMissing 'offset', 0
-		Integer max = params.int('max')
-		Integer offset = params.int('offset')
-		def userLookup = SpringSecurityUtils.securityConfig.userLookup
-		String enabledPropertyName = userLookup.enabledPropertyName
-		String accountExpiredPropertyName = userLookup.accountExpiredPropertyName
-		String accountLockedPropertyName = userLookup.accountLockedPropertyName
-		String passwordExpiredPropertyName = userLookup.passwordExpiredPropertyName
-		String usernameFieldName = userLookup.usernamePropertyName
-		def cs = lookupUserClass().createCriteria()
-
-		def results = cs.list(max: max, offset: offset) {
-			firstResult: offset
-			maxResults: max
-			if(params['username']) {
-				ilike(usernameFieldName,'%' + params['username'] + '%')
-			}
-			for (name in [enabled: enabledPropertyName,
-				accountExpired: accountExpiredPropertyName,
-				accountLocked: accountLockedPropertyName,
-				passwordExpired: passwordExpiredPropertyName]) {
-				Integer value = params.int(name.key)
-				if (value) {
-					eq(name.value,value == 1)
-				}
-			}
-			if (params.sort) {
-				order(params.sort,params.order ?: 'ASC')
-			}
-		}
-
-		def model = [results: results, totalCount: results.totalCount, searched: true]
-
-		// add query params to model for paging
-		for (name in ['username', 'enabled', 'accountExpired', 'accountLocked',
-			'passwordExpired', 'sort', 'order']) {
-			model[name] = params[name]
-		}
-
-		render view: 'search', model: model
+	protected lookupFromParams() {
+		findUserByUsername(params.username) ?: byId()
 	}
 
-	/**
-	 * Ajax call used by autocomplete textfield.
-	 */
-	def ajaxUserSearch() {
-
-		def jsonData = []
-
-		if (params.term?.length() > 2) {
-			String username = params.term
-			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			setIfMissing 'max', 10, 100
-			def cs = lookupUserClass().createCriteria()
-			def results = cs.list(max: params.int('max')) {
-				maxResults: params.int('max')
-				ilike(usernameFieldName,'%' + username + '%')
-				order(usernameFieldName,'DESC')
-				projections{
-					distinct(usernameFieldName)
-				}
-			}
-
-			for (result in results) {
-				jsonData << [value: result]
-			}
-		}
-
-		render text: jsonData as JSON, contentType: 'text/plain'
-	}
-
-	protected void addRoles(user) {
-		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
-			SpringSecurityUtils.securityConfig.authority.nameField, null)
-
-		for (String key in params.keySet()) {
-			if (key.contains('ROLE') && 'on' == params.get(key)) {
-				lookupUserRoleClass().create user, lookupRoleClass()."findBy$upperAuthorityFieldName"(key), true
-			}
-		}
+	protected List<String> roleNamesFromParams() {
+		params.keySet().findAll { it.contains('ROLE_') && params[it] == 'on' } as List
 	}
 
 	protected Map buildUserModel(user) {
 
-		String authorityFieldName = SpringSecurityUtils.securityConfig.authority.nameField
-		String authoritiesPropertyName = SpringSecurityUtils.securityConfig.userLookup.authoritiesPropertyName
-
-		List roles = sortedRoles()
-		Set userRoleNames = user[authoritiesPropertyName].collect { it[authorityFieldName] }
+		Set userRoleNames = user[authoritiesPropertyName].collect { it[authorityNameField] }
 		def granted = [:]
 		def notGranted = [:]
-		for (role in roles) {
-			String authority = role[authorityFieldName]
+		for (role in sortedRoles()) {
+			String authority = role[authorityNameField]
 			if (userRoleNames.contains(authority)) {
 				granted[(role)] = userRoleNames.contains(authority)
 			}
@@ -217,20 +81,39 @@ class UserController extends AbstractS2UiController {
 			}
 		}
 
-		return [user: user, roleMap: granted + notGranted]
-	}
-
-	protected findById() {
-		def user = lookupUserClass().get(params.id)
-		if (!user) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-			redirect action: 'search'
-		}
-
-		user
+		[roleMap: granted + notGranted, tabData: tabData, user: user]
 	}
 
 	protected List sortedRoles() {
-		lookupRoleClass().list().sort { it.authority }
+		Role.list().sort { it[authorityNameField] }
+	}
+
+	protected getTabData() {[
+		[name: 'userinfo', icon: 'icon_user', message: message(code: 'spring.security.ui.user.info')],
+		[name: 'roles',    icon: 'icon_role', message: message(code: 'spring.security.ui.user.roles')]
+	]}
+
+	protected Class<?> getClazz() { User }
+	protected String getClassLabelCode() { 'user.label' }
+
+	protected Map model(user, String action) {
+		if (action == 'edit' || action == 'update') {
+			buildUserModel user
+		}
+		else {
+			[user: user, authorityList: sortedRoles(), tabData: tabData]
+		}
+	}
+
+	protected String authoritiesPropertyName
+
+	void afterPropertiesSet() {
+		super.afterPropertiesSet()
+
+		if (!conf.userLookup.userDomainClassName) {
+			return
+		}
+
+		authoritiesPropertyName = conf.userLookup.authoritiesPropertyName
 	}
 }

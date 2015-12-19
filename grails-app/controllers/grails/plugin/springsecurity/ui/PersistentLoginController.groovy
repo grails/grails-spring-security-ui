@@ -14,135 +14,56 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.converters.JSON
-import grails.plugin.springsecurity.SpringSecurityUtils
-
-import org.springframework.dao.DataIntegrityViolationException
+import grails.plugin.springsecurity.ui.strategy.PersistentLoginStrategy
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-class PersistentLoginController extends AbstractS2UiController {
+class PersistentLoginController extends AbstractS2UiDomainController {
 
-	def edit() {
-		def persistentLogin = findById()
-		if (!persistentLogin) return
-
-			[persistentLogin: persistentLogin]
-	}
+	/** Dependency injection for the 'uiPersistentLoginStrategy' bean. */
+	PersistentLoginStrategy uiPersistentLoginStrategy
 
 	def update() {
-		def persistentLogin = findById()
-		if (!persistentLogin) return
-			if (!versionCheck('persistentLogin.label', 'PersistentLogin', persistentLogin, [persistentLogin: persistentLogin])) {
-				return
-			}
-
-		if (!springSecurityUiService.updatePersistentLogin(persistentLogin, params)) {
-			render view: 'edit', model: [persistentLogin: persistentLogin]
-			return
+		doUpdate { persistentLogin ->
+			uiPersistentLoginStrategy.updatePersistentLogin params, persistentLogin
 		}
-
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), persistentLogin.id])}"
-		redirect action: 'edit', id: persistentLogin.id
 	}
 
 	def delete() {
-		def persistentLogin = findById()
-		if (!persistentLogin) return
-
-			try {
-				springSecurityUiService.deletePersistentLogin persistentLogin
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), params.id])}"
-				redirect action: 'search'
-			}
-			catch (DataIntegrityViolationException e) {
-				flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), params.id])}"
-				redirect action: 'edit', id: params.id
-			}
+		tryDelete { persistentLogin ->
+			uiPersistentLoginStrategy.deletePersistentLogin persistentLogin
+		}
 	}
 
-	def search() {}
-
-	def persistentLoginSearch() {
-
-		boolean useOffset = params.containsKey('offset')
-		setIfMissing 'max', 10, 100
-		setIfMissing 'offset', 0
-
-		Integer max = params.int('max')
-		Integer offset = params.int('offset')
-
-		def cs = lookupPersistentLoginClass().createCriteria()
-		def results = cs.list(max: max, offset: offset) {
-			firstResult: offset
-			maxResults: max
-			for (name in ['username', 'series', 'token']) {
-				String param = params[name]
-				if (param) {
-					if (name == 'series') name = 'id' // aliased primary key
-					ilike(name,'%' + param + '%')
-				}
-			}
-
-			if (params.sort) {
-				order(params.sort,params.order ?: 'ASC')
-			}
-		}
-		def model = [results: results, totalCount: results.totalCount, searched: true]
-
-		// add query params to model for paging
-		for (name in ['username', 'series', 'token']) {
-			model[name] = params[name]
+	def search() {
+		if (!isSearch()) {
+			// show the form
+			return
 		}
 
-		render view: 'search', model: model
-	}
-
-	/**
-	 * Ajax call used by autocomplete textfield.
-	 */
-	def ajaxPersistentLoginSearch() {
-
-		def jsonData = []
-
-		if (params.term?.length() > 2) {
-			String username = params.term
-
-			setIfMissing 'max', 10, 100
-
-			def cs = lookupPersistentLoginClass().createCriteria()
-			def results = cs.list(max: params.int('max')) {
-				maxResults: params.int('max')
-				ilike('username','%' + username + '%')
-				order('username','DESC')
-				projections{
-					distinct('username')
-				}
-			}
-			for (result in results) {
-				jsonData << [value: result]
-			}
+		def results = doSearch { ->
+			like 'series', delegate
+			like 'token', delegate
+			like 'username', delegate
 		}
 
-		render text: jsonData as JSON, contentType: 'text/plain'
+		renderSearch([results: results, totalCount: results.totalCount],
+		             'series', 'token', 'username')
 	}
 
-	protected findById() {
-		def persistentLogin = lookupPersistentLoginClass().get(params.id)
-		if (!persistentLogin) {
-			flash.error = "${message(code: 'default.not.found.message', args: [message(code: 'persistentLogin.label', default: 'PersistentLogin'), params.id])}"
-			redirect action: 'search'
+	protected Class<?> getClazz() { PersistentLogin }
+	protected String getClassLabelCode() { 'persistentLogin.label' }
+	protected Map model(persistentLogin, String action) {
+		[persistentLogin: persistentLogin]
+	}
+
+	protected Class<?> PersistentLogin
+
+	void afterPropertiesSet() {
+		super.afterPropertiesSet()
+		if (conf.rememberMe.persistentToken.domainClassName) {
+			PersistentLogin = getDomainClassClass(conf.rememberMe.persistentToken.domainClassName)
 		}
-
-		persistentLogin
-	}
-
-	protected String lookupPersistentLoginClassName() {
-		SpringSecurityUtils.securityConfig.rememberMe.persistentToken.domainClassName
-	}
-
-	protected Class<?> lookupPersistentLoginClass() {
-		grailsApplication.getDomainClass(lookupPersistentLoginClassName()).clazz
 	}
 }

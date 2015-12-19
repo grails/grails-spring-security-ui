@@ -14,164 +14,77 @@
  */
 package grails.plugin.springsecurity.ui
 
-import org.springframework.dao.DataIntegrityViolationException
-
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-class AclEntryController extends AbstractS2UiController {
+class AclEntryController extends AbstractS2UiDomainController {
 
 	def aclPermissionFactory
 
 	def create() {
-		def aclEntry = lookupClass().newInstance(params)
-		aclEntry.granting = true
-		[aclEntry: aclEntry, sids: lookupAclSidClass().list()]
+		params.granting = true
+		super.create()
 	}
 
 	def save() {
-		def aclEntry = lookupClass().newInstance(params)
-		if (!aclEntry.save(flush: true)) {
-			render view: 'create', model: [aclEntry: aclEntry, sids: lookupAclSidClass().list()]
-			return
-		}
-
-		flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), aclEntry.id])}"
-		redirect action: 'edit', id: aclEntry.id
-	}
-
-	def edit() {
-		def aclEntry = findById()
-		if (!aclEntry) return
-
-		[aclEntry: aclEntry, sids: lookupAclSidClass().list()]
+		doSave uiAclStrategy.saveAclEntry(params)
 	}
 
 	def update() {
-
-		def aclEntry = findById()
-		if (!aclEntry) return
-		if (!versionCheck('aclEntry.label', 'AclEntry', aclEntry, [aclEntry: aclEntry])) {
-			return
+		doUpdate { aclEntry ->
+			uiAclStrategy.updateAclEntry params, aclEntry
 		}
-
-		Long parentId = params.parent?.id ? params.parent.id.toLong() : null
-		Long ownerId = params.owner?.id ? params.owner.id.toLong() : null
-		if (!springSecurityUiService.updateAclEntry(aclEntry, params.aclObjectIdentity.id.toLong(),
-				params.sid.id.toLong(), params.int('aceOrder'), params.int('mask'),
-				params.granting == 'on', params.auditSuccess == 'on', params.auditFailure == 'on')) {
-			render view: 'edit', model: [aclEntry: aclEntry, sids: lookupAclSidClass().list()]
-			return
-		}
-
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), aclEntry.id])}"
-		redirect action: 'edit', id: aclEntry.id
 	}
 
 	def delete() {
-		def aclEntry = findById()
-		if (!aclEntry) return
-
-		try {
-			springSecurityUiService.deleteAclEntry aclEntry
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), params.id])}"
-			redirect action: 'search'
-		}
-		catch (DataIntegrityViolationException e) {
-			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), params.id])}"
-			redirect action: 'edit', id: params.id
+		tryDelete { aclEntry ->
+			uiAclStrategy.deleteAclEntry aclEntry
 		}
 	}
 
 	def search() {
-		[granting: 0, auditSuccess: 0, auditFailure: 0, sids: lookupAclSidClass().list()]
-	}
-
-	def aclEntrySearch() {
-		boolean useOffset = params.containsKey('offset')
-		setIfMissing 'max', 10, 100
-		setIfMissing 'offset', 0
-
-		Integer max = params.int('max')
-		Integer offset = params.int('offset')
-
-		def cs = lookupClass().createCriteria()
-
-		def results = cs.list(max: max, offset: offset) {
-			firstResult: offset
-			maxResults: max
-			for (name in ['aceOrder', 'mask']) {
-				if (params[name]) {
-					eq(name,params.int(name))
-				}
-			}
-			for (name in ['sid', 'aclObjectIdentity']) {
-				if (params[name] && params[name] != 'null') {
-					eq(name,params.long(name))
-				}
-			}
-			for (name in ['granting', 'auditSuccess', 'auditFailure']) {
-				Integer value = params.int(name)
-				if (value) {
-					eq(name,value == 1)
-				}
-			}
-
-			if (params.aclClass) {
-				/*
-				 *  special case for external search - original query was
-				 *  hql.append " AND e.aclObjectIdentity.aclClass.id=:aclClass"
-				 *
-				 *  Looking up current version of the plugin ( 2.0-RC2)
-				 *  AclEntry has a AclObjectIdentity aclObjectIdentity
-				 *   AclObjectIdentity is created by extending AbstractAclObjectIdentity
-				 *   AbstractAclObjectIdentity contains AclClass aclClass
-				 *
-				 *   AbstractAclObjectIdentity is located in the grails-spring-security-acl at
-				 *   /src/groovy/grails/plugin/springsecurity/acl/AbstractAclObjectIdentity.groovy
-				 */
-
-				aclObjectIdentity{
-					aclClass{
-						eq('id',params.long('aclClass'))
-					}
-				}
-			}
-			if (params.sort) {
-				order(params.sort,params.order ?: 'ASC')
-			}
+		if (!isSearch('aclClass.id', 'aclObjectIdentity.id', 'sid.id')) {
+			// show the form
+			return [sids: AclSid.list()]
 		}
 
-		def model = [results: results, totalCount: results.totalCount, searched: true,
-			sids: lookupAclSidClass().list(), permissionFactory: aclPermissionFactory]
-		// add query params to model for paging
-		for (name in ['granting', 'auditSuccess', 'auditFailure', 'sid',
-			'aclObjectIdentity', 'aceOrder', 'mask']) {
-			model[name] = params[name]
+		Closure projection
+		Long classId = params.long('aclClass.id')
+		if (classId) {
+			// special case for external search
+			projection = buildProjection('aclObjectIdentity.aclClass', 'eq', ['id', classId])
 		}
 
-		render view: 'search', model: model
-	}
+		def results = doSearch(projection) { ->
 
-	protected findById() {
-		def aclEntry = lookupClass().get(params.id)
-		if (!aclEntry) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'aclEntry.label', default: 'AclEntry'), params.id])}"
-			redirect action: 'search'
+			eqInt 'aceOrder', delegate
+			eqInt 'mask', delegate
+
+			eqLongId 'aclObjectIdentity', delegate
+			eqLongId 'sid', delegate
+
+			eqBoolean 'auditFailure', delegate
+			eqBoolean 'auditSuccess', delegate
+			eqBoolean 'granting', delegate
 		}
 
-		aclEntry
+		renderSearch([results: results, totalCount: results.totalCount,
+		              sids: AclSid.list(), permissionFactory: aclPermissionFactory],
+		             'aceOrder', 'aclClass.id', 'aclObjectIdentity.id', 'auditFailure',
+						 'auditSuccess', 'granting', 'mask', 'sid.id')
 	}
 
-	protected String lookupClassName() {
-		'grails.plugin.springsecurity.acl.AclEntry'
+	protected Class<?> getClazz() { AclEntry }
+	protected String getClassLabelCode() { 'aclEntry.label' }
+	protected String getSimpleClassName() { 'AclEntry' }
+	protected Map model(aclEntry, String action) {
+		[aclEntry: aclEntry, sids: AclSid.list()]
 	}
 
-	protected Class<?> lookupClass() {
-		grailsApplication.getDomainClass(lookupClassName()).clazz
-	}
+	protected Class<?> AclEntry
 
-	protected Class<?> lookupAclSidClass() {
-		grailsApplication.getDomainClass('grails.plugin.springsecurity.acl.AclSid').clazz
+	void afterPropertiesSet() {
+		super.afterPropertiesSet()
+		AclEntry = getDomainClassClass('grails.plugin.springsecurity.acl.AclEntry')
 	}
 }

@@ -14,114 +14,77 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.ReflectionUtils
+import grails.plugin.springsecurity.ui.strategy.RequestmapStrategy
 
-import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.HttpMethod
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-class RequestmapController extends AbstractS2UiController {
+class RequestmapController extends AbstractS2UiDomainController {
 
-	def search() {}
+	/** Dependency injection for the 'uiRequestmapStrategy' bean. */
+	RequestmapStrategy uiRequestmapStrategy
 
-	def requestmapSearch() {
-
-		boolean useOffset = params.containsKey('offset')
-		setIfMissing 'max', 10, 100
-		setIfMissing 'offset', 0
-
-		Integer max = params.int('max')
-		Integer offset = params.int('offset')
-
-
-		String urlField = SpringSecurityUtils.securityConfig.requestMap.urlField
-		String configAttributeField = SpringSecurityUtils.securityConfig.requestMap.configAttributeField
-
-
-		def cs = lookupRequestmapClass().createCriteria()
-		def results = cs.list(max: max,offset: offset) {
-			firstResult: offset
-			maxResults: max
-			for (name in [url: urlField, configAttribute: configAttributeField]) {
-				if (params[name.key]) {
-					ilike(name.value,'%' + params[name.key] + '%')
-				}
-			}
-			if (params.sort) {
-				order(params.sort,params.order ?: 'ASC')
-			}
-		}
-		def model = [results: results, totalCount: results.totalCount, searched: true]
-
-		// add query params to model for paging
-		for (name in ['url', 'configAttribute', 'sort', 'order']) {
-			model[name] = params[name]
-		}
-
-		render view: 'search', model: model
-	}
-
-	def create() {
-		[requestmap: lookupRequestmapClass().newInstance(params)]
-	}
+	def springSecurityService
 
 	def save() {
-		def requestmap = lookupRequestmapClass().newInstance(params)
-		if (!requestmap.save(flush: true)) {
-			render view: 'create', model: [requestmap: requestmap]
-			return
+		if (!(param('url'))) params.remove('url')
+		doSave(uiRequestmapStrategy.saveRequestmap(params)) {
+			springSecurityService.clearCachedRequestmaps()
 		}
-
-		springSecurityService.clearCachedRequestmaps()
-		flash.error = "${message(code: 'default.created.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), requestmap.id])}"
-		redirect action: 'edit', id: requestmap.id
-	}
-
-	def edit() {
-		def requestmap = findById()
-		if (!requestmap) return
-
-			[requestmap: requestmap]
 	}
 
 	def update() {
-		def requestmap = lookupRequestmapClass().get(params.id)
-		requestmap.properties = params
-
-		if (!requestmap.save(flush: true)) {
-			render view: 'edit', model: [requestmap: requestmap]
-			return
+		if (!(param('url'))) params.remove('url')
+		doUpdate { requestmap ->
+			uiRequestmapStrategy.updateRequestmap params, requestmap
 		}
-
-		springSecurityService.clearCachedRequestmaps()
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), requestmap.id])}"
-		redirect action: 'edit', id: requestmap.id
 	}
 
 	def delete() {
-		def requestmap = findById()
-		if (!requestmap) return
-
-			try {
-				requestmap.delete(flush: true)
-				springSecurityService.clearCachedRequestmaps()
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
-				redirect action: 'search'
-			}
-			catch (DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
-				redirect action: 'edit', id: params.id
-			}
+		tryDelete { requestmap ->
+			uiRequestmapStrategy.deleteRequestmap requestmap
+		}
 	}
 
-	protected findById() {
-		def requestmap = lookupRequestmapClass().get(params.id)
-		if (!requestmap) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
-			redirect action: 'search'
+	def search() {
+		if (!isSearch()) {
+			// show the form
+			return [hasHttpMethod: hasHttpMethod]
 		}
 
-		requestmap
+		def results = doSearch { ->
+			like 'configAttribute', delegate
+			like 'url', delegate
+			if (param('httpMethod')) {
+				eq 'httpMethod', HttpMethod.valueOf(params.httpMethod), delegate
+			}
+		}
+
+		renderSearch([results: results, totalCount: results.totalCount, hasHttpMethod: hasHttpMethod],
+		              'configAttribute', 'httpMethod', 'url')
+	}
+
+	protected Class<?> getClazz() { Requestmap }
+	protected String getClassLabelCode() { 'requestmap.label' }
+	protected Map model(requestmap, String action) {
+		[requestmap: requestmap, hasHttpMethod: hasHttpMethod]
+	}
+
+	protected boolean hasHttpMethod
+	protected Class<?> Requestmap
+
+	void afterPropertiesSet() {
+		super.afterPropertiesSet()
+
+		if (!conf.requestMap.className) {
+			return
+		}
+
+		hasHttpMethod = ReflectionUtils.requestmapClassSupportsHttpMethod()
+
+		Requestmap = getDomainClassClass(conf.requestMap.className)
 	}
 }
