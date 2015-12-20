@@ -7,12 +7,19 @@ set -e
 
 CONFIGS="simple extended"
 
+rm -rf target
+
 function runTests {
 	config=$1
 
 	echo $config > testconfig
 
-	rm -rf target
+	rm -f target/*.log
+	rm -f target/web.xml.tmp
+	rm -rf target/*classes
+	rm -rf target/plugins
+	rm -rf target/resources
+	rm -rf target/tomcat
 
 	./grailsw compile --non-interactive
 
