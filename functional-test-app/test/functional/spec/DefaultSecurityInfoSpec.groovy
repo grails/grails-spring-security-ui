@@ -38,7 +38,7 @@ class DefaultSecurityInfoSpec extends AbstractSecuritySpec {
 		go 'securityInfo/usercache'
 
 		then:
-		assertContentContains 'UserCache: net.sf.ehcache.Cache'
+		assertContentContains 'UserCache class: net.sf.ehcache.Cache'
 		assertContentContains 'Memory Store Object Count 0'
 	}
 
