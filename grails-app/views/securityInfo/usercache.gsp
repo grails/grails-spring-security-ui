@@ -4,31 +4,29 @@
 		<title><g:message code='spring.security.ui.menu.securityInfo.usercache'/></title>
 	</head>
 	<body>
-		<br/>
 		<g:if test='${cache}'>
-		<h4><g:message code='spring.security.ui.info.usercache.classname' args='[cache.getClass().name]'/></h4>
-		<br/>
-		<table>
-			<tr>
+		<p/>
+		<g:message code='spring.security.ui.info.usercache.classname' args='[cache.getClass().name]'/>
+		<s2ui:securityInfoTable type='usercache' headerCodes='attribute,value'>
+			<tr class='even'>
 				<td><g:message code='spring.security.ui.info.usercache.label.size'/></td>
 				<td>${cache.size}</td>
 			</tr>
-			<tr>
+			<tr class='odd'>
 				<td><g:message code='spring.security.ui.info.usercache.label.status'/></td>
 				<td>${cache.status}</td>
 			</tr>
-			<tr>
+			<tr class='even'>
 				<td><g:message code='spring.security.ui.info.usercache.label.name'/></td>
 				<td>${cache.name}</td>
 			</tr>
-			<tr>
+			<tr class='odd'>
 				<td><g:message code='spring.security.ui.info.usercache.label.guid'/></td>
-				<td>${cache.guid}</td>
+				<td>${cache.guid - 'Precision.M4800/'}</td>
 			</tr>
-			<tr>
-				<td><g:message code='spring.security.ui.info.usercache.label.stats'/></td>
-				<td>
-					<table>
+			<tr class='even'>
+				<td colspan='2'>
+					<s2ui:securityInfoTable type='usercache.statistics' headerCodes='attribute,value'>
 						<tr>
 							<td><g:message code='spring.security.ui.info.usercache.label.stats.cacheHits'/></td>
 							<td>${cache.statistics.cacheHitCount()}</td>
@@ -61,24 +59,21 @@
 							<td><g:message code='spring.security.ui.info.usercache.label.stats.evictionCount'/></td>
 							<td>${cache.statistics.cacheEvictedCount()}</td>
 						</tr>
-					</table>
+					</s2ui:securityInfoTable>
 				</td>
 			</tr>
-			<tr><th colspan='2'><g:message code='spring.security.ui.info.usercache.header.userCount' args='[cache.size]'/></th></tr>
 			<tr>
-				<th><g:message code='spring.security.ui.info.usercache.header.username'/></th>
-				<th><g:message code='spring.security.ui.info.usercache.header.user'/></th>
+				<td colspan='2'>
+					<s2ui:securityInfoTable type='usercache.cachedUsers' items='${cache.keys}' headerCodes='username,user' captionArgs='[cache.size]'>
+						<td>${it}</td>
+						<td>${cache.get(it)?.value}</td>
+					</s2ui:securityInfoTable>
+				</td>
 			</tr>
-			<g:each var='k' in='${cache.keys}'>
-			<tr>
-				<td>${k}</td>
-				<td>${cache.get(k)?.value}</td>
-			</tr>
-			</g:each>
-		</table>
+		</s2ui:securityInfoTable>
 		</g:if>
 		<g:else>
-		<h4><g:message code='spring.security.ui.info.usercache.disabled'/></h4>
+		<h3><g:message code='spring.security.ui.info.usercache.disabled'/></h3>
 		</g:else>
 	</body>
 </html>

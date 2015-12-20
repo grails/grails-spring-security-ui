@@ -4,28 +4,14 @@
 		<title><g:message code='spring.security.ui.menu.securityInfo.secureChannel'/></title>
 	</head>
 	<body>
-		<br/>
 		<g:if test='${requestMap}'>
-		<br/>
-		<table>
-			<thead>
-				<tr>
-					<th><g:message code='spring.security.ui.info.channel.header.pattern'/></th>
-					<th><g:message code='spring.security.ui.info.channel.header.attributes'/></th>
-				</tr>
-			</thead>
-			<tbody>
-			<g:each var='entry' in='${requestMap}'>
-				<tr>
-					<td>${entry.key}</td>
-					<td>${entry.value}</td>
-				</tr>
-			</g:each>
-			</tbody>
-		</table>
+		<s2ui:securityInfoTable type='secureChannel' items='${requestMap}' headerCodes='pattern,attributes'>
+			<td>${it.key}</td>
+			<td>${it.value}</td>
+		</s2ui:securityInfoTable>
 		</g:if>
 		<g:else>
-		<h4><g:message code='spring.security.ui.info.channel.disabled'/></h4>
+		<h3><g:message code='spring.security.ui.info.secureChannel.disabled'/></h3>
 		</g:else>
 	</body>
 </html>

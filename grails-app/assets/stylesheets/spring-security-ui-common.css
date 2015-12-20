@@ -28,32 +28,21 @@ body, input, select, textarea {
 	font-size:   0.9em;
 }
 
-h1, h2, h3, h4 {
-	color:       #222222;
-	font-weight: normal;
-}
-
-h1 {
-	font-size:     2em;
-	line-height:   1;
-	margin-bottom: 0.5em;
-}
-
-h2 {
-	font-size:     1.5em;
-	margin-bottom: 0.75em;
+caption {
+	font-family:    "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;	
+	font-weight:    bold;
+	text-align:     center;
+	font-size:      1.5em;
+	padding-bottom: 20px;
 }
 
 h3 {
+	color:         #222222;
 	font-size:     1.2em;
+	font-weight:   bold;
 	line-height:   1;
 	margin-bottom: 1em;
-}
-
-h4 {
-	font-size:     1em;
-	line-height:   1.25;
-	margin-bottom: 1.25em;
+	text-align:    center;
 }
 
 img a {
@@ -80,11 +69,20 @@ table {
 	vertical-align:  middle;
 }
 
+table.info {
+	width: 100%;
+}
+
+table.info thead th {
+	background: #444;
+	color:      white;
+}
+
 th {
 	font-weight: bold;
 }
 
-th, td, caption {
+th, td {
 	font-weight:    normal;
 	padding:        4px 10px 4px 5px;
 	text-align:     left;

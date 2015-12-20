@@ -7,6 +7,7 @@
 	<body>
 		<div id="configHolder">
 		<table id="config" cellpadding="0" cellspacing="0" border="0" class="display">
+			<caption><g:message code='spring.security.ui.menu.securityInfo.config'/></caption>
 			<thead>
 				<tr>
 					<th><g:message code='spring.security.ui.info.config.header.name'/></th>

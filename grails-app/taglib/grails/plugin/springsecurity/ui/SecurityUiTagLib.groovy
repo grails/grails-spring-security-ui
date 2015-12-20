@@ -327,6 +327,7 @@ class SecurityUiTagLib {
 
 		def out = getOut()
 		out << """<a href="${createLink(attrs).encodeAsHTML()}" id="$elementId" """
+// TODO encodeAsHTML
 
 		writeRemainingAttributes out, attrs
 		out << '>' << text << '</a>'
@@ -441,6 +442,7 @@ class SecurityUiTagLib {
 	/**
 	 */
 	def required = { attrs ->
+		// TODO use this
 		out << "<span class='s2ui_required'>*&nbsp;</span>"
 	}
 
@@ -471,6 +473,62 @@ class SecurityUiTagLib {
 			</form>"""
 
 		pageScope.s2uiFormName = null
+	}
+
+	/**
+	 * @attr type        REQUIRED the type
+	 * @attr captionArgs optional args for the caption i18n code
+	 * @attr headerCodes the th tag i18n codes, a comma-delimited string
+	 * @attr items       optional items to loop over each in a tr
+	 */
+	def securityInfoTable = { attrs, body ->
+		attrs = [:] + attrs
+
+		String type = getRequiredAttribute(attrs, 'type', 'securityInfoTable')
+		String headerCodes = attrs.remove('headerCodes') ?: ''
+		def items = attrs.remove('items')
+		def captionArgs = attrs.remove('captionArgs')
+
+		out << """
+			<table class='info'>
+				<caption>${message(code: 'spring.security.ui.menu.securityInfo.' + type, args: captionArgs)}</caption>"""
+
+		if (headerCodes) {
+			out << """
+				<thead>
+					<tr>"""
+
+			for (code in headerCodes.split(',')) {
+				out << """
+						<th>${message(code: 'spring.security.ui.info.' + type + '.header.' + code)}</th>"""
+			}
+
+			out << """
+					</tr>
+				</thead>"""
+		}
+
+		out << """
+				<tbody>"""
+
+		if (items) {
+			items.eachWithIndex { item, int i ->
+				out << """
+					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">"""
+
+				out << body(item)
+
+				out << """
+					</tr>"""
+			}
+		}
+		else {
+			out << body()
+		}
+
+		out << """
+				</tbody>
+			</table>"""
 	}
 
 	/**

@@ -4,27 +4,13 @@
 		<title><g:message code='spring.security.ui.menu.securityInfo.mappings'/></title>
 	</head>
 	<body>
-		<br/>
-		<h4><g:message code='spring.security.ui.info.mappings.type' args='[securityConfigType]'/></h4>
-		<br/>
-		<table>
-			<thead>
-			<tr>
-				<th><g:message code='spring.security.ui.info.mappings.header.pattern'/></th>
-				<th><g:message code='spring.security.ui.info.mappings.header.attribute'/></th>
-				<th><g:message code='spring.security.ui.info.mappings.header.method'/></th>
-			</tr>
-			</thead>
-			<tbody>
-			<g:each var='iu' in='${configAttributes}'>
-			<g:set var='closure' value='${iu.configAttributes.any { it.getClass().name.contains("ClosureConfigAttribute") }}'/>
-				<tr>
-					<td>${iu.pattern}</td>
-					<td>${closure ? '&lt;closure&gt;' : iu.configAttributes.toString()[1..-2]}</td>
-					<td>${iu.httpMethod ?: 'N/A'}</td>
-				</tr>
-			</g:each>
-			</tbody>
-		</table>
+		<p/>
+		<g:message code='spring.security.ui.info.mappings.type' args='[securityConfigType]'/>
+		<s2ui:securityInfoTable type='mappings' items='${configAttributes}' headerCodes='pattern,attribute,method'>
+			<g:set var='closure' value='${it.configAttributes.any { ca -> ca.getClass().name.contains("ClosureConfigAttribute") }}'/>
+			<td>${it.pattern}</td>
+			<td>${closure ? '&lt;closure&gt;' : it.configAttributes.toString()[1..-2]}</td>
+			<td>${it.httpMethod ?: 'all'}</td>
+		</s2ui:securityInfoTable>
 	</body>
 </html>
