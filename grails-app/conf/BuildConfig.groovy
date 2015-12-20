@@ -22,7 +22,7 @@ grails.project.dependency.resolution = {
 		compile ':spring-security-core:2.0.0'
 		compile ':asset-pipeline:2.6.10'
 
-		compile ':spring-security-acl:2.0.0', {
+		compile ':spring-security-acl:2.0.1', {
 			export = false
 		}
 
