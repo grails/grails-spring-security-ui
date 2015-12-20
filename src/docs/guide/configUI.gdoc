@@ -2,9 +2,9 @@ The Security Info menu has links for several pages that contain read-only views 
 
 !security_info_menu.png!
 
-h4. Configuration
+h4. Security Configuration
 
-The Configuration menu item displays all security-related attributes in @Config.groovy@. The names omit the @grails.plugin.springsecurity@ prefix:
+The Security Configuration menu item displays all security-related attributes in @Config.groovy@. The names omit the @grails.plugin.springsecurity@ prefix:
 
 !security_info_config.png!
 
@@ -20,29 +20,38 @@ The Current Authentication menu item displays your @Authentication@ information,
 
 !security_info_auth.png!
 
+h4. User Cache
+
+The User Cache menu item displays information about cached users if the feature is enabled (it is disabled by default).
+
+!security_info_user_cache.png!
+
 h4. Filter Chains
 
-The Filter Chains menu item displays your configured Filter chains. Typically there is just one chain, applied to all URLs
+The Filter Chains menu item displays your configured Filter chains. It is possible to have multiple URL patterns each with its own filter chain, for example when using HTTP Basic Auth for a web service. By default since the 2.0.0 release the spring-security-core @s2-quickstart@ script configures empty filter chains for static assets to avoid unnecessary security checks (although of course if you need to secure some or all of your static assets you should reconfigure these).
 
 !security_info_filter_chains.png!
 
-It is possible to have multiple URL patterns each with its own filter chain, for example when using HTTP Basic Auth for a web service.
-
 h4. Logout Handlers
 
-The Logout Handlers menu item displays your registered @LogoutHandler@s. Typically there will be just the two shown here, but you can register your own custom implementations, or a plugin might contribute one or more:
+The Logout Handlers menu item displays your registered @LogoutHandler@s. Typically there will be just the ones shown here, but you can register your own custom implementations, or a plugin might contribute more:
 
 !security_info_logout_handlers.png!
 
 h4. Voters
 
-The Voters menu item displays your registered @AccessDecisionVoter@s. Typically there will be just the three shown here, but you can register your own custom implementations, or a plugin might contribute one or more:
+The Voters menu item displays your registered @AccessDecisionVoter@s. Typically there will be just the ones shown here, but you can register your own custom implementations, or a plugin might contribute more:
 
 !security_info_voters.png!
 
 h4. Authentication Providers
 
-The Authentication Providers menu item displays your registered @AuthenticationProvider@s. Typically there will be just the three shown here, but you can register your own custom implementations, or a plugin (e.g. LDAP) might contribute one or more:
+The Authentication Providers menu item displays your registered @AuthenticationProvider@s. Typically there will be just the ones shown here, but you can register your own custom implementations, or a plugin (e.g. LDAP) might contribute more:
 
 !security_info_providers.png!
 
+h4. Secure Channel Definition
+
+The Secure Channel Definition menu item displays your registered channel security mappings.
+
+!security_info_secure_channel.png!
