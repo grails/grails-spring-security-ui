@@ -52,5 +52,13 @@ interface RegistrationCodeStrategy {
 	RegistrationCode sendForgotPasswordMail(String username, String emailAddress,
 	                                        Closure emailBodyGenerator)
 
-	void resetPassword(ResetPasswordCommand command, RegistrationCode registrationCode)
+	/**
+	 * If the user is found by the username in the RegistrationCode, updates the user's password from
+	 * the ResetPasswordCommand and authenticates the user.
+	 *
+	 * @param command the command
+	 * @param registrationCode the registration code retrieved using the token in the link from the email
+	 * @return the user with the specified username if found
+	 */
+	def resetPassword(ResetPasswordCommand command, RegistrationCode registrationCode)
 }

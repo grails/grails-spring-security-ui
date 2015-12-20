@@ -53,8 +53,8 @@ abstract class AbstractS2UiController implements InitializingBean {
 	protected Class<?> UserRole
 
 	void afterPropertiesSet() {
-		authorityNameField = conf.authority.nameField
-		usernamePropertyName = conf.userLookup.usernamePropertyName
+		authorityNameField = conf.authority.nameField ?: ''
+		usernamePropertyName = conf.userLookup.usernamePropertyName ?: ''
 
 		Role = getDomainClassClass(conf.authority.className ?: '')
 		User = getDomainClassClass(conf.userLookup.userDomainClassName ?: '')

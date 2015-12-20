@@ -25,9 +25,7 @@ import groovy.text.SimpleTemplateEngine
  */
 class RegisterController extends AbstractS2UiController {
 
-	static allowedMethods = [register: 'POST']
-
-	static defaultAction = 'index'
+	static defaultAction = 'register'
 
 	/** Dependency injection for the 'saltSource' bean. */
 	def saltSource
@@ -41,45 +39,29 @@ class RegisterController extends AbstractS2UiController {
 	/** Dependency injection for the 'uiPropertiesStrategy' bean. */
 	PropertiesStrategy uiPropertiesStrategy
 
-	def index() {
-		def copy = [:] + (flash.chainedParams ?: [:])
-		copy.remove 'action'
-		copy.remove 'controller'
-		copy.remove 'format'
-		[registerCommand: new RegisterCommand(copy)]
-	}
-
 	def register(RegisterCommand registerCommand) {
 
+		if (!request.post) {
+			return [registerCommand: new RegisterCommand()]
+		}
+
 		if (registerCommand.hasErrors()) {
-			render view: 'index', model: [registerCommand: registerCommand]
-			return
+			return [registerCommand: registerCommand]
 		}
 
 		def user = uiRegistrationCodeStrategy.createUser(registerCommand)
-		RegistrationCode registrationCode = doRegister(registerCommand, user)
-		if (!registrationCode) {
-			return
+		String salt = saltSource instanceof NullSaltSource ? null : registerCommand.username
+		RegistrationCode registrationCode = uiRegistrationCodeStrategy.register(user, registerCommand.password, salt)
+
+		if (registrationCode == null || registrationCode.hasErrors()) {
+			// null means problem creating the user
+			flash.error = message(code: 'spring.security.ui.register.miscError')
+			return [registerCommand: registerCommand]
 		}
 
 		sendVerifyRegistrationMail registrationCode, user, registerCommand.email
 
-		render view: 'index', model: [emailSent: true]
-	}
-
-	protected RegistrationCode doRegister(RegisterCommand registerCommand, user) {
-		String salt = saltSource instanceof NullSaltSource ? null : registerCommand.username
-
-		RegistrationCode registrationCode = uiRegistrationCodeStrategy.register(user, registerCommand.password, salt)
-		if (registrationCode == null || registrationCode.hasErrors()) {
-			// null means problem creating the user
-			flash.error = message(code: 'spring.security.ui.register.miscError')
-			flash.chainedParams = params
-			redirect action: 'index'
-			return null
-		}
-
-		registrationCode
+		[emailSent: true, registerCommand: registerCommand]
 	}
 
 	protected void sendVerifyRegistrationMail(RegistrationCode registrationCode, user, String email) {
@@ -127,29 +109,32 @@ class RegisterController extends AbstractS2UiController {
 
 	def forgotPassword(ForgotPasswordCommand forgotPasswordCommand) {
 
-		if (forgotPasswordCommand.hasErrors()) {
-			return [forgotPasswordCommand: forgotPasswordCommand]
+		if (!request.post) {
+			return [forgotPasswordCommand: new ForgotPasswordCommand()]
 		}
 
-		if (!request.post) {
-			// show the form
+		if (forgotPasswordCommand.hasErrors()) {
 			return [forgotPasswordCommand: forgotPasswordCommand]
 		}
 
 		def user = findUserByUsername(forgotPasswordCommand.username)
 		if (!user) {
-			forgotPasswordCommand.errors.rejectValue('username', 'spring.security.ui.forgotPassword.user.notFound')
-			redirect action: 'forgotPassword'
-			return
+			forgotPasswordCommand.errors.rejectValue 'username',
+				'spring.security.ui.forgotPassword.user.notFound'
+			return [forgotPasswordCommand: forgotPasswordCommand]
 		}
 
 		String email = uiPropertiesStrategy.getProperty(user, 'email')
+		if (!email) {
+			forgotPasswordCommand.errors.rejectValue 'username',
+				'spring.security.ui.forgotPassword.noEmail'
+			return [forgotPasswordCommand: forgotPasswordCommand]
+		}
 
 		RegistrationCode registrationCode = uiRegistrationCodeStrategy.sendForgotPasswordMail(
 				forgotPasswordCommand.username, email) { String registrationCodeToken ->
 
 			String url = generateLink('resetPassword', [t: registrationCodeToken])
-
 			String body = forgotPasswordEmailBody
 			if (body.contains('$')) {
 				body = evaluate(body, [user: user, url: url])
@@ -157,8 +142,7 @@ class RegisterController extends AbstractS2UiController {
 
 			body
 		}
-
-		[emailSent: true]
+		[emailSent: true, forgotPasswordCommand: forgotPasswordCommand]
 	}
 
 	def resetPassword(ResetPasswordCommand resetPasswordCommand) {
@@ -173,7 +157,7 @@ class RegisterController extends AbstractS2UiController {
 		}
 
 		if (!request.post) {
-			return [token: token, resetPasswordCommand: resetPasswordCommand]
+			return [token: token, resetPasswordCommand: new ResetPasswordCommand()]
 		}
 
 		resetPasswordCommand.username = registrationCode.username
@@ -219,13 +203,13 @@ class RegisterController extends AbstractS2UiController {
 		RegisterCommand.User = User
 		RegisterCommand.usernamePropertyName = usernamePropertyName
 
-		forgotPasswordEmailBody = conf.ui.forgotPassword.emailBody
-		registerEmailBody = conf.ui.register.emailBody
-		registerEmailFrom = conf.ui.register.emailFrom
-		registerEmailSubject = conf.ui.register.emailSubject
-		registerPostRegisterUrl = conf.ui.register.postRegisterUrl
-		registerPostResetUrl = conf.ui.register.postResetUrl
-		successHandlerDefaultTargetUrl = conf.successHandler.defaultTargetUrl
+		forgotPasswordEmailBody = conf.ui.forgotPassword.emailBody ?: ''
+		registerEmailBody = conf.ui.register.emailBody ?: ''
+		registerEmailFrom = conf.ui.register.emailFrom ?: ''
+		registerEmailSubject = conf.ui.register.emailSubject ?: ''
+		registerPostRegisterUrl = conf.ui.register.postRegisterUrl ?: ''
+		registerPostResetUrl = conf.ui.register.postResetUrl ?: ''
+		successHandlerDefaultTargetUrl = conf.successHandler.defaultTargetUrl ?: '/'
 
 		passwordMaxLength = conf.ui.password.maxLength instanceof Number ? conf.ui.password.maxLength : 64
 		passwordMinLength = conf.ui.password.minLength instanceof Number ? conf.ui.password.minLength : 8
@@ -289,7 +273,7 @@ class RegisterCommand implements CommandObject {
 		}
 		email email: true
 		password validator: RegisterController.passwordValidator
-		password2 validator: RegisterController.password2Validator
+		password2 nullable: true, validator: RegisterController.password2Validator
 	}
 }
 
@@ -301,6 +285,6 @@ class ResetPasswordCommand implements CommandObject {
 
 	static constraints = {
 		password validator: RegisterController.passwordValidator
-		password2 validator: RegisterController.password2Validator
+		password2 nullable: true, validator: RegisterController.password2Validator
 	}
 }

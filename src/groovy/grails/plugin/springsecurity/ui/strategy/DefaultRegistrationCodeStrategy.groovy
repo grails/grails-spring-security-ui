@@ -52,7 +52,7 @@ class DefaultRegistrationCodeStrategy implements RegistrationCodeStrategy {
 		springSecurityUiService.sendForgotPasswordMail username, emailAddress, emailBodyGenerator
 	}
 
-	void resetPassword(ResetPasswordCommand command, RegistrationCode registrationCode) {
+	def resetPassword(ResetPasswordCommand command, RegistrationCode registrationCode) {
 		springSecurityUiService.resetPassword command, registrationCode
 	}
 }

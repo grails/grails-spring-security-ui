@@ -114,6 +114,6 @@ class UserController extends AbstractS2UiDomainController {
 			return
 		}
 
-		authoritiesPropertyName = conf.userLookup.authoritiesPropertyName
+		authoritiesPropertyName = conf.userLookup.authoritiesPropertyName ?: ''
 	}
 }

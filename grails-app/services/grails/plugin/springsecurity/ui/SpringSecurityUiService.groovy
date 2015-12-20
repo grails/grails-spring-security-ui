@@ -18,6 +18,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.ui.strategy.AclStrategy
 import grails.plugin.springsecurity.ui.strategy.ErrorsStrategy
+import grails.plugin.springsecurity.ui.strategy.MailStrategy
 import grails.plugin.springsecurity.ui.strategy.PersistentLoginStrategy
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
 import grails.plugin.springsecurity.ui.strategy.QueryStrategy
@@ -26,11 +27,16 @@ import grails.plugin.springsecurity.ui.strategy.RequestmapStrategy
 import grails.plugin.springsecurity.ui.strategy.RoleStrategy
 import grails.plugin.springsecurity.ui.strategy.UserStrategy
 import grails.transaction.Transactional
+import grails.util.GrailsNameUtils
 import groovy.util.logging.Slf4j
 
 import java.text.SimpleDateFormat
 
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.security.authentication.dao.SaltSource
+import org.springframework.security.core.userdetails.UserCache
 import org.springframework.transaction.TransactionStatus
 import org.springframework.util.ClassUtils
 
@@ -56,15 +62,17 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	/** Dependency injection for the 'uiErrorsStrategy' bean. */
 	ErrorsStrategy uiErrorsStrategy
 
+	/** Dependency injection for the 'uiMailStrategy' bean. */
+	MailStrategy uiMailStrategy
+
 	/** Dependency injection for the 'uiPropertiesStrategy' bean. */
 	PropertiesStrategy uiPropertiesStrategy
 
-	def grailsApplication
-	def messageSource
-	def saltSource
+	GrailsApplication grailsApplication
+	MessageSource messageSource
+	SaltSource saltSource
 	def springSecurityService
-	def uiMailStrategy
-	def userCache
+	UserCache userCache
 
 	@Transactional
 	def saveAclClass(Map properties) {
@@ -213,18 +221,18 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	@Transactional
-	void resetPassword(ResetPasswordCommand command, RegistrationCode registrationCode) {
+	def resetPassword(ResetPasswordCommand command, RegistrationCode registrationCode) {
 
 		String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
 		def user = findUserByUsername(registrationCode.username)
 		save password: encodePassword(command.password, salt), user, 'resetPassword', transactionStatus
-		if (user.hasErrors()) {
-			return
+
+		if (!user.hasErrors()) {
+			delete registrationCode, 'resetPassword', transactionStatus
+			springSecurityService.reauthenticate registrationCode.username
 		}
 
-		delete registrationCode, 'resetPassword', transactionStatus
-
-		springSecurityService.reauthenticate registrationCode.username
+		user
 	}
 
 	@Transactional
@@ -326,7 +334,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	protected void addRoles(user, List<String> roleNames) {
-		String authorityNameField = classMappings[Role].authority
+		String authorityNameField = uiPropertiesStrategy.paramNameToPropertyName('authority', 'role')
 
 		try {
 			for (String roleName in roleNames) {
@@ -361,21 +369,21 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 
 		def userLookup = conf.userLookup
 		mappings[User] = [
-			username:        userLookup.usernamePropertyName,
-			enabled:         userLookup.enabledPropertyName,
-			password:        userLookup.passwordPropertyName,
-			authorities:     userLookup.authoritiesPropertyName,
-			accountExpired:  userLookup.accountExpiredPropertyName,
-			accountLocked:   userLookup.accountLockedPropertyName,
-			passwordExpired: userLookup.passwordExpiredPropertyName].asImmutable()
+			username:        userLookup.usernamePropertyName ?: '',
+			enabled:         userLookup.enabledPropertyName ?: '',
+			password:        userLookup.passwordPropertyName ?: '',
+			authorities:     userLookup.authoritiesPropertyName ?: '',
+			accountExpired:  userLookup.accountExpiredPropertyName ?: '',
+			accountLocked:   userLookup.accountLockedPropertyName ?: '',
+			passwordExpired: userLookup.passwordExpiredPropertyName ?: ''].asImmutable()
 
-		mappings[Role] = [authority: conf.authority.nameField].asImmutable()
+		mappings[Role] = [authority: conf.authority.nameField ?: ''].asImmutable()
 
 		def requestMap = conf.requestMap
 		mappings[Requestmap] = [
-			url:             requestMap.urlField,
-			configAttribute: requestMap.configAttributeField,
-			httpMethod:      requestMap.httpMethodField].asImmutable()
+			url:             requestMap.urlField ?: '',
+			configAttribute: requestMap.configAttributeField ?: '',
+			httpMethod:      requestMap.httpMethodField ?: ''].asImmutable()
 
 		mappings
 	}
@@ -388,16 +396,31 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		}
 
 		def value = instance
+		String currentPath = ''
 		for (String paramNamePart in paramName.split('\\.')) {
-			Map<String, String> mappings = classMappings[unproxy(value.getClass())]
-			String propertyName = mappings ? mappings[paramNamePart] : paramNamePart
+			currentPath += paramNamePart
+
+			String classPropertyName = GrailsNameUtils.getPropertyName(
+				unproxy(value.getClass()).name)
+
+			String propertyName = uiPropertiesStrategy.paramNameToPropertyName(
+				paramNamePart, classPropertyName)
+
 			try {
-				value = value[propertyName]
-				if (value == null) return
+				if (instance.metaClass.getMetaProperty(propertyName)?.getter) {
+					value = value[propertyName]
+					if (value == null) return
+				}
+				else {
+					log.error "Attempted to read non-existent property $currentPath in $instance"
+					return
+				}
 			}
 			catch (e) {
 				throw new InvalidValueException(propertyName, paramNamePart, value, e)
 			}
+
+			currentPath += '.'
 		}
 
 		value
@@ -673,10 +696,10 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		def encode = conf.ui.encodePassword
 		encodePassword = encode instanceof Boolean ? encode : false
 
-		forgotPasswordEmailFrom = conf.ui.forgotPassword.emailFrom
-		forgotPasswordEmailSubject = conf.ui.forgotPassword.emailSubject
+		forgotPasswordEmailFrom = conf.ui.forgotPassword.emailFrom ?: ''
+		forgotPasswordEmailSubject = conf.ui.forgotPassword.emailSubject ?: ''
 
-		registerDefaultRoleNames = conf.ui.register.defaultRoleNames
+		registerDefaultRoleNames = conf.ui.register.defaultRoleNames ?: []
 
 		def getDomainClassClass = { String name ->
 			if (name) return grailsApplication.getDomainClass(name)?.clazz

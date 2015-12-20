@@ -15,10 +15,10 @@
 				<br/>
 				<table>
 				<tbody>
-					<s2ui:textFieldRow name='username' size='40' labelCode='user.username.label' labelCodeDefault='Username'/>
-					<s2ui:textFieldRow name='email' size='40' labelCode='user.email.label' labelCodeDefault='E-mail'/>
-					<s2ui:passwordFieldRow name='password' size='40' labelCode='user.password.label' labelCodeDefault='Password'/>
-					<s2ui:passwordFieldRow name='password2' size='40' labelCode='user.password2.label' labelCodeDefault='Password (again)'/>
+					<s2ui:textFieldRow name='username' size='40' labelCodeDefault='Username'/>
+					<s2ui:textFieldRow name='email' size='40' labelCodeDefault='E-mail'/>
+					<s2ui:passwordFieldRow name='password' size='40' labelCodeDefault='Password'/>
+					<s2ui:passwordFieldRow name='password2' size='40' labelCodeDefault='Password (again)'/>
 				</tbody>
 				</table>
 				<s2ui:submitButton elementId='submit' messageCode='spring.security.ui.register.submit'/>
