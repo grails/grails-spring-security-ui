@@ -243,6 +243,7 @@ class RegisterSpec extends AbstractSecuritySpec {
 
 		server = SimpleSmtpServer.start(port)
 
-		assert getContent('testData/updateMailSenderPort?port=' + port)?.trim() == 'OK: ' + port
+		go 'testData/updateMailSenderPort?port=' + port
+		assertContentContains 'OK: ' + port
 	}
 }
