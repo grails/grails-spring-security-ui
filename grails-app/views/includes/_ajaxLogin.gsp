@@ -14,7 +14,7 @@
 						<div id="loginLinkContainer">
 							<sec:ifLoggedIn>
 							<g:message code='spring.security.ui.login.loggedInAs' args='[sec.username()]'/> 
-								(<g:link controller='logout' elementId='logout'> <g:message code='spring.security.ui.login.logout'/></g:link>)
+								(<g:link controller='logout' elementId='logout'><g:message code='spring.security.ui.login.logout'/></g:link>)
 							</sec:ifLoggedIn>
 							<sec:ifNotLoggedIn>
 							<a href="#" id="loginLink"><g:message code='spring.security.ui.login.login'/></a>

@@ -4,7 +4,6 @@
 		<s2ui:title messageCode='spring.security.ui.register.title'/>
 	</head>
 	<body>
-		<p/>
 		<s2ui:formContainer type='register' focus='username' width='800px'>
 			<s2ui:form beanName='registerCommand'>
 				<g:if test='${emailSent}'>

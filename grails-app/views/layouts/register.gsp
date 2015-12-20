@@ -9,7 +9,8 @@
 <g:layoutHead/>
 	</head>
 	<body>
-<g:layoutBody/>
+		<p/>
+		<g:layoutBody/>
 <asset:javascript src='spring-security-ui-register.js'/>
 <s2ui:showFlash/>
 <s2ui:deferredScripts/>

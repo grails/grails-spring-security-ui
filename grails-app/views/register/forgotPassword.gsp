@@ -4,7 +4,6 @@
 		<s2ui:title messageCode='spring.security.ui.forgotPassword.title'/>
 	</head>
 	<body>
-		<p/>
 		<s2ui:formContainer type='forgotPassword' focus='username' width='50%'>
 			<s2ui:form beanName='forgotPasswordCommand'>
 				<g:if test='${emailSent}'>
@@ -13,7 +12,7 @@
 				</g:if>
 				<g:else>
 				<br/>
-				<h4><g:message code='spring.security.ui.forgotPassword.description'/></h4>
+				<h3><g:message code='spring.security.ui.forgotPassword.description'/></h3>
 				<table>
 					<s2ui:textFieldRow name='username' size='25' labelCodeDefault='Username'/>
 				</table>

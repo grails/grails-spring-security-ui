@@ -52,6 +52,7 @@
 			</div>
 			<div id="s2ui_main">
 				<div id="s2ui_content">
+					<p/>
 					<g:layoutBody/>
 				</div>
 			</div>

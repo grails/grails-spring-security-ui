@@ -4,13 +4,12 @@
 		<s2ui:title messageCode='spring.security.ui.resetPassword.title'/>
 	</head>
 	<body>
-		<p/>
 		<s2ui:formContainer type='resetPassword' focus='password' width='475px'>
 			<s2ui:form beanName='resetPasswordCommand'>
 				<g:hiddenField name='t' value='${token}'/>
 				<div class="sign_in">
 				<br/>
-				<h4><g:message code='spring.security.ui.resetPassword.description'/></h4>
+				<h3><g:message code='spring.security.ui.resetPassword.description'/></h3>
 				<table>
 					<s2ui:passwordFieldRow name='password' labelCodeDefault='Password'/>
 					<s2ui:passwordFieldRow name='password2' labelCodeDefault='Password (again)'/>
