@@ -68,7 +68,7 @@ grails.project.dependency.resolution = {
 		compile ':spring-security-ui:1.0-SNAPSHOT'
 
 		if (extended) {
-			runtime ':spring-security-acl:2.0.1-SNAPSHOT'
+			runtime ':spring-security-acl:2.0.0'
 		}
 
 		test ":geb:$gebVersion"
