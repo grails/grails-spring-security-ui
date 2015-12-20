@@ -8,7 +8,7 @@ grails.server.port.http = 8238
 grails.testing.patterns = ['Register', 'RegistrationCode', 'Requestmap', 'Role', 'User']
 if (extended) {
 	grails.testing.patterns.addAll 'AclClass', 'AclEntry', 'AclObjectIdentity', 'AclSid',
-											 'ExtendedMenu', 'ExtendedSecurityInfo', 'PersistentLogin'
+	                               'ExtendedMenu', 'ExtendedSecurityInfo', 'PersistentLogin'
 }
 else {
 	grails.testing.patterns.addAll 'DefaultMenu', 'DefaultSecurityInfo'
