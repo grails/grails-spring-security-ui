@@ -1,7 +1,7 @@
 <g:set var='securityConfig' value='${applicationContext.springSecurityService.securityConfig}'/>
 <html>
 	<head>
-		<meta name="layout" content="${securityConfig.ui.gsp.layoutAuth ?: 'main'}"/>
+		<meta name="layout" content="main"/>
 		<s2ui:title messageCode='spring.security.ui.login.title'/>
 		<asset:stylesheet src='spring-security-ui-auth.css'/>
 	</head>

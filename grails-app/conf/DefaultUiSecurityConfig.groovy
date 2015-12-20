@@ -34,7 +34,6 @@ If you did make the request, then click <a href="$url">here</a> to reset your pa
 		}
 
 		gsp {
-			layoutAuth     = 'register'
 			layoutRegister = 'register'
 			layoutUi       = 'springSecurityUI'
 		}
