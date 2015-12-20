@@ -15,21 +15,27 @@
 package grails.plugin.springsecurity.ui
 
 import grails.plugin.springsecurity.SpringSecurityUtils
-
+import grails.plugin.springsecurity.web.GrailsSecurityFilterChain
+import grails.plugin.springsecurity.web.access.intercept.AbstractFilterInvocationDefinition
+import org.springframework.security.access.AccessDecisionManager
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserCache
+import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource
+import org.springframework.security.web.authentication.logout.LogoutHandler
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
 class SecurityInfoController {
 
-	def accessDecisionManager
-	def authenticationManager
-	def channelFilterInvocationSecurityMetadataSource
-	def logoutHandlers
-	def objectDefinitionSource
-	def springSecurityFilterChain
-	def userCache
+	AccessDecisionManager accessDecisionManager
+	AuthenticationManager authenticationManager
+	FilterInvocationSecurityMetadataSource channelFilterInvocationSecurityMetadataSource
+	List<LogoutHandler> logoutHandlers
+	AbstractFilterInvocationDefinition objectDefinitionSource
+	List<GrailsSecurityFilterChain> securityFilterChains
+	UserCache userCache
 
 	def config() {
 		[conf: new TreeMap(conf.flatten())]
@@ -50,7 +56,7 @@ class SecurityInfoController {
 	}
 
 	def filterChains() {
-		[filterChainMap: springSecurityFilterChain.filterChainMap]
+		[securityFilterChains: securityFilterChains]
 	}
 
 	def logoutHandlers() {

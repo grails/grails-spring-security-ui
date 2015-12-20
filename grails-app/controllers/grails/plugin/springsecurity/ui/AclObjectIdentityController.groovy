@@ -19,8 +19,16 @@ package grails.plugin.springsecurity.ui
  */
 class AclObjectIdentityController extends AbstractS2UiDomainController {
 
+	def create() {
+		super.create()
+	}
+
 	def save() {
 		doSave uiAclStrategy.saveAclObjectIdentity(params)
+	}
+
+	def edit() {
+		super.edit()
 	}
 
 	def update() {

@@ -1,16 +1,15 @@
 language: groovy
-jdk:
-  - oraclejdk8
-
-# To use new Travis container infrastructure with caching
 sudo: false
 cache:
   directories:
-  - $HOME/.grails
-  - $HOME/.m2
-
-script: ./travis-build.sh
-
+  - "$HOME/.gradle/caches"
+  - "$HOME/.gradle/wrapper"
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+jdk:
+- oraclejdk8
+install: true
+script: "./travis-build.sh"
 env:
   global:
   - GIT_NAME="Graeme Rocher"

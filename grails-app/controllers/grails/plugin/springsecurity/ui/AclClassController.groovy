@@ -19,8 +19,16 @@ package grails.plugin.springsecurity.ui
  */
 class AclClassController extends AbstractS2UiDomainController {
 
+	def create() {
+		super.create()
+	}
+
 	def save() {
 		doSave uiAclStrategy.saveAclClass(params)
+	}
+
+	def edit() {
+		super.edit()
 	}
 
 	def update() {

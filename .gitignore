@@ -1,9 +1,8 @@
-.classpath
-.project
-.settings
+*.iml
+*.ipr
+*.iws
 *.log
-target
-/grails-spring-security-ui-*.zip
-/grails-spring-security-ui-*.zip.sha1
-/plugin.xml
-/web-app/WEB-INF
+.DS_Store
+.gradle
+.idea
+build

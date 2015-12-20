@@ -25,8 +25,16 @@ class RoleController extends AbstractS2UiDomainController {
 	/** Dependency injection for the 'uiRoleStrategy' bean. */
 	RoleStrategy uiRoleStrategy
 
+	def create() {
+		super.create()
+	}
+
 	def save() {
 		doSave uiRoleStrategy.saveRole(params)
+	}
+
+	def edit() {
+		super.edit()
 	}
 
 	def update() {

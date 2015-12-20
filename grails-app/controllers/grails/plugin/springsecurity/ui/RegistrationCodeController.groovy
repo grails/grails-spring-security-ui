@@ -24,6 +24,10 @@ class RegistrationCodeController extends AbstractS2UiDomainController {
 	/** Dependency injection for the 'uiRegistrationCodeStrategy' bean. */
 	RegistrationCodeStrategy uiRegistrationCodeStrategy
 
+	def edit() {
+		super.edit()
+	}
+
 	def update() {
 		doUpdate { registrationCode ->
 			uiRegistrationCodeStrategy.updateRegistrationCode params, registrationCode

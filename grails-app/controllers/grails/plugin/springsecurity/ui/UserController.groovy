@@ -24,8 +24,16 @@ class UserController extends AbstractS2UiDomainController {
 	/** Dependency injection for the 'uiUserStrategy' bean. */
 	UserStrategy uiUserStrategy
 
+	def create() {
+		super.create()
+	}
+
 	def save() {
 		doSave uiUserStrategy.saveUser(params, roleNamesFromParams(), params.password)
+	}
+
+	def edit() {
+		super.edit()
 	}
 
 	def update() {

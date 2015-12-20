@@ -19,6 +19,7 @@ import grails.plugin.springsecurity.ui.strategy.MailStrategy
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
 import grails.plugin.springsecurity.ui.strategy.RegistrationCodeStrategy
 import groovy.text.SimpleTemplateEngine
+import org.springframework.security.authentication.dao.SaltSource
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -28,7 +29,7 @@ class RegisterController extends AbstractS2UiController {
 	static defaultAction = 'register'
 
 	/** Dependency injection for the 'saltSource' bean. */
-	def saltSource
+	SaltSource saltSource
 
 	/** Dependency injection for the 'uiMailStrategy' bean. */
 	MailStrategy uiMailStrategy

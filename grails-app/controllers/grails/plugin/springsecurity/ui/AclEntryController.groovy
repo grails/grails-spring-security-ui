@@ -30,6 +30,10 @@ class AclEntryController extends AbstractS2UiDomainController {
 		doSave uiAclStrategy.saveAclEntry(params)
 	}
 
+	def edit() {
+		super.edit()
+	}
+
 	def update() {
 		doUpdate { aclEntry ->
 			uiAclStrategy.updateAclEntry params, aclEntry

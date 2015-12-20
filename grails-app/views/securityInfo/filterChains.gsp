@@ -4,12 +4,12 @@
 		<title><g:message code='spring.security.ui.menu.securityInfo.filterChains'/></title>
 	</head>
 	<body>
-		<s2ui:securityInfoTable type='filterChains' items='${filterChainMap}' headerCodes='pattern,filters'>
-			<td>${it.key}</td>
+		<s2ui:securityInfoTable type='filterChains' items='${securityFilterChains}' headerCodes='pattern,filters'>
+			<td>${it.matcherPattern}</td>
 			<td>
-				<g:if test='${it.value}'>
+				<g:if test='${it.filters}'>
 				<ul>
-				<g:each var='filter' in='${it.value}'>
+				<g:each var='filter' in='${it.filters}'>
 					<li>${filter.getClass().name}</li>
 				</g:each>
 				</ul>

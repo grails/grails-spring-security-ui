@@ -1,14 +1,8 @@
 #!/bin/bash
 set -e
 
-rm -f *.zip
+rm -rf build
 
-rm -rf target
+./gradlew -q clean check install --stacktrace
 
-./grailsw compile --non-interactive
-
-./grailsw test-app --non-interactive
-
-./grailsw maven-install --non-interactive
-
-./functional-test-app/run_functional_tests.sh
+functional-test-app/run_functional_tests.sh

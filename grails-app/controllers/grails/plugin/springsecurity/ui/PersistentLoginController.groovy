@@ -24,6 +24,10 @@ class PersistentLoginController extends AbstractS2UiDomainController {
 	/** Dependency injection for the 'uiPersistentLoginStrategy' bean. */
 	PersistentLoginStrategy uiPersistentLoginStrategy
 
+	def edit() {
+		super.edit()
+	}
+
 	def update() {
 		doUpdate { persistentLogin ->
 			uiPersistentLoginStrategy.updatePersistentLogin params, persistentLogin

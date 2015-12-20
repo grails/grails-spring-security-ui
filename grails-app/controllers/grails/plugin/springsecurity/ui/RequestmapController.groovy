@@ -16,7 +16,6 @@ package grails.plugin.springsecurity.ui
 
 import grails.plugin.springsecurity.ReflectionUtils
 import grails.plugin.springsecurity.ui.strategy.RequestmapStrategy
-
 import org.springframework.http.HttpMethod
 
 /**
@@ -29,11 +28,19 @@ class RequestmapController extends AbstractS2UiDomainController {
 
 	def springSecurityService
 
+	def create() {
+		super.create()
+	}
+
 	def save() {
 		if (!(param('url'))) params.remove('url')
 		doSave(uiRequestmapStrategy.saveRequestmap(params)) {
 			springSecurityService.clearCachedRequestmaps()
 		}
+	}
+
+	def edit() {
+		super.edit()
 	}
 
 	def update() {

@@ -18,7 +18,6 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.ui.strategy.AclStrategy
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
 import grails.plugin.springsecurity.ui.strategy.QueryStrategy
-
 import org.springframework.dao.DataIntegrityViolationException
 
 /**

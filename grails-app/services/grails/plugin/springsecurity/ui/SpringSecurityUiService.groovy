@@ -14,6 +14,7 @@
  */
 package grails.plugin.springsecurity.ui
 
+import grails.core.GrailsApplication
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.ui.strategy.AclStrategy
@@ -29,16 +30,14 @@ import grails.plugin.springsecurity.ui.strategy.UserStrategy
 import grails.transaction.Transactional
 import grails.util.GrailsNameUtils
 import groovy.util.logging.Slf4j
-
-import java.text.SimpleDateFormat
-
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.security.authentication.dao.SaltSource
 import org.springframework.security.core.userdetails.UserCache
 import org.springframework.transaction.TransactionStatus
 import org.springframework.util.ClassUtils
+
+import java.text.SimpleDateFormat
 
 /**
  * Helper methods for UI management.

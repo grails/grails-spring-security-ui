@@ -14,11 +14,12 @@
  */
 package grails.plugin.springsecurity.ui
 
+import grails.core.GrailsApplication
 import grails.plugin.springsecurity.SpringSecurityUtils
-
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InitializingBean
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -26,6 +27,10 @@ import org.springframework.beans.factory.InitializingBean
 abstract class AbstractS2UiController implements InitializingBean {
 
 	static scope = 'singleton'
+
+	// needed for afterPropertiesSet since accessing the Trait's
+	// grailsApplication looks for a current thread-bound request
+	private @Autowired GrailsApplication application
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass())
 
@@ -37,7 +42,7 @@ abstract class AbstractS2UiController implements InitializingBean {
 
 	protected Class<?> getDomainClassClass(String name) {
 		if (name) {
-			return grailsApplication.getDomainClass(name)?.clazz
+			return application.getDomainClass(name)?.clazz
 		}
 	}
 
