@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory
  */
 class SpringSecurityUiGrailsPlugin {
 
-	String version = '1.0-RC2'
+	String version = '1.0-SNAPSHOT'
 	String grailsVersion = '2.3.0 > *'
 	List loadAfter = ['springSecurityCore', 'springSecurityAcl']
 	List pluginExcludes = [
