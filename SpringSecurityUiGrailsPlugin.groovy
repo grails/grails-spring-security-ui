@@ -91,8 +91,13 @@ class SpringSecurityUiGrailsPlugin {
 	}
 
 	def doWithApplicationContext = { ctx ->
+
 		def conf = SpringSecurityUtils.securityConfig
-		if (conf.active && log.traceEnabled) {
+		if (!conf || !conf.active) {
+			return
+		}
+
+		if (log.traceEnabled) {
 			// redisplay here to show the merged config
 			def sb = new StringBuilder('Spring Security configuration:\n')
 			def flatConf = conf.flatten()
