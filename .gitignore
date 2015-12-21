@@ -1,7 +1,9 @@
 .classpath
+.gradle
 .project
 .settings
 *.log
+build
 target
 /grails-spring-security-ui-*.zip
 /grails-spring-security-ui-*.zip.sha1
