@@ -80,7 +80,7 @@ h4. RegistrationCode search
 
 The plugin uses its @grails.plugin.springsecurity.ui.RegistrationCode@ domain class to store a token associated with the new users' username for use when finishing the registration process after the user clicks the link in the generated email (and also as part of the forgot-password workflow). The plugin includes a controller and GSPs to manage these instances.
 
-The default action for the RegistrationCode controller is search. By default only the standard fields (@username@ and @token@) are available but this is customizable with the @grails s2ui-override@ script - see [the section on configuration|guide:customization].
+The default action for the RegistrationCode controller is search. By default only the standard fields (@username@ and @token@) are available but this is customizable with the [s2ui-override|Scripts] script - see [the section on configuration|guide:customization] for details.
 
 You can search by any combination of fields, and both fields have an Ajax autocomplete to assist in finding instances. Leave both fields empty to return all instances.
 

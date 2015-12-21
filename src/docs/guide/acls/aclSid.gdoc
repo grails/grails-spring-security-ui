@@ -1,4 +1,4 @@
-The default action for the AclSid controller is search. By default only the standard fields are available but this is customizable with the @grails s2ui-override@ script - see [the section on configuration|guide:customization].
+The default action for the AclSid controller is search. By default only the standard fields are available but this is customizable with the [s2ui-override|Scripts] script - see [the section on configuration|guide:customization] for details.
 
 The @sid@ field has an Ajax autocomplete to assist in finding instances. Leave the field empty and @principal@ set to Either to return all instances.
 

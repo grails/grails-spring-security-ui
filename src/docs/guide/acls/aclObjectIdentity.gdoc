@@ -1,4 +1,4 @@
-The default action for the AclObjectIdentity controller is search. By default only the standard fields are available but this is customizable with the @grails s2ui-override@ script - see [the section on configuration|guide:customization].
+The default action for the AclObjectIdentity controller is search. By default only the standard fields are available but this is customizable with the [s2ui-override|Scripts] script - see [the section on configuration|guide:customization] for details.
 
 Leave all fields at their default values to return all instances.
 

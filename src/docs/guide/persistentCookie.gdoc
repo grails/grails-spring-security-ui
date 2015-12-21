@@ -1,10 +1,10 @@
-Persistent cookies aren't enabled by default - you must enable them by running the @s2-create-persistent-token@ script. See [the Spring Security Core plugin documentation|http://grails-plugins.github.io/grails-spring-security-core/docs/manual/guide/authentication.html#rememberMeCookie] for details about this feature.
+Persistent cookies aren't enabled by default - you must enable them by running the @s2-create-persistent-token@ script. See [the Spring Security Core plugin documentation|https://grails-plugins.github.io/grails-spring-security-core/v2/guide/authentication.html#rememberMeCookie] for details about this feature.
 
 The Persistent Logins menu is only shown if this feature is enabled.
 
 h4. Persistent logins search
 
-The default action for the PersistentLogin controller is search. By default only the standard fields (@username@, @token@, and @series@) are available but this is customizable with the @grails s2ui-override@ script - see [the section on configuration|guide:customization].
+The default action for the PersistentLogin controller is search. By default only the standard fields (@username@, @token@, and @series@) are available but this is customizable with the [s2ui-override|Scripts] script - see [the section on configuration|guide:customization] for details.
 
 You can search by any combination of fields, and all fields have an Ajax autocomplete to assist in finding instances. Leave all fields empty to return all instances.
 
