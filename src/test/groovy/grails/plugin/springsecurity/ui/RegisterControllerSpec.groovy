@@ -1,19 +1,13 @@
 package grails.plugin.springsecurity.ui
 
-import grails.core.DefaultGrailsApplication
-import grails.plugin.springsecurity.ReflectionUtils
 import grails.plugin.springsecurity.SpringSecurityUtils
 import spock.lang.Specification
 
 class RegisterControllerSpec extends Specification {
 
-	void setupSpec() {
-		ReflectionUtils.application = new DefaultGrailsApplication()
-		updateFromConfig()
-	}
-
 	void setup() {
 		SpringSecurityUtils.setSecurityConfig [:] as ConfigObject
+		updateFromConfig()
 	}
 
 	void cleanup() {
