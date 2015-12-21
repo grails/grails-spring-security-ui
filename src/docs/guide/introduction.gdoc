@@ -1,6 +1,8 @@
 The Spring Security UI plugin provides CRUD screens and other user management workflows. Non-default functionality is available only if the feature is available; this includes the ACL controllers and views which are enabled if the [ACL plugin|http://grails.org/plugin/spring-security-acl] is installed, Requestmaps support which is available if @grails.plugin.springsecurity.securityConfigType@ is set to @"Requestmap"@ or @SecurityConfigType.Requestmap@ in @Config.groovy@, and persistent cookies support which is enabled if it has been configured with the @s2-create-persistent-token@ script.
 
 h4. Release History
+* December 21, 2015
+** 1.0-RC3 release
 * May 20, 2014
 ** 1.0-RC2 release
 * November 11, 2013
