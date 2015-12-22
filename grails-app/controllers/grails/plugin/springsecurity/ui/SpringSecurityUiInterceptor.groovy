@@ -14,12 +14,15 @@
  */
 package grails.plugin.springsecurity.ui
 
+import grails.plugin.springsecurity.ReflectionUtils
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
+import groovy.transform.CompileStatic
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
+@CompileStatic
 class SpringSecurityUiInterceptor {
 
 	/** Dependency injection for the 'uiPropertiesStrategy' bean. */
@@ -35,8 +38,8 @@ class SpringSecurityUiInterceptor {
 
 		if (model != null) {
 			def conf = SpringSecurityUtils.securityConfig
-			model.layoutRegister = conf.ui.gsp.layoutRegister ?: 'register'
-			model.layoutUi = conf.ui.gsp.layoutUi ?: 'springSecurityUI'
+			model.layoutRegister = ReflectionUtils.getConfigProperty('ui.gsp.layoutRegister') ?: 'register'
+			model.layoutUi = ReflectionUtils.getConfigProperty('ui.gsp.layoutUi') ?: 'springSecurityUI'
 			model.securityConfig = conf
 			model.uiPropertiesStrategy = uiPropertiesStrategy
 		}
