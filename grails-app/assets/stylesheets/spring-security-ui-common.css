@@ -33,7 +33,7 @@ caption {
 	font-weight:    bold;
 	text-align:     center;
 	font-size:      1.5em;
-	padding-bottom: 20px;
+	padding: 20px 0;
 }
 
 h3 {
@@ -45,10 +45,6 @@ h3 {
 	text-align:    center;
 }
 
-img a {
-	border: none;
-}
-
 input[type=checkbox], input[type=radio] {
 	height: 20px;
 	width:  20px;
@@ -56,10 +52,6 @@ input[type=checkbox], input[type=radio] {
 
 ol, ul {
 	list-style: none;
-}
-
-p {
-	margin: 0 0 1.5em;
 }
 
 table {
@@ -78,15 +70,18 @@ table.info thead th {
 	color:      white;
 }
 
-th {
-	font-weight: bold;
+td {
+	font-weight:    normal;
 }
 
-th, td {
-	font-weight:    normal;
-	padding:        4px 10px 4px 5px;
+td, th {
+	padding:        8px 10px 8px 5px;
 	text-align:     left;
 	vertical-align: middle;
+}
+
+th {
+	font-weight: bold;
 }
 
 thead th {

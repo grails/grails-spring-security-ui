@@ -5,7 +5,7 @@
 	</head>
 	<body>
 		<div>
-			<s2ui:formContainer type='search' beanType='aclEntry' focus='aclObjectIdentity' height='500'>
+			<s2ui:formContainer type='search' beanType='aclEntry' focus='aclObjectIdentity' height='550'>
 				<s2ui:searchForm colspan='4'>
 					<tr>
 						<td><g:message code='aclEntry.aclObjectIdentity.label' default='AclObjectIdentity'/>:</td>

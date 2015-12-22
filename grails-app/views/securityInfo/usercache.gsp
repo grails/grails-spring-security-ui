@@ -22,7 +22,7 @@
 			</tr>
 			<tr class='odd'>
 				<td><g:message code='spring.security.ui.info.usercache.label.guid'/></td>
-				<td>${cache.guid - 'Precision.M4800/'}</td>
+				<td>${cache.guid}</td>
 			</tr>
 			<tr class='even'>
 				<td colspan='2'>
