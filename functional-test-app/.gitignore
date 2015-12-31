@@ -1,6 +1,3 @@
-.asscache
 build*.gradle
 gradle*.properties
 testconfig
-
-grails-app/i18n/messages.spring-security-ui.properties

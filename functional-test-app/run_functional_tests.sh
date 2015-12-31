@@ -6,14 +6,11 @@ cd "$DIR"
 set -e
 
 # doesn't work with 3.1 yet because the compiled domain class references org.grails.datastore.gorm.GormEntity in org.grails:grails-datastore-gorm-support and this results in a NoClassDefFoundError at startup
-# GRAILS_VERSIONS="3.0.10 3.1.0.M3"
-GRAILS_VERSIONS="3.0.10"
+# GRAILS_VERSIONS="3.0.11 3.1.0.RC1"
+GRAILS_VERSIONS="3.0.11"
 TEST_GROUPS="simple extended"
 
 rm -rf build
-
-# TODO remove when the Grails bug about plugin i18n files not being used is fixed
-cp ../grails-app/i18n/messages.spring-security-ui.properties grails-app/i18n
 
 function generateBuildGradle {
 	testGroup=$1
@@ -25,25 +22,26 @@ function generateBuildGradle {
 	if [[ $grailsVersion =~ 3\.0\..+ ]]; then
 		echo "$(<gradle/spring_dependency_management.inc)" >> build.gradle
 
-		echo -e "\napply plugin: 'spring-boot'" >> build.gradle
+		echo -e "\napply plugin: 'spring-boot'\n" >> build.gradle
 	fi
 
-	echo "$(<gradle/middle.inc)" >> build.gradle
+	echo -e "apply from: '../gradle/testapp.gradle'" >> build.gradle
 
+	echo -e "\ndependencies {" >> build.gradle
+	echo -e "\tcompile 'dumbster:dumbster:1.6', { transitive = false }" >> build.gradle
+	echo -e "\tcompile 'org.grails.plugins:mail:2.0.0.RC4'" >> build.gradle
 	if [[ $testGroup = 'extended' ]]; then
 		echo -e "\tcompile 'org.grails.plugins:spring-security-acl:3.0.1'" >> build.gradle
 	fi
-
 	if [[ $grailsVersion =~ 3\.0\..+ ]]; then
 		echo -e "\tcompile 'org.grails.plugins:hibernate'" >> build.gradle
 	else
-		echo -e "\tcompile 'org.grails.plugins:hibernate4'\n" >> build.gradle
-		echo -e "\tcompile 'org.grails:grails-core'\n" >> build.gradle
-		echo -e "\tprofile \"org.grails.profiles:web:$grailsVersion\"\n" >> build.gradle
-		echo -e "\ttestCompile 'net.sourceforge.htmlunit:htmlunit:2.18'\n" >> build.gradle
+		echo -e "\tcompile 'org.grails.plugins:hibernate4'" >> build.gradle
+		echo -e "\tcompile 'org.grails:grails-core'" >> build.gradle
+		echo -e "\tprofile 'org.grails.profiles:web:$grailsVersion'" >> build.gradle
 	fi
+	echo "}" >> build.gradle
 
-	echo "$(<gradle/common_deps.inc)" >> build.gradle
 	echo "$(<gradle/integrationTest.inc)" >> build.gradle
 }
 
