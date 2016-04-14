@@ -16,6 +16,6 @@ plugins {
 apply from: 'gradle/plugin.gradle'
 
 dependencies {
-	compile 'org.grails.plugins:spring-security-core:3.0.0'
-	compile 'org.grails.plugins:asset-pipeline:3.0.15'
+	compile 'org.grails.plugins:spring-security-core:3.0.4'
+	compile 'org.grails.plugins:asset-pipeline:3.1.3'
 }
