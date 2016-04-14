@@ -79,6 +79,10 @@ class SpringSecurityUiGrailsPlugin extends Plugin {
 			bean.autowire = 'byName'
 		}
 
+		springSecurityUiInterceptor(SpringSecurityUiInterceptor) {
+			uiPropertiesStrategy = ref('uiPropertiesStrategy')
+		}
+
 		if (printStatusMessages) {
 			println '... finished configuring Spring Security UI\n'
 		}

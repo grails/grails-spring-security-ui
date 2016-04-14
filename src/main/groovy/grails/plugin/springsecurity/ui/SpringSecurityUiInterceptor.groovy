@@ -1,4 +1,4 @@
-/* Copyright 2015 the original author or authors.
+/* Copyright 2015-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,25 @@ import grails.plugin.springsecurity.ReflectionUtils
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
 import groovy.transform.CompileStatic
+import org.springframework.web.servlet.HandlerInterceptor
+import org.springframework.web.servlet.ModelAndView
+
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
 @CompileStatic
-class SpringSecurityUiInterceptor {
+class SpringSecurityUiInterceptor implements HandlerInterceptor {
 
 	/** Dependency injection for the 'uiPropertiesStrategy' bean. */
 	PropertiesStrategy uiPropertiesStrategy
 
-	SpringSecurityUiInterceptor() {
-		matchAll()
-	}
+	boolean preHandle(HttpServletRequest request, HttpServletResponse response, handler) { true }
 
-	boolean before() { true }
-
-	boolean after() {
-
+	void postHandle(HttpServletRequest request, HttpServletResponse response, handler, ModelAndView modelAndView) {
+		Map<String, Object> model = modelAndView?.model
 		if (model != null) {
 			def conf = SpringSecurityUtils.securityConfig
 			model.layoutRegister = ReflectionUtils.getConfigProperty('ui.gsp.layoutRegister') ?: 'register'
@@ -43,9 +44,7 @@ class SpringSecurityUiInterceptor {
 			model.securityConfig = conf
 			model.uiPropertiesStrategy = uiPropertiesStrategy
 		}
-
-		true
 	}
 
-	void afterView() {}
+	void afterCompletion(HttpServletRequest request, HttpServletResponse response, handler, Exception e) {}
 }
