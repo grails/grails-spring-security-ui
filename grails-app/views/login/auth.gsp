@@ -1,16 +1,16 @@
 <g:set var='securityConfig' value='${applicationContext.springSecurityService.securityConfig}'/>
 <html>
-	<head>
-		<meta name="layout" content="main"/>
-		<s2ui:title messageCode='spring.security.ui.login.title'/>
-		<asset:stylesheet src='spring-security-ui-auth.css'/>
-	</head>
-	<body>
-		<p/>
-		<div class="login s2ui_center ui-corner-all" style='text-align:center;'>
-			<div class="login-inner">
-			<s2ui:form type='login' focus='username'>
-				<div class="sign-in">
+<head>
+	<meta name="layout" content="main"/>
+	<s2ui:title messageCode='spring.security.ui.login.title'/>
+	<asset:stylesheet src='spring-security-ui-auth.css'/>
+</head>
+<body>
+<p/>
+<div class="login s2ui_center ui-corner-all" style='text-align:center;'>
+	<div class="login-inner">
+		<s2ui:form type='login' focus='username'>
+			<div class="sign-in">
 				<h2><g:message code='spring.security.ui.login.signin'/></h2>
 				<table>
 					<tr>
@@ -37,9 +37,9 @@
 						</td>
 					</tr>
 				</table>
-				</div>
-			</s2ui:form>
 			</div>
-		</div>
-	</body>
+		</s2ui:form>
+	</div>
+</div>
+</body>
 </html>
