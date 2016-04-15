@@ -5,7 +5,23 @@ The Spring Security UI plugin provides CRUD screens and other user management wo
 
 [NOTE]
 ====
-The plugin works with Grails 3.0.x but not with 3.1.x yet. This will be resolved in the next release.
+To support both Grails 3.0.x and 3.1.x applications, the plugin depends on version 5.0.x of the hibernate4 plugin and the grails-data-mapping libraries. Because of the way that dependency resolution works across Grails versions, you must add explicit dependencies for the hibernate4 plugin and the GORM libraries to ensure that everything is in sync. As of this writing the current release version of the hibernate4 plugin is '5.0.4' and '5.0.4.RELEASE' for the grails-data-mapping libraries. In addition to adding a dependency for this plugin, add these to the `dependencies` block of your `build.gradle`:
+
+[source,groovy]
+----
+compile 'org.grails.plugins:hibernate4:5.0.4'
+
+compile 'org.grails:grails-datastore-core:5.0.4.RELEASE'
+compile 'org.grails:grails-datastore-gorm-support:5.0.4.RELEASE'
+compile 'org.grails:grails-datastore-gorm:5.0.4.RELEASE'
+compile 'org.grails:grails-datastore-simple:5.0.4.RELEASE'
+compile 'org.grails:grails-datastore-gorm-hibernate4:5.0.4.RELEASE'
+compile 'org.grails:grails-datastore-gorm-hibernate-core:5.0.4.RELEASE'
+----
+
+If you use MongoDB or another NoSQL datastore other than Hibernate, retain the supporting dependencies but update the datastore-specific dependencies as necessary.
+
+Also be sure to update the versions when new releases are available.
 ====
 
 === Release History
