@@ -8,5 +8,6 @@
 .gradle
 .idea
 build
+classes
 cobertura.ser
 kindlegen

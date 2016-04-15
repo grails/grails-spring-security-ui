@@ -29,7 +29,7 @@ image::register_final.png[]
 
 The post-registration destination url is configurable in `grails-app/conf/application.groovy` using the `postRegisterUrl` attribute:
 
-[source,java]
+[source,groovy]
 ----
 grails.plugin.springsecurity.ui.register.postRegisterUrl = '/welcome'
 ----
@@ -38,7 +38,7 @@ If you don't specify a value then the `grails.plugin.springsecurity.successHandl
 
 You can customize the subject, body, and from address of the registration email by overriding the default values in `grails-app/conf/application.groovy`, for example:
 
-[source,java]
+[source,groovy]
 ----
 grails.plugin.springsecurity.ui.register.emailBody = '...'
 grails.plugin.springsecurity.ui.register.emailFrom = '...'
@@ -49,14 +49,14 @@ The `emailBody` property should be a GString and will have the User domain class
 
 In addition, each new user will be granted `ROLE_USER` after finalizing the registration. If you want to change the default role, add more, or grant no roles at all (for example if you want an admin to approve new users and explicitly enable new users) then you can customize that with the `defaultRoleNames` attribute (which is a List of Strings):
 
-[source,java]
+[source,groovy]
 ----
 grails.plugin.springsecurity.ui.register.defaultRoleNames = [] // no roles
 ----
 
 or
 
-[source,java]
+[source,groovy]
 ----
 grails.plugin.springsecurity.ui.register.defaultRoleNames = ['ROLE_CUSTOMER']
 ----
@@ -71,7 +71,7 @@ You should consider the registration code as starter code - every signup workflo
 
 If there are unexpected validation errors during registration (which can happen when there is a disconnect between the domain classes and the code in `RegisterController` they will be logged at the `warn` or `error` level, so enable logging to ensure that you see the messages, e.g.
 
-[source,java]
+[source,groovy]
 ----
 ...
 logger 'grails.plugin.springsecurity.ui.SpringSecurityUiService', WARN

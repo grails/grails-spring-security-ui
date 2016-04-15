@@ -178,7 +178,6 @@ The `springSecurityUI.gsp` layout includes `grails-app/assets/stylesheets/spring
  *= require jquery.jgrowl.css
  *= require spring-security-ui-common.css
  */
-[source,java]
 ----
 
 and `grails-app/assets/javascripts/spring-security-ui.js` which has no JavaScript code and only includes other JavaScript files:
@@ -244,7 +243,7 @@ The unfortunate consequence of mixing a newer domain class that does password ha
 
 This option defaults to `false`, so if you have an older domain class that doesn't handle hashing just enable this plugin's hashing:
 
-[source,java]
+[source,groovy]
 ----
 grails.plugin.springsecurity.ui.encodePassword = true
 ----
@@ -283,7 +282,7 @@ Each interface has a default implementation, e.g. `DefaultAclStrategy`, `Default
 
 To override the functionality defined in one of the strategy interfaces, register your own implementation of the interface in your application's `grails-app/conf/spring/resources.groovy`, e.g.
 
-[source,java]
+[source,groovy]
 ----
 import com.myapp.MyRequestmapStrategy
 
