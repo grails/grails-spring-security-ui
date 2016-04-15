@@ -26,6 +26,8 @@ Also be sure to update the versions when new releases are available.
 
 === Release History
 
+* April 15, 2016
+** 3.0.0.M2 release
 * December 21, 2015
 ** 3.0.0.M1 release
 * December 21, 2015
