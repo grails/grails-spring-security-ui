@@ -497,23 +497,21 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 
 	void handleValidationErrors(bean, source, String operation, TransactionStatus transactionStatus) {
 
-		if (!log.isWarnEnabled()) {
-			return
-		}
+		if (log.isWarnEnabled()) {
+			def message = new StringBuilder()
+			message << 'Problem in ' << source << ' at "' << operation <<
+					message << '" ' << (isAttached(bean) ? 'updating' : 'creating') << ' '
+			message << bean.getClass().simpleName << ': ' << bean
 
-		def message = new StringBuilder()
-		message << 'Problem in ' << source << ' at "' << operation <<
-		message << '" ' << (isAttached(bean) ? 'updating' : 'creating') << ' '
-		message << bean.getClass().simpleName << ': ' << bean
-
-		def locale = LocaleContextHolder.getLocale()
-		for (fieldErrors in bean.errors) {
-			for (error in fieldErrors.allErrors) {
-				message << '\n\t' << messageSource.getMessage(error, locale)
+			def locale = LocaleContextHolder.getLocale()
+			for (fieldErrors in bean.errors) {
+				for (error in fieldErrors.allErrors) {
+					message << '\n\t' << messageSource.getMessage(error, locale)
+				}
 			}
-		}
 
-		log.warn message.toString()
+			log.warn message.toString()
+		}
 
 		rollbackAndDiscard bean
 	}
