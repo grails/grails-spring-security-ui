@@ -1,4 +1,4 @@
-/* Copyright 2009-2013 SpringSource.
+/* Copyright 2009-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,68 +16,48 @@ package grails.plugin.springsecurity.ui
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.InitializingBean
+
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-abstract class AbstractS2UiController {
+abstract class AbstractS2UiController implements InitializingBean {
 
-	static allowedMethods = [save: 'POST', update: 'POST', delete: 'POST']
-	static defaultAction = 'search'
+	static scope = 'singleton'
 
-	def springSecurityService
-	def springSecurityUiService
+	protected final Logger logger = LoggerFactory.getLogger(getClass())
 
-	protected boolean versionCheck(String messageCode, String messageCodeDefault, instance, model) {
-		if (params.version) {
-			def version = params.version.toLong()
-			if (instance.version > version) {
-				instance.errors.rejectValue('version', 'default.optimistic.locking.failure',
-						[message(code: messageCode, default: messageCodeDefault)] as Object[],
-						"Another user has updated this instance while you were editing")
-				render view: 'edit', model: model
-				return false
-			}
+	protected findUserByUsername(String username) {
+		if (username) {
+			return User.findWhere((usernamePropertyName): username)
 		}
-		true
 	}
 
-	protected void setIfMissing(String paramName, long valueIfMissing, Long max = null) {
-		long value = (params[paramName] ?: valueIfMissing).toLong()
-		if (max) {
-			value = Math.min(value, max)
+	protected Class<?> getDomainClassClass(String name) {
+		if (name) {
+			return grailsApplication.getDomainClass(name)?.clazz
 		}
-		params[paramName] = value
 	}
 
-	protected String lookupUserClassName() {
-		SpringSecurityUtils.securityConfig.userLookup.userDomainClassName
+	protected static getConf() {
+		SpringSecurityUtils.securityConfig
 	}
 
-	protected Class<?> lookupUserClass() {
-		grailsApplication.getDomainClass(lookupUserClassName()).clazz
-	}
+	protected String authorityNameField
+	protected String usernamePropertyName
 
-	protected String lookupRoleClassName() {
-		SpringSecurityUtils.securityConfig.authority.className
-	}
+	protected Class<?> Role
+	protected Class<?> User
+	protected Class<?> UserRole
 
-	protected Class<?> lookupRoleClass() {
-		grailsApplication.getDomainClass(lookupRoleClassName()).clazz
-	}
+	void afterPropertiesSet() {
+		authorityNameField = conf.authority.nameField ?: ''
+		usernamePropertyName = conf.userLookup.usernamePropertyName ?: ''
 
-	protected String lookupUserRoleClassName() {
-		SpringSecurityUtils.securityConfig.userLookup.authorityJoinClassName
-	}
-
-	protected Class<?> lookupUserRoleClass() {
-		grailsApplication.getDomainClass(lookupUserRoleClassName()).clazz
-	}
-
-	protected String lookupRequestmapClassName() {
-		SpringSecurityUtils.securityConfig.requestMap.className
-	}
-
-	protected Class<?> lookupRequestmapClass() {
-		grailsApplication.getDomainClass(lookupRequestmapClassName()).clazz
+		Role = getDomainClassClass(conf.authority.className ?: '')
+		User = getDomainClassClass(conf.userLookup.userDomainClassName ?: '')
+		UserRole = getDomainClassClass(conf.userLookup.authorityJoinClassName ?: '')
 	}
 }

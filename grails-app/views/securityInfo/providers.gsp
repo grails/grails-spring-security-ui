@@ -1,24 +1,11 @@
 <html>
-
-<head>
-	<meta name='layout' content='springSecurityUI'/>
-	<title>Authentication Providers</title>
-</head>
-
-<body>
-
-<br/>
-
-<table>
-	<thead>
-	<tr><th>Authentication Providers</th></tr>
-	</thead>
-	<tbody>
-	<g:each var='provider' in='${providers}'>
-	<tr><td>${provider.getClass().name}</td></tr>
-	</g:each>
-	</tbody>
-</table>
-</body>
-
+	<head>
+		<meta name="layout" content="${layoutUi}"/>
+		<title><g:message code='spring.security.ui.menu.securityInfo.providers'/></title>
+	</head>
+	<body>
+		<s2ui:securityInfoTable type='providers' items='${providers}' headerCodes='className'>
+			<td>${it.getClass().name}</td>
+		</s2ui:securityInfoTable>
+	</body>
 </html>

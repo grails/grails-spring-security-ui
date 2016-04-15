@@ -1,4 +1,4 @@
-/* Copyright 2009-2013 SpringSource.
+/* Copyright 2009-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,8 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.util.Holders
+import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -23,332 +24,556 @@ class SecurityUiTagLib {
 
 	static namespace = 's2ui'
 
-	def resources = { attrs ->
-		boolean hasResourcesPlugin = Holders.pluginManager.hasGrailsPlugin('resources')
+	/** Dependency injection for the 'uiPropertiesStrategy' bean. */
+	PropertiesStrategy uiPropertiesStrategy
 
-		if ('spring-security-ui' == attrs.module) {
-			if (hasResourcesPlugin) {
-				r.require(module: attrs.module)
-				out << r.layoutResources()
-			}
-			else {
-				out << g.javascript(library: 'jquery', plugin: 'jquery')
-				out << jqui.resources()
+	/**
+	 * @attr paramName REQUIRED the property to search on
+	 * @attr focus     if true, set the focus to the field at document ready (defaults to true)
+	 * @attr minLength the minimum number of chars to type before search starts
+	 */
+	def ajaxSearch = { attrs ->
+		attrs = [:] + attrs
 
-				out << """
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css/smoothness',file:'jquery-ui-1.10.3.custom.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'date_input.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.slate.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'table.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
-"""
-			}
-		}
-		else if ('register' == attrs.module) {
-			if (hasResourcesPlugin) {
-				r.require(module: attrs.module)
-				out << r.layoutResources()
-			}
-			else {
-				out << g.javascript(library: 'jquery', plugin: 'jquery')
-				out << """
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'reset.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
-"""
-				out << jqui.resources()
+		String paramName = getRequiredAttribute(attrs, 'paramName', 'ajaxSearch')
+		int minLength = (attrs.remove('minLength') as Integer) ?: 3
 
-				out << """
-<link rel="stylesheet" media="screen" href="${resource(dir:'css/smoothness',file:'jquery-ui-1.10.3.custom.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
-<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'auth.css',plugin:'spring-security-ui')}"/>
-"""
-			}
-		}
+		String focus = attrs.remove('focus') != 'false' ? '.focus()' : ''
+
+		writeDocumentReady out, """\
+	\$("#$paramName")${focus}.autocomplete({
+		minLength: $minLength,
+		cache: false,
+		source: "${createLink('ajaxSearch', null, [paramName: paramName])}"
+	});"""
 	}
 
-	def layoutResources = { attrs ->
-		boolean hasResourcesPlugin = Holders.pluginManager.hasGrailsPlugin('resources')
-
-		if ('spring-security-ui' == attrs.module) {
-			if (hasResourcesPlugin) {
-				out << r.layoutResources()
-			}
-			else {
-				for (name in ['jquery/jquery.jgrowl', 'jquery/jquery.checkbox',
-				              'jquery/jquery.date_input', 'jquery/jquery.positionBy',
-				              'jquery/jquery.bgiframe', 'jquery/jquery.jdMenu',
-				              'jquery/jquery.dataTables.min', 'spring-security-ui']) {
-					out << g.javascript(src: name + '.js', plugin: 'spring-security-ui')
-				}
-			}
-		}
-		else if ('register' == attrs.module) {
-			if (hasResourcesPlugin) {
-				out << r.layoutResources()
-			}
-			else {
-				for (name in ['jquery/jquery.jgrowl', 'jquery/jquery.checkbox', 'spring-security-ui']) {
-					out << g.javascript(src: name + '.js', plugin: 'spring-security-ui')
-				}
-			}
-		}
-	}
-
-	// TODO check required attrs
-
+	/**
+	 * @attr name             REQUIRED the HTML element name
+	 * @attr labelCodeDefault the default to display if there's no message for the i18n code
+	 */
 	def checkboxRow = { attrs ->
+		attrs = [:] + attrs
 
-		String labelCodeDefault = attrs.remove('labelCodeDefault')
+		def bean = beanFromModel()
 		String name = getRequiredAttribute(attrs, 'name', 'checkboxRow')
-		String labelCode = getRequiredAttribute(attrs, 'labelCode', 'checkboxRow')
-		def value = getRequiredAttribute(attrs, 'value', 'checkboxRow')
-		def bean = getRequiredAttribute(attrs, 'bean', 'checkboxRow')
-
-		def fieldAttributes = [name: name, value: value] + attrs
-		out << """
-		<tr class="prop">
-			<td valign="top" class="name">
-			<label for="${name}">${message(code: labelCode, default: labelCodeDefault)}</label>
-			</td>
-			<td valign="top" class="value ${hasErrors(bean: bean, field: name, 'errors')}">
-			${checkBox(fieldAttributes)}
-			${fieldErrors(bean: bean, field: name)}
-			</td>
-		</tr>
-		"""
-	}
-
-	def textFieldRow = { attrs ->
 		String labelCodeDefault = attrs.remove('labelCodeDefault')
-		String name = getRequiredAttribute(attrs, 'name', 'textFieldRow')
-		String labelCode = getRequiredAttribute(attrs, 'labelCode', 'textFieldRow')
-		def value = getRequiredAttribute(attrs, 'value', 'textFieldRow')
-		def bean = getRequiredAttribute(attrs, 'bean', 'textFieldRow')
 
-		def fieldAttributes = [name: name, value: value] + attrs
 		out << """
-		<tr class="prop">
-			<td valign="top" class="name">
-			<label for="${name}">${message(code: labelCode, default: labelCodeDefault)}</label>
-			</td>
-			<td valign="top" class="value ${hasErrors(bean: bean, field: name, 'errors')}">
-			${textField(fieldAttributes)}
-			${fieldErrors(bean: bean, field: name)}
-			</td>
-		</tr>
-		"""
+			<tr class="prop">
+				<td valign="top" class="name">
+					<label for="$name">${message(code: labelCode(name), default: labelCodeDefault)}</label>
+				</td>
+				<td valign="top" class="value ${hasErrors(bean: bean, field: name, 'errors')}">
+					${checkBox([name: name, value: uiPropertiesStrategy.getProperty(bean, name)] + attrs)}
+					${fieldErrors(bean, name)}
+				</td>
+			</tr>"""
 	}
 
-	def passwordFieldRow = { attrs ->
-		String labelCodeDefault = attrs.remove('labelCodeDefault')
-		String name = getRequiredAttribute(attrs, 'name', 'passwordFieldRow')
-		String labelCode = getRequiredAttribute(attrs, 'labelCode', 'passwordFieldRow')
-		def value = getRequiredAttribute(attrs, 'value', 'passwordFieldRow')
-		def bean = getRequiredAttribute(attrs, 'bean', 'passwordFieldRow')
-
-		def fieldAttributes = [name: name, value: value] + attrs
-		out << """
-		<tr class="prop">
-			<td valign="top" class="name">
-			<label for="${name}">${message(code: labelCode, default: labelCodeDefault)}</label>
-			</td>
-			<td valign="top" class="value ${hasErrors(bean: bean, field: name, 'errors')}">
-			${passwordField(fieldAttributes)}
-			${fieldErrors(bean: bean, field: name)}
-			</td>
-		</tr>
-		"""
-	}
-
+	/**
+	 * @attr name             REQUIRED the HTML element name
+	 * @attr labelCodeDefault the default to display if there's no message for the i18n code
+	 */
 	def dateFieldRow = { attrs ->
+		attrs = [:] + attrs
+
+		def bean = beanFromModel()
 		String labelCodeDefault = attrs.remove('labelCodeDefault')
 		String name = getRequiredAttribute(attrs, 'name', 'dateFieldRow')
-		String labelCode = getRequiredAttribute(attrs, 'labelCode', 'dateFieldRow')
-		def value = getRequiredAttribute(attrs, 'value', 'dateFieldRow')
-		def bean = getRequiredAttribute(attrs, 'bean', 'dateFieldRow')
 
-		value = formatDate(date: value)
+		def value = formatDate(date: uiPropertiesStrategy.getProperty(bean, name),
+		                       formatName: 'spring.security.ui.dateFormatGsp')
 
-		def fieldAttributes = [name: name, value: value, maxlength: '20', 'class': 'date_input'] + attrs
 		out << """
-		<tr class="prop">
-			<td valign="top" class="name">
-			<label for="${name}">${message(code: labelCode, default: labelCodeDefault)}</label>
-			</td>
-			<td valign="top" class="value ${hasErrors(bean: bean, field: name, 'errors')}">
-			${textField(fieldAttributes)}
-			${fieldErrors(bean: bean, field: name)}
-			</td>
-		</tr>
-		"""
+			<tr class="prop">
+				<td valign="top" class="name">
+					<label for="$name">${message(code: labelCode(name), default: labelCodeDefault)}</label>
+				</td>
+				<td valign="top" class="value ${hasErrors(bean: bean, field: name, 'errors')}">
+					${textField([name: name, value: value, maxlength: '20'] + attrs)}
+					${fieldErrors(bean, name)}
+				</td>
+			</tr>"""
 
-		writeDocumentReady out, "\$('#${name}').date_input();"
+		writeDocumentReady out, "\t\$('#$name').datepicker({ dateFormat: '${message(code:'spring.security.ui.dateFormatJs')}' });"
 	}
 
-	def submitButton = { attrs ->
-		String form = getRequiredAttribute(attrs, 'form', 'submitButton')
-		String elementId = getRequiredAttribute(attrs, 'elementId', 'submitButton')
-		String text = resolveText(attrs)
+	/**
+	 * @attr src REQUIRED the src
+	 */
+	def deferredScript = { attrs ->
+		attrs = [:] + attrs
 
-		def writer = getOut()
-		writer << """<a id="${elementId}" """
-		writeRemainingAttributes writer, attrs
-		writer << ">${text}</a>\n"
-		writer << "<input type='submit' value=' ' id='${elementId}_submit' class='s2ui_hidden_button' />\n"
+		String src = getRequiredAttribute(attrs, 'src', 'deferredScript')
 
-		String javascript = """
-			\$("#${elementId}").button();
-			\$('#${elementId}').bind('click', function() {
-			   document.forms.${form}.submit();
-			});
-		"""
-		writeDocumentReady writer, javascript
-	}
-
-	// TODO remove
-	def linkButton = { attrs ->
-		String text = resolveText(attrs)
-		String elementId = getRequiredAttribute(attrs, 'elementId', 'linkButton')
-
-		def writer = getOut()
-		writer <<  """<a href="${createLink(attrs).encodeAsHTML()}" id="${elementId}" """
-
-		writeRemainingAttributes writer, attrs
-		writer << ">${text}</a>"
-
-		String javascript = """\$("#${elementId}").button();"""
-		writeDocumentReady writer, javascript
-	}
-
-	def tabs = { attrs, body ->
-
-		String id = getRequiredAttribute(attrs, 'elementId', 'tabs')
-		def data = getRequiredAttribute(attrs, 'data', 'tabs')
-		def height = getRequiredAttribute(attrs, 'height', 'tabs')
-
-		def writer = getOut()
-		writer << """<div style='display: none' id="${id}">\n"""
-		writer << "<ul>\n"
-		for (element in data) {
-			writer << """<li><a href="#tab-${element.name}" class="icon ${element.icon}">\n"""
-			writer << message(code: element.messageCode)
-			writer << '</a></li>\n'
+		def deferred = request.s2uiDeferredScripts
+		if (!deferred) {
+			deferred = request.s2uiDeferredScripts = []
 		}
-		writer << "</ul>\n"
-
-		writer << body()
-		writer << "</div>\n"
-
-		String javascript = """
-			\$("#${id}").tabs().show().resizable({minHeight: ${height}, minWidth: 100});
-		"""
-		writeDocumentReady writer, javascript
+		deferred << src
 	}
 
-	def tab = { attrs, body ->
-
-		String name = getRequiredAttribute(attrs, 'name', 'tab')
-		def height = getRequiredAttribute(attrs, 'height', 'tab')
-
-		out << """
-		<div id="tab-${name}">
-			<div class="s2ui_section" style="height: ${height}px; overflow: auto">
-			${body()}
-			</div>
-		</div>
-		"""
+	/**
+	 */
+	def deferredScripts = { attrs ->
+		request.s2uiDeferredScripts.each { out << asset.javascript(src: it) << '\n' }
+		out << asset.deferredScripts().replaceAll('</script><script >', '')
 	}
 
+	/**
+	 */
+	def deleteButton = { attrs ->
+		out << """<a id="deleteButton">${message(code:'spring.security.ui.button.delete.label')}</a>"""
+	}
+
+	/**
+	 * @attr instanceId REQUIRED the id of the domain class instance
+	 */
 	def deleteButtonForm = { attrs ->
+		attrs = [:] + attrs
 
 		def id = getRequiredAttribute(attrs, 'instanceId', 'deleteButton')
 
 		attrs.action = 'delete'
 
 		out << """
-			<form action='${createLink(attrs)}' method='POST' name='deleteForm'>
-				<input type="hidden" name="id" value="${id}" />
+			<form action="${createLink(attrs)}" method="post" name="deleteForm" id="deleteForm">
+				<input type="hidden" name="id" value="$id" />
 			</form>
-			<div id="deleteConfirmDialog" title="Are you sure?"></div>
+			<div id="deleteConfirmDialog" title="${message(code:'default.button.delete.confirm.message')}"></div>"""
 
-			<script>
-			\$(document).ready(function() {
-				\$("#deleteButton").button().bind('click', function() {
-					\$('#deleteConfirmDialog').dialog('open');
-				});
+		writeDocumentReady out, """
+	\$("#deleteButton").button().bind('click', function() {
+		\$('#deleteConfirmDialog').dialog('open');
+	});
 
-				\$("#deleteConfirmDialog").dialog({
-					autoOpen: false,
-					resizable: false,
-					height: 100,
-					modal: true,
-					buttons: {
-						'Delete': function() {
-							document.forms.deleteForm.submit();
-						},
-						Cancel: function() {
-							\$(this).dialog('close');
-						}
-					}
-				});
-			});
-			</script>
-		"""
+	\$("#deleteConfirmDialog").dialog({
+		autoOpen: false, resizable: false, height: 100, modal: true,
+		buttons: [
+			{ text: "${message(code:'spring.security.ui.button.delete.label')}", id: '#confirmDelete',
+			  click: function() { document.forms.deleteForm.submit(); } },
+			{ text: "${message(code:'spring.security.ui.button.cancel.label')}",
+			  click: function() { \$(this).dialog('close'); } }
+		]
+	});"""
 	}
 
-	def deleteButton = { attrs ->
-		out << """<a id="deleteButton">${message(code:'default.button.delete.label')}</a>"""
+	/**
+	 * Uses the asset:script tag to create a block of deferred code that will be rendered at the end
+	 * of the body and will be wrapped in a jQuery function that fires when the document is ready.
+	 */
+	def documentReady = { attrs, body ->
+		writeDocumentReady out, body()
 	}
 
-	def initCheckboxes = { attrs ->
-		out << """
-			\$('input:checkbox:not([safari])').checkbox({
-				empty: '${resource(dir: 'images', file: 'empty.png', plugin:'spring-security-ui')}',
-				cls: 'jquery-safari-checkbox'
-			});
-			\$('input:radio:not([safari])').checkbox({
-				empty: '${resource(dir: 'images', file: 'empty.png', plugin:'spring-security-ui')}',
-				cls: 'jquery-safari-checkbox'
-			});
-		"""
-	}
+	/**
+	 * @attr beanName the model name of the domain class or command object instance when not a child
+	 *                of formContainer or if nonstandard (e.g. command object)
+	 * @attr class    the CSS class
+	 * @attr focus    the element to focus on document ready
+	 * @attr idName   the name of the id property if it's not 'id'
+	 * @attr type     'save', 'update', 'login' if provided, only when not a child of formContainer
+	 */
+	def form = { attrs, body ->
+		attrs = [:] + attrs
 
-	def required = { attrs ->
-		out << "<span class='s2ui_required'>*&nbsp;</span>"
-	}
-
-	def fieldErrors = { attrs ->
-		def bean = attrs.remove('bean')
-		if (bean) {
-			out << eachError(attrs, {
-				out << "<span class='s2ui_error'>${message(error:it)}</span>"
-			})
+		String type = attrs.remove('type')
+		if (type) {
+			pageScope.s2uiFormType = type
 		}
+		else {
+			type = pageScope.s2uiFormType
+		}
+		assert type
+
+		def bean
+		String beanName = attrs.remove('beanName')
+		if (beanName) {
+			bean = pageScope.s2uiBean = pageScope.s2uiBeanType = pageScope[beanName]
+			assert bean
+		}
+		else {
+			bean = pageScope.s2uiBean
+		}
+
+		String cssClass = attrs.remove('class') ?: ''
+		if (cssClass) {
+			cssClass = """class="$cssClass" """
+		}
+
+		String idName = attrs.remove('idName')
+		def id
+		if (bean && !(bean instanceof CommandObject)) {
+			id = idName ? bean[idName] : bean.id
+		}
+
+		String name = pageScope.s2uiFormName = type + 'Form'
+		String autocomplete = (type == 'login' || type.endsWith('Password')) ? ' autocomplete="off"' : ''
+
+		String link
+		if (type == 'login') {
+			link = "$request.contextPath$SpringSecurityUtils.securityConfig.apf.filterProcessesUrl"
+		}
+		else {
+			link = createLink(type)
+		}
+
+		out << """
+			<form action="$link"$cssClass method="post" name="$name" id="$name"$autocomplete>"""
+
+		if (type == 'update') {
+			out << """
+				${hiddenField(name: idName ?: 'id', value: id)}
+				${hiddenField(name: 'version', value: bean?.version)}"""
+		}
+
+		out << """
+				${body()}
+			</form>"""
+
+
+		String focus = attrs.remove('focus')
+		if (focus) {
+			writeDocumentReady out, "\t\$('#$focus').focus();"
+		}
+
+		pageScope.s2uiBean = null
+		pageScope.s2uiBeanType = null
+		pageScope.s2uiFormName = null
+		pageScope.s2uiFormType = null
 	}
 
-	def paginationSummary = { attrs ->
-		int total = getRequiredAttribute(attrs, 'total', 'paginationSummary').toInteger()
-		if (total == 0) {
-			out << "No results"
+	/**
+	 * @attr type     REQUIRED one of 'save', 'update', 'search', 'register', 'forgotPassword', or 'resetPassword'
+	 * @attr beanType when type is 'search' this is the bean type, e.g. aclEntry, registrationCode, etc. and when
+	 *                it's 'save' or 'update' it's the model name for the bean
+	 * @attr focus    the element to focus on document ready
+	 * @attr height   the height, to override the CSS default
+	 * @attr width    the width (defaults to '100%'
+	 */
+	def formContainer = { attrs, body ->
+		attrs = [:] + attrs
+
+		String type = pageScope.s2uiFormType = getRequiredAttribute(attrs, 'type', 'formContainer')
+		def bean
+		String beanType = attrs.remove('beanType')
+		if (beanType) {
+			pageScope.s2uiBeanType = beanType
+			if (type != 'search') {
+				bean = pageScope.s2uiBean = pageScope[beanType]
+				assert bean
+			}
+		}
+
+		String title
+		if (type == 'search') {
+			title = message(code: 'spring.security.ui.' + beanType + '.search')
+		}
+		else if (type == 'forgotPassword' || type == 'register' || type == 'resetPassword') {
+			title = message(code: 'spring.security.ui.' + type + '.header')
+		}
+		else {
+			title = message(code: 'default.' + (type == 'save' ? 'create' : 'edit') + '.label', args: [pageScope.entityName])
+		}
+
+		Integer height = attrs.remove('height') as Integer
+		def width = attrs.remove('width') ?: '100%'
+
+		String heightStyle = height ? " height: ${height}px;" : ''
+
+		out << """
+			<div class="ui-widget-content s2ui_form s2ui_center" id="formContainer" style="width: $width;$heightStyle">
+				<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix s2ui_center" style='padding: 10px;'>
+					<span style="-moz-user-select: none;" unselectable="on" class="ui-dialog-title">$title</span>
+				</div>
+				${body()}
+			</div>"""
+
+		writeDocumentReady out, "\t\$('#formContainer').resizable();"
+
+		String focus = attrs.remove('focus')
+		if (focus) {
+			writeDocumentReady out, "\t\$('#$focus').focus();"
+		}
+
+		pageScope.s2uiBean = null
+		pageScope.s2uiBeanType = null
+		pageScope.s2uiFormType = null
+	}
+
+	/**
+	 * @attr bean REQUIRED the domain class instance
+	 * @attr name REQUIRED the 'params' name to lookup the real property name or the real property name
+	 */
+	def formatBoolean = { attrs ->
+		attrs = [:] + attrs
+
+		out << g.formatBoolean(boolean: uiPropertiesStrategy.getProperty(
+			getRequiredAttribute(attrs, 'bean', 'formatBoolean'),
+			getRequiredAttribute(attrs, 'name', 'formatBoolean')))
+	}
+
+	/**
+	 * @attr elementId   REQUIRED the HTML id
+	 * @attr messageCode the i18n code for the text
+	 * @attr text        the button value if there's no messageCode attr
+	 */
+	def linkButton = { attrs ->
+		attrs = [:] + attrs
+
+		String text = resolveText(attrs)
+		String elementId = getRequiredAttribute(attrs, 'elementId', 'linkButton')
+
+		def out = getOut()
+		out << """<a href="${createLink(attrs).encodeAsHTML()}" id="$elementId" """
+// TODO encodeAsHTML
+
+		writeRemainingAttributes out, attrs
+		out << '>' << text << '</a>'
+
+		writeDocumentReady out, """\t\$("#$elementId").button();"""
+	}
+
+	/**
+	 * @attr controller   REQUIRED the controller name
+	 * @attr itemAction   if present render just a menu item
+	 * @attr searchOnly   if true omit the item to create (defaults to false)
+	 * @attr submenu      if true renders nested (defaults to false)
+	 */
+	def menu = { attrs ->
+		attrs = [:] + attrs
+
+		String controller = getRequiredAttribute(attrs, 'controller', 'submenu')
+		String itemAction = attrs.remove('itemAction')
+		String indent = '\t\t\t\t\t'
+
+		String messageKey = 'spring.security.ui.menu.' + controller
+		if (itemAction) {
+			messageKey += '.' + itemAction
+		}
+		String caption = message(code: messageKey)
+
+		if (itemAction) {
+			out << '<li><a href="' << createLink(itemAction, controller) << '">' << caption << '</a></li>'
 			return
 		}
 
-		int max = params.int('max')
-		int offset = params.int('offset')
+		boolean searchOnly = attrs.remove('searchOnly')
+		boolean submenu = attrs.remove('submenu')
 
-		int from = offset + 1
-		int to = offset + max
-		if (to > total) {
-			to = total
+		def lines = []
+		if (submenu) {
+			lines << "<li>$caption &raquo;"
+			indent += '\t\t'
 		}
-		out << "Showing $from through $to out of ${total}."
+		else {
+			lines << """<li><a class="accessible">$caption</a>"""
+		}
+		lines << indent + '\t<ul>'
+
+		lines << """$indent\t\t<li><a href="${createLink('search', controller)}">${message(code:'spring.security.ui.search')}</a></li>"""
+		if (!searchOnly) {
+			lines << """$indent\t\t<li><a href="${createLink('create', controller)}">${message(code:'spring.security.ui.create')}</a></li>"""
+		}
+		lines << indent + '\t</ul>'
+		lines << indent + '</li>'
+
+		lines.each { out << it << '\n' }
 	}
 
+	/**
+	 * @attr total REQUIRED the total number of results
+	 */
+	def paginate = { attrs ->
+		attrs = [:] + attrs
+
+		String summary
+		int total = getRequiredAttribute(attrs, 'total', 'paginationSummary') as int
+		if (total == 0) {
+			summary = message(code:'spring.security.ui.search.noResults')
+		}
+		else {
+			int max = params.int('max')
+			int offset = params.int('offset')
+
+			int from = offset + 1
+			int to = offset + max
+			if (to > total) {
+				to = total
+			}
+			summary = message(code:'spring.security.ui.search.summary', args: [from, to, total])
+
+			out << """
+				<div class="paginateButtons">
+					${g.paginate(total: total, params: pageScope.queryParams)}
+				</div>"""
+		}
+
+		out << """\n\t\t\t\t\t\t<div style="text-align:center;">$summary</div>"""
+	}
+
+	/**
+	 * @attr name             REQUIRED the HTML element name
+	 * @attr id               the DOM id
+	 * @attr labelCodeDefault the default to display if there's no message for the i18n code
+	 */
+	def passwordFieldRow = { attrs ->
+		attrs = [:] + attrs
+
+		def bean = beanFromModel()
+		String labelCodeDefault = attrs.remove('labelCodeDefault')
+		String name = getRequiredAttribute(attrs, 'name', 'passwordFieldRow')
+
+		String id = attrs.remove('id') ?: name
+
+		out << """
+			<tr class="prop">
+				<td valign="top" class="name">
+					<label for="$id">${message(code: labelCode(name), default: labelCodeDefault)}</label>
+				</td>
+				<td valign="top" class="value ${hasErrors(bean: bean, field: name, 'errors')}">
+					${passwordField([name: name, id: id, value: uiPropertiesStrategy.getProperty(bean, name)] + attrs)}
+					${fieldErrors(bean, name)}
+				</td>
+			</tr>"""
+	}
+
+	/**
+	 */
+	def required = { attrs ->
+		// TODO use this
+		out << "<span class='s2ui_required'>*&nbsp;</span>"
+	}
+
+	/**
+	 * @attr colspan REQUIRED number of td elements per tr row
+	 */
+	def searchForm = { attrs, body ->
+		attrs = [:] + attrs
+
+		int colspan = getRequiredAttribute(attrs, 'colspan', 'searchForm') as int
+
+		pageScope.s2uiFormName = 'search'
+
+		out << """
+			<form action="${createLink('search')}" method="post" name="search" id="search">
+				<br/>
+				<table>
+					<tbody>
+					${body()}
+					<tr><td colspan="$colspan">&nbsp;</td></tr>
+					<tr>
+						<td colspan="$colspan">
+							${s2ui:submitButton(elementId:'searchButton', messageCode:'spring.security.ui.search')}
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</form>"""
+
+		pageScope.s2uiFormName = null
+	}
+
+	/**
+	 * @attr type        REQUIRED the type
+	 * @attr captionArgs optional args for the caption i18n code
+	 * @attr headerCodes the th tag i18n codes, a comma-delimited string
+	 * @attr items       optional items to loop over each in a tr
+	 */
+	def securityInfoTable = { attrs, body ->
+		attrs = [:] + attrs
+
+		String type = getRequiredAttribute(attrs, 'type', 'securityInfoTable')
+		String headerCodes = attrs.remove('headerCodes') ?: ''
+		def items = attrs.remove('items')
+		def captionArgs = attrs.remove('captionArgs')
+
+		out << """
+			<table class='info'>
+				<caption>${message(code: 'spring.security.ui.menu.securityInfo.' + type, args: captionArgs)}</caption>"""
+
+		if (headerCodes) {
+			out << """
+				<thead>
+					<tr>"""
+
+			for (code in headerCodes.split(',')) {
+				out << """
+						<th>${message(code: 'spring.security.ui.info.' + type + '.header.' + code)}</th>"""
+			}
+
+			out << """
+					</tr>
+				</thead>"""
+		}
+
+		out << """
+				<tbody>"""
+
+		if (items) {
+			items.eachWithIndex { item, int i ->
+				out << """
+					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">"""
+
+				out << body(item)
+
+				out << """
+					</tr>"""
+			}
+		}
+		else {
+			out << body()
+		}
+
+		out << """
+				</tbody>
+			</table>"""
+	}
+
+	/**
+	 * @attr from             REQUIRED the items used to populate the select
+	 * @attr name             REQUIRED the HTML element name
+	 * @attr labelCodeDefault the default to display if there's no message for the i18n code
+	 * @attr noSelection      displayed when nothing is selected
+	 * @attr optionKey        the property name to lookup from the items in 'from'
+	 * @attr optionValue      the option name
+	 */
+	def selectRow = { attrs ->
+		attrs = [:] + attrs
+
+		def bean = beanFromModel()
+		def from = getRequiredAttribute(attrs, 'from', 'selectRow')
+		String labelCodeDefault = attrs.remove('labelCodeDefault')
+		String name = getRequiredAttribute(attrs, 'name', 'selectRow')
+		def noSelection = attrs.remove('noSelection')
+		def optionKey = attrs.remove('optionKey')
+		def optionValue = attrs.remove('optionValue')
+
+		def value = uiPropertiesStrategy.getProperty(bean, name)
+
+		def selectAttrs = [name: name, from: from, value: value, noSelection: noSelection,
+		                   optionKey: optionKey ?: 'id', optionValue: optionValue]
+
+		String fieldName = name
+		if (name.endsWith('.id')) {
+			fieldName = selectAttrs.id = name[0..-4]
+			selectAttrs.value = value?.id
+		}
+
+		out << """
+			<tr class="prop">
+				<td valign="top" class="name">
+					<label for="$name">${message(code: labelCode(fieldName), default: labelCodeDefault)}</label>
+				</td>
+				<td valign="top" class="value ${hasErrors(bean: bean, field: fieldName, 'errors')}">
+					${select(selectAttrs)} ${fieldError(bean: bean, field: fieldName)}
+				</td>
+			</tr>"""
+	}
+
+	/**
+	 */
 	def showFlash = { attrs ->
 		String message = flash.remove('message')
 		String error = flash.remove('error')
@@ -356,85 +581,240 @@ class SecurityUiTagLib {
 			return
 		}
 
-		String type = message ? 'info' : 'error'
-		String text = message ?: error
+		String clazz = message ? 'icon icon_info' : 'icon icon_error'
+		String text = (message ?: error).encodeAsHTML()
+
+		writeDocumentReady out, """\t\$.jGrowl('<span class="$clazz">$text</span>', { life: 10000 });"""
+	}
+
+	/**
+	 * @attr property     REQUIRED the property name
+	 * @attr titleDefault REQUIRED the i18n default
+	 */
+	def sortableColumn = { attrs ->
+		attrs = [:] + attrs
+
+		String property = getRequiredAttribute(attrs, 'property', 'sortableColumn')
+
+		String titleCode = property
+		int indexDot = titleCode.lastIndexOf('.')
+		if (indexDot != -1) {
+			 titleCode = titleCode[0..indexDot-1]
+		}
+		titleCode = controllerName + '.' + titleCode + '.label'
+		String titleDefault = getRequiredAttribute(attrs, 'titleDefault', 'sortableColumn')
+
+		out << g.sortableColumn(property: property, params: pageScope.queryParams,
+		                        title: message(code: titleCode, default: titleDefault))
+	}
+
+	/**
+	 * @attr src REQUIRED the src
+	 */
+	def stylesheet = { attrs ->
+		attrs = [:] + attrs
+
+		String src = getRequiredAttribute(attrs, 'src', 'stylesheet')
+
+		def sb = new StringBuilder('\n')
+		asset.stylesheet(src: src).eachLine { if (it.trim()) sb << '\t\t' << it.trim() << '\n' }
+		out << sb
+	}
+
+	/**
+	 * @attr elementId   the HTML id (optional if the formName is 'saveForm')
+	 * @attr messageCode the i18n code for the text (optional if the formName is 'saveForm' or 'updateForm')
+	 * @attr text        the button text if there's no messageCode attr
+	 */
+	def submitButton = { attrs ->
+		attrs = [:] + attrs
+
+		String elementId = attrs.remove('elementId')
+		String text = resolveText(attrs)
+		String formName = pageScope.s2uiFormName
+
+		if (!elementId) {
+			if (formName == 'saveForm') {
+				elementId = 'create'
+			}
+			else if (formName == 'updateForm') {
+				elementId = 'update'
+			}
+			else {
+				throwTagError("Tag [$namespace:submitButton] is missing required attribute [elementId]")
+			}
+			if (!text) {
+				if (formName == 'saveForm') {
+					text = message(code: 'default.button.create.label')
+				}
+				else if (formName == 'updateForm') {
+					text = message(code: 'default.button.update.label')
+				}
+				else {
+					throwTagError("Tag [$namespace:submitButton] is missing required attribute [messageCode or text]")
+				}
+			}
+		}
+
+		def out = getOut()
+		out << """<a id="$elementId" """
+		writeRemainingAttributes out, attrs
+		out << ">$text</a><input type='submit' value=' ' id='${elementId}_submit' class='s2ui_hidden_button'>"
+
+		writeDocumentReady out, """\
+	\$("#$elementId").button();
+	\$('#$elementId').bind('click', function() {
+		document.forms.${formName}.submit();
+	});"""
+	}
+
+	/**
+	 * @attr name   REQUIRED the name
+	 * @attr height REQUIRED the height
+	 */
+	def tab = { attrs, body ->
+		attrs = [:] + attrs
+
+		String name = getRequiredAttribute(attrs, 'name', 'tab')
+		def height = getRequiredAttribute(attrs, 'height', 'tab')
+
 		out << """
-		<script>
-		\$(document).ready(function() {
-			SpringSecurityUI.message('${type}', "${text.encodeAsHTML()}", 3000);
-		});
-		</script>
-		"""
+			<div id="tab-$name">
+				<div class="s2ui_section" style="height: $height; overflow: auto;">
+				${body()}
+				</div>
+			</div>"""
 	}
 
-	def form = { attrs, body ->
-		boolean center = attrs.remove('center') == 'true'
-		boolean resizeable = attrs.remove('resizeable') != 'false'
-		def width = getRequiredAttribute(attrs, 'width', 'form')
-		if (width.endsWith('%')) {
-			center = true
-			resizeable = true
-		}
-		else {
-			width = width.toInteger().toString() + 'px'
-		}
-		int height = getRequiredAttribute(attrs, 'height', 'form').toInteger()
-		String titleCode = getRequiredAttribute(attrs, 'titleCode', 'form')
-		def titleCodeArgs = attrs.remove('titleCodeArgs')
-		String elementId = getRequiredAttribute(attrs, 'elementId', 'form')
+	/**
+	 * @attr data      REQUIRED a list of maps with data to build the tabs
+	 * @attr elementId REQUIRED the HTML id
+	 * @attr height    REQUIRED minimum height (int)
+	 */
+	def tabs = { attrs, body ->
+		attrs = [:] + attrs
 
-		String classes = "ui-widget-content"
-		if (center) classes += ' s2ui_center'
+		def id = getRequiredAttribute(attrs, 'elementId', 'tabs')
+		def data = getRequiredAttribute(attrs, 'data', 'tabs')
+		int height = getRequiredAttribute(attrs, 'height', 'tabs') as int
 
-		String title = titleCodeArgs ? message(code: titleCode, args: titleCodeArgs) : message(code: titleCode)
+		def out = getOut()
+		out << """<div style='display: none;' id="$id">\n"""
+		out << "\t\t\t\t\t\t<ul>\n"
+		for (element in data) {
+			out << """\t\t\t\t\t\t\t<li><a href="#tab-$element.name" class="icon $element.icon">$element.message</a></li>\n"""
+		}
+		out << "\t\t\t\t\t\t</ul>\n"
+
+		out << body()
+		out << "</div>\n"
+
+		writeDocumentReady out, """\t\$("#$id").tabs().show().resizable({minHeight: $height, minWidth: 100});"""
+	}
+
+	/**
+	 * @attr name             REQUIRED the HTML element name
+	 * @attr labelCodeDefault the default to display if there's no message for the i18n code
+	 */
+	def textFieldRow = { attrs ->
+		attrs = [:] + attrs
+
+		def bean = beanFromModel()
+		String labelCodeDefault = attrs.remove('labelCodeDefault')
+		String name = getRequiredAttribute(attrs, 'name', 'textFieldRow')
+
+		def value = uiPropertiesStrategy.getProperty(bean, name)
+
+		def textFieldAttrs = [name: name, value: value] + attrs
+
+		String fieldName = name
+		if (name.endsWith('.id')) {
+			fieldName = textFieldAttrs.id = name[0..-4]
+			textFieldAttrs.value = value?.id
+		}
 
 		out << """
-		<div class="$classes" id="${elementId}"
-		     style="width: ${width}; height: ${height}px; padding: 5px; text-align: center; position: relative;">
-
-		<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix s2ui_center" style='padding: 10px'>
-		<span style="-moz-user-select: none;" unselectable="on" class="ui-dialog-title">
-		${title}
-		</span>
-		</div>
-
-		${body()}
-
-		</div>
-		"""
-
-		if (resizeable) {
-			writeDocumentReady out, "\$('#${elementId}').resizable();"
-		}
+			<tr class="prop">
+				<td valign="top" class="name">
+					<label for="$name">${message(code: labelCode(name), default: labelCodeDefault)}</label>
+				</td>
+				<td valign="top" class="value ${hasErrors(bean: bean, field: fieldName, 'errors')}">
+					${textField(textFieldAttrs)}
+					${fieldErrors(bean, fieldName)}
+				</td>
+			</tr>"""
 	}
 
-	protected void writeDocumentReady(writer, String javascript) {
-		writer << """
-		<script>
-		\$(document).ready(function() {
-			${javascript}
-		});
-		</script>
-		"""
-	}
+	/**
+	 * @attr messageCode           REQUIRED the i18n message code
+	 * @attr entityNameMessageCode the i18n message code for the 'entityName'
+	 * @attr entityNameDefault     the i18n default value for the 'entityName'
+	 */
+	def title = { attrs ->
+		attrs = [:] + attrs
 
-	protected String resolveText(attrs) {
-		String messageCode = attrs.remove('messageCode')
-		if (messageCode) {
-			return message(code: messageCode)
+		String messageCode = getRequiredAttribute(attrs, 'messageCode', 'title')
+		String entityNameMessageCode = attrs.remove('entityNameMessageCode')
+		String entityNameDefault = attrs.remove('entityNameDefault')
+
+		def args
+		if (entityNameMessageCode) {
+			String entityName = message(code: entityNameMessageCode, default: entityNameDefault)
+			args = [entityName]
+			set(var: 'entityName', value: entityName)
 		}
 
-		return attrs.remove('text')
+		out << "<title>${message(code: messageCode, args: args)}</title>"
 	}
 
 	protected getRequiredAttribute(attrs, String name, String tagName) {
 		if (!attrs.containsKey(name)) {
-			throwTagError("Tag [$tagName] is missing required attribute [$name]")
+			throwTagError("Tag [$namespace:$tagName] is missing required attribute [$name]")
 		}
 		attrs.remove name
 	}
 
+	protected String resolveText(attrs) {
+		String messageCode = attrs.remove('messageCode')
+		messageCode ? message(code: messageCode) : attrs.remove('text')
+	}
+
+	protected void writeDocumentReady(writer, javascript) {
+		writer << asset.script { """
+\$(function() {
+$javascript
+});\n"""
+		}
+	}
+
 	protected void writeRemainingAttributes(writer, attrs) {
 		writer << attrs.collect { k, v -> """ $k="$v" """ }.join('')
+	}
+
+	protected String createLink(String action, String controller = controllerName, Map params = null) {
+		g.createLink(action: action, controller: controller, params: params)
+	}
+
+	protected String fieldErrors(bean, field) {
+		if (!bean) {
+			return
+		}
+
+		def attrs = [bean: bean, field: field]
+		def sb = new StringBuilder()
+		eachError attrs, { sb << "<span class='s2ui_error'>${message(error: it, encodeAs: 'HTML')}</span>" }
+		sb
+	}
+
+	protected beanFromModel() {
+		def bean = pageScope.s2uiBean
+		assert bean
+		bean
+	}
+
+	protected String labelCode(String propertyName) {
+		String beanType = pageScope.s2uiBeanType
+		assert beanType
+		beanType + '.' + propertyName + '.label'
 	}
 }

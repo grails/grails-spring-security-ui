@@ -1,18 +1,20 @@
-The default action for the AclObjectIdentity controller is search. Leave all fields at their default values to return all instances.
+The default action for the AclObjectIdentity controller is search. By default only the standard fields are available but this is customizable with the [s2ui-override|Scripts] script - see [the section on configuration|guide:customization] for details.
+
+Leave all fields at their default values to return all instances.
 
 !acl_oid_search_start.png!
 
-Results are shown paginated in groups of 10. The column headers are clickable and will sort the results by that field:
+Results are shown paginated in groups of 10 and you can click on any header to sort by that field:
 
 !acl_oid_search_results.png!
 
 h4. AclObjectIdentity Edit
 
-After clicking through to an instance you get to the edit page (there are no view pages):
+After clicking through to an AclObjectIdentity you get to the edit page (there are no view pages):
 
 !acl_oid_edit.png!
 
-You can update the values and delete the instance if there aren't any associated @AclEntry@ instances - by default there is no support for cascading.
+You can update any of the attributes, and can delete the instance if there aren't any associated @AclEntry@ instances - by default there is no support for cascading.
 
 You can also see the associated @AclEntry@ instances.
 
@@ -21,4 +23,3 @@ h4. AclObjectIdentity Create
 You can create new instances by going to @/aclObjectIdentity/create@ or by clicking the @Create@ action in the @OID@ menu under @ACL@.
 
 !acl_oid_create.png!
-

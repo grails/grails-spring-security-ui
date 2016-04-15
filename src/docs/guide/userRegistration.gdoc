@@ -30,7 +30,7 @@ The post-registration destination url is configurable in @grails-app/conf/Config
 grails.plugin.springsecurity.ui.register.postRegisterUrl = '/welcome'
 {code}
 
-If you don't specify a value then the @defaultTargetUrl@ value will be used, which is @'/'@ by default.
+If you don't specify a value then the @grails.plugin.springsecurity.successHandler.defaultTargetUrl@ value will be used, which is @'/'@ by default.
 
 You can customize the subject, body, and from address of the registration email by overriding the default values in @grails-app/conf/Config.groovy@, for example:
 
@@ -56,21 +56,19 @@ grails.plugin.springsecurity.ui.register.defaultRoleNames = ['ROLE_CUSTOMER']
 
 h4. Mail configuration
 
-The plugin uses the [Mail plugin|http://grails.org/plugin/mail] to send registration emails, so you'll need to configure an SMTP server. See the plugin's documentation for the syntax.
+By default the plugin uses the [Mail|http://grails.org/plugin/mail] plugin to send emails, but only if it installed. This is configurable by registering your own @MailStrategy@ implementation - see [the section on configuration|guide:customization] for more information. The plugin assumes that the Mail plugin and an SMTP server are already configured.
 
 h4. Notes
 
 You should consider the registration code as starter code - every signup workflow will be different, and this should help you get going but is unlikely to be sufficient. You may wish to collect more information than just username and email - first and last name for example. Run @grails s2ui-override register@ to copy the registration controller and GSPs into your application to be customized.
 
-If there are unexpected validation errors during registration (which can happen when there is a disconnect between the domain classes and the code in @RegisterController@ they will be logged at the @warn@ level, so enable logging to ensure that you see the messages, e.g.
+If there are unexpected validation errors during registration (which can happen when there is a disconnect between the domain classes and the code in @RegisterController@ they will be logged at the @warn@ or @error@ level, so enable logging to ensure that you see the messages, e.g.
 
 {code}
 log4j = {
-   error 'org.codehaus.groovy.grails',
-         'org.springframework',
-         'org.hibernate',
-         'net.sf.ehcache.hibernate'
-   warn 'grails.app.services.grails.plugin.springsecurity.ui.SpringSecurityUiService'
+   ...
+   warn 'grails.plugin.springsecurity.ui.SpringSecurityUiService'
+   ...
 }
 {code}
 
@@ -78,3 +76,26 @@ log4j = {
 @RegisterController@ and its GSPs assume that your User domain class has an @email@ field. Be sure to either rework the workflow (using the @s2ui-override@ script) if you don't need an email confirmation step or add an email field.
 {note}
 
+h4. RegistrationCode search
+
+The plugin uses its @grails.plugin.springsecurity.ui.RegistrationCode@ domain class to store a token associated with the new users' username for use when finishing the registration process after the user clicks the link in the generated email (and also as part of the forgot-password workflow). The plugin includes a controller and GSPs to manage these instances.
+
+The default action for the RegistrationCode controller is search. By default only the standard fields (@username@ and @token@) are available but this is customizable with the [s2ui-override|Scripts] script - see [the section on configuration|guide:customization] for details.
+
+You can search by any combination of fields, and both fields have an Ajax autocomplete to assist in finding instances. Leave both fields empty to return all instances.
+
+!registration_code_search_start.png!
+
+Searching is case-insensitive and the search string can appear anywhere in the field. Results are shown paginated in groups of 10 and you can click on any header to sort by that field:
+
+!registration_code_search_results.png!
+
+h4. RegistrationCode edit
+
+After clicking through to a RegistrationCode you get to the edit page (there are no view pages):
+
+!registration_code_edit.png!
+
+You can update the @username@ or @token@ attribute or delete the RegistrationCode.
+
+Since instances are created during the "User Registration" and "Forgot Password" workflows, there is no functionality in this plugin to create new instances.

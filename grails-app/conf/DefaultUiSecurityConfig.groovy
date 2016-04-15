@@ -1,4 +1,4 @@
-/* Copyright 2009-2013 SpringSource.
+/* Copyright 2009-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,6 @@ security {
 
 		encodePassword = false
 
-		register {
-			emailBody = '''\
-Hi $user.username,<br/>
-<br/>
-You (or someone pretending to be you) created an account with this email address.<br/>
-<br/>
-If you made the request, please click&nbsp;<a href="$url">here</a> to finish the registration.
-'''
-			emailFrom = 'do.not.reply@localhost'
-			emailSubject = 'New Account'
-			defaultRoleNames = ['ROLE_USER']
-			postRegisterUrl = null // use defaultTargetUrl if not set
-		}
-
 		forgotPassword {
 			emailBody = '''\
 Hi $user.username,<br/>
@@ -46,5 +32,26 @@ If you did make the request, then click <a href="$url">here</a> to reset your pa
 			emailSubject = 'Password Reset'
 			postResetUrl = null // use defaultTargetUrl if not set
 		}
+
+		gsp {
+			layoutRegister = 'register'
+			layoutUi       = 'springSecurityUI'
+		}
+
+		register {
+			defaultRoleNames = ['ROLE_USER']
+			emailBody = '''\
+Hi $user.username,<br/>
+<br/>
+You (or someone pretending to be you) created an account with this email address.<br/>
+<br/>
+If you made the request, please click&nbsp;<a href="$url">here</a> to finish the registration.
+'''
+			emailFrom = 'do.not.reply@localhost'
+			emailSubject = 'New Account'
+			postRegisterUrl = null // use defaultTargetUrl if not set
+		}
+
+		switchUserRoleName = 'ROLE_SWITCH_USER'
 	}
 }

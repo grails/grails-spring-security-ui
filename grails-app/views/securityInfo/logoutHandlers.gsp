@@ -1,22 +1,11 @@
 <html>
-
-<head>
-	<meta name='layout' content='springSecurityUI'/>
-	<title>Logout Handlers</title>
-</head>
-
-<body>
-
-<table>
-	<thead>
-	<tr><th>Logout Handlers</th></tr>
-	</thead>
-	<tbody>
-	<g:each var='handler' in='${handlers}'>
-	<tr><td>${handler.getClass().name}</td></tr>
-	</g:each>
-	</tbody>
-</table>
-</body>
-
+	<head>
+		<meta name="layout" content="${layoutUi}"/>
+		<title><g:message code='spring.security.ui.menu.securityInfo.logoutHandlers'/></title>
+	</head>
+	<body>
+		<s2ui:securityInfoTable type='logoutHandlers' items='${handlers}' headerCodes='className'>
+			<td>${it.getClass().name}</td>
+		</s2ui:securityInfoTable>
+	</body>
 </html>

@@ -1,4 +1,4 @@
-/* Copyright 2009-2013 SpringSource.
+/* Copyright 2009-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,150 +14,44 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.converters.JSON
-
-import org.springframework.dao.DataIntegrityViolationException
-
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-class AclClassController extends AbstractS2UiController {
-
-	def create() {
-		[aclClass: lookupClass().newInstance(params)]
-	}
+class AclClassController extends AbstractS2UiDomainController {
 
 	def save() {
-		def aclClass = lookupClass().newInstance(params)
-		if (!aclClass.save(flush: true)) {
-			render view: 'create', model: [aclClass: aclClass]
-			return
-		}
-
-		flash.message = "${message(code: 'default.created.message', args: [message(code: 'aclClass.label', default: 'AclClass'), aclClass.id])}"
-		redirect action: 'edit', id: aclClass.id
-	}
-
-	def edit() {
-		def aclClass = findById()
-		if (!aclClass) return
-
-		[aclClass: aclClass]
+		doSave uiAclStrategy.saveAclClass(params)
 	}
 
 	def update() {
-		def aclClass = findById()
-		if (!aclClass) return
-		if (!versionCheck('aclClass.label', 'AclClass', aclClass, [aclClass: aclClass])) {
-			return
+		doUpdate { aclClass ->
+			uiAclStrategy.updateAclClass params, aclClass
 		}
-
-		if (!springSecurityUiService.updateAclClass(aclClass, params.className)) {
-			render view: 'edit', model: [aclClass: aclClass]
-			return
-		}
-
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'aclClass.label', default: 'AclClass'), aclClass.id])}"
-		redirect action: 'edit', id: aclClass.id
 	}
 
 	def delete() {
-		def aclClass = findById()
-		if (!aclClass) return
-
-		try {
-			springSecurityUiService.deleteAclClass aclClass
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'aclClass.label', default: 'AclClass'), params.id])}"
-			redirect action: 'search'
-		}
-		catch (DataIntegrityViolationException e) {
-			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'aclClass.label', default: 'AclClass'), params.id])}"
-			redirect action: 'edit', id: params.id
+		tryDelete { aclClass ->
+			uiAclStrategy.deleteAclClass aclClass
 		}
 	}
 
-	def search() {}
-
-	def aclClassSearch() {
-
-		boolean useOffset = params.containsKey('offset')
-		setIfMissing 'max', 10, 100
-		setIfMissing 'offset', 0
-
-		def hql = new StringBuilder('FROM ').append(lookupClassName()).append(' c WHERE 1=1 ')
-		def queryParams = [:]
-
-		for (name in ['className']) {
-			if (params[name]) {
-				hql.append " AND LOWER(c.$name) LIKE :$name"
-				queryParams[name] = '%' + params[name].toLowerCase() + '%'
-			}
+	def search() {
+		if (!isSearch()) {
+			// show the form
+			return
 		}
 
-		int totalCount = lookupClass().executeQuery("SELECT COUNT(DISTINCT c) $hql", queryParams)[0]
-
-		Integer max = params.int('max')
-		Integer offset = params.int('offset')
-
-		String orderBy = ''
-		if (params.sort) {
-			orderBy = " ORDER BY c.$params.sort ${params.order ?: 'ASC'}"
+		def results = doSearch { ->
+			like 'className', delegate
 		}
 
-		def results = lookupClass().executeQuery(
-				"SELECT DISTINCT c $hql $orderBy",
-				queryParams, [max: max, offset: offset])
-		def model = [results: results, totalCount: totalCount, searched: true]
-
-		// add query params to model for paging
-		for (name in ['className']) {
-		 	model[name] = params[name]
-		}
-
-		render view: 'search', model: model
+		renderSearch([results: results, totalCount: results.totalCount], 'className')
 	}
 
-	/**
-	 * Ajax call used by autocomplete textfield.
-	 */
-	def ajaxAclClassSearch() {
-
-		def jsonData = []
-
-		if (params.term?.length() > 2) {
-			String className = params.term
-			setIfMissing 'max', 10, 100
-
-			def results = lookupClass().executeQuery(
-					"SELECT DISTINCT c.className " +
-					"FROM ${lookupClassName()} c " +
-					"WHERE LOWER(c.className) LIKE :name " +
-					"ORDER BY c.className ",
-					[name: "%${className.toLowerCase()}%"],
-					[max: params.max])
-			for (result in results) {
-				jsonData << [value: result]
-			}
-		}
-
-		render text: jsonData as JSON, contentType: 'text/plain'
-	}
-
-	protected findById() {
-		def aclClass = lookupClass().get(params.id)
-		if (!aclClass) {
-			flash.error = "${message(code: 'default.not.found.message', args: [message(code: 'aclClass.label', default: 'AclClass'), params.id])}"
-			redirect action: 'search'
-		}
-
-		aclClass
-	}
-
-	protected String lookupClassName() {
-		'grails.plugin.springsecurity.acl.AclClass'
-	}
-
-	protected Class<?> lookupClass() {
-		grailsApplication.getDomainClass(lookupClassName()).clazz
+	protected Class<?> getClazz() { AclClass }
+	protected String getClassLabelCode() { 'aclClass.label' }
+	protected String getSimpleClassName() { 'AclClass' }
+	protected Map model(aclClass, String action) {
+		[aclClass: aclClass]
 	}
 }

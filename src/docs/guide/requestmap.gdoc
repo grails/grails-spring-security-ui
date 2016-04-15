@@ -2,11 +2,13 @@ The default approach to securing URLs is with annotations, so the Requestmaps me
 
 h4. Requestmap search
 
-The default action for the Requestmap controller is search. You can search by URL or Config Attribute. Leave all fields empty to return all Requestmaps.
+The default action for the Requestmap controller is search. By default only the standard fields (@url@ and @configAttribute@) are available but this is customizable with the [s2ui-override|Scripts] script - see [the section on configuration|guide:customization] for details.
+
+You can search by any combination of fields, and the @url@ and @configAttribute@ fields have an Ajax autocomplete to assist in finding instances. Leave both fields empty to return all instances.
 
 !requestmap_search_start.png!
 
-Searching is case-insensitive and the search string can appear anywhere in the field. Multiple results are shown paginated in groups of 10 and you can click on either header to sort by that field:
+Searching is case-insensitive and the search string can appear anywhere in the field. Results are shown paginated in groups of 10 and you can click on either header to sort by that field:
 
 !requestmap_search_results.png!
 

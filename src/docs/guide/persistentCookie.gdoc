@@ -1,15 +1,27 @@
-Persistent cookies aren't enabled by default - you must enable them by running the @s2-create-persistent-token@ script. See [the Spring Security Core plugin documentation|http://grails-plugins.github.io/grails-spring-security-core/docs/manual/guide/authentication.html#rememberMeCookie] for details about this feature.
+Persistent cookies aren't enabled by default - you must enable them by running the @s2-create-persistent-token@ script. See [the Spring Security Core plugin documentation|https://grails-plugins.github.io/grails-spring-security-core/v2/guide/authentication.html#rememberMeCookie] for details about this feature.
+
+The Persistent Logins menu is only shown if this feature is enabled.
 
 h4. Persistent logins search
 
-The Persistent Logins menu is only shown if this feature is enabled. Navigate to @/persistentLogin/search@ or click the Search item in the menu:
+The default action for the PersistentLogin controller is search. By default only the standard fields (@username@, @token@, and @series@) are available but this is customizable with the [s2ui-override|Scripts] script - see [the section on configuration|guide:customization] for details.
+
+You can search by any combination of fields, and all fields have an Ajax autocomplete to assist in finding instances. Leave all fields empty to return all instances.
 
 !persistent_login_search.png!
 
-You can search by any field, and there's an Ajax autocomplete for the @username@ field to assist with user lookup:
+Searching is case-insensitive and the search string can appear anywhere in the field. Results are shown paginated in groups of 10 and you can click on any header to sort by that field:
 
 !persistent_login_search_results.png!
 
-Click the series to get to the edit page:
+h4. Persistent logins edit
+
+After clicking through to an instance you get to the edit page (there are no view pages):
 
 !persistent_login_edit.png!
+
+You can update the @token@ or @lastUsed@ attribute or delete the instance.
+
+h4. Persistent logins creation
+
+Since instances are created during authentication by the spring-security-core plugin, there is no functionality in this plugin to create new instances.

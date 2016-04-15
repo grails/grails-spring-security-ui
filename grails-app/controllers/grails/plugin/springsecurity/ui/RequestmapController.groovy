@@ -1,4 +1,4 @@
-/* Copyright 2009-2013 SpringSource.
+/* Copyright 2009-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,119 +14,77 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.ReflectionUtils
+import grails.plugin.springsecurity.ui.strategy.RequestmapStrategy
 
-import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.HttpMethod
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-class RequestmapController extends AbstractS2UiController {
+class RequestmapController extends AbstractS2UiDomainController {
 
-	def search() {}
+	/** Dependency injection for the 'uiRequestmapStrategy' bean. */
+	RequestmapStrategy uiRequestmapStrategy
 
-	def requestmapSearch() {
-
-		boolean useOffset = params.containsKey('offset')
-		setIfMissing 'max', 10, 100
-		setIfMissing 'offset', 0
-
-		def hql = new StringBuilder('FROM ').append(lookupRequestmapClassName()).append(' r WHERE 1=1 ')
-		def queryParams = [:]
-
-		String urlField = SpringSecurityUtils.securityConfig.requestMap.urlField
-		String configAttributeField = SpringSecurityUtils.securityConfig.requestMap.configAttributeField
-
-		for (name in [url: urlField, configAttribute: configAttributeField]) {
-			if (params[name.key]) {
-				hql.append " AND LOWER(r.${name.value}) LIKE :$name.key"
-				queryParams[name.key] = '%' + params[name.key].toLowerCase() + '%'
-			}
-		}
-
-		int totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT r) $hql", queryParams)[0]
-
-		Integer max = params.int('max')
-		Integer offset = params.int('offset')
-
-		String orderBy = ''
-		if (params.sort) {
-			orderBy = " ORDER BY r.$params.sort ${params.order ?: 'ASC'}"
-		}
-
-		def results = lookupRequestmapClass().executeQuery(
-				"SELECT DISTINCT r $hql $orderBy",
-				queryParams, [max: max, offset: offset])
-		def model = [results: results, totalCount: totalCount, searched: true]
-
-		// add query params to model for paging
-		for (name in ['url', 'configAttribute', 'sort', 'order']) {
-			model[name] = params[name]
-		}
-
-		render view: 'search', model: model
-	}
-
-	def create() {
-		[requestmap: lookupRequestmapClass().newInstance(params)]
-	}
+	def springSecurityService
 
 	def save() {
-		def requestmap = lookupRequestmapClass().newInstance(params)
-		if (!requestmap.save(flush: true)) {
-         render view: 'create', model: [requestmap: requestmap]
-         return
+		if (!(param('url'))) params.remove('url')
+		doSave(uiRequestmapStrategy.saveRequestmap(params)) {
+			springSecurityService.clearCachedRequestmaps()
 		}
-
-		springSecurityService.clearCachedRequestmaps()
-		flash.error = "${message(code: 'default.created.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), requestmap.id])}"
-		redirect action: 'edit', id: requestmap.id
-	}
-
-	def edit() {
-		def requestmap = findById()
-		if (!requestmap) return
-
-		[requestmap: requestmap]
 	}
 
 	def update() {
-		def requestmap = lookupRequestmapClass().get(params.id)
-		requestmap.properties = params
-
-		if (!requestmap.save(flush: true)) {
-			render view: 'edit', model: [requestmap: requestmap]
-			return
+		if (!(param('url'))) params.remove('url')
+		doUpdate { requestmap ->
+			uiRequestmapStrategy.updateRequestmap params, requestmap
 		}
-
-		springSecurityService.clearCachedRequestmaps()
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), requestmap.id])}"
-		redirect action: 'edit', id: requestmap.id
 	}
 
 	def delete() {
-		def requestmap = findById()
-		if (!requestmap) return
-
-		try {
-			requestmap.delete(flush: true)
-			springSecurityService.clearCachedRequestmaps()
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
-			redirect action: 'search'
-		}
-		catch (DataIntegrityViolationException e) {
-			flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
-			redirect action: 'edit', id: params.id
+		tryDelete { requestmap ->
+			uiRequestmapStrategy.deleteRequestmap requestmap
 		}
 	}
 
-	protected findById() {
-		def requestmap = lookupRequestmapClass().get(params.id)
-		if (!requestmap) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'requestmap.label', default: 'Requestmap'), params.id])}"
-			redirect action: 'search'
+	def search() {
+		if (!isSearch()) {
+			// show the form
+			return [hasHttpMethod: hasHttpMethod]
 		}
 
-		requestmap
+		def results = doSearch { ->
+			like 'configAttribute', delegate
+			like 'url', delegate
+			if (param('httpMethod')) {
+				eq 'httpMethod', HttpMethod.valueOf(params.httpMethod), delegate
+			}
+		}
+
+		renderSearch([results: results, totalCount: results.totalCount, hasHttpMethod: hasHttpMethod],
+		              'configAttribute', 'httpMethod', 'url')
+	}
+
+	protected Class<?> getClazz() { Requestmap }
+	protected String getClassLabelCode() { 'requestmap.label' }
+	protected Map model(requestmap, String action) {
+		[requestmap: requestmap, hasHttpMethod: hasHttpMethod]
+	}
+
+	protected boolean hasHttpMethod
+	protected Class<?> Requestmap
+
+	void afterPropertiesSet() {
+		super.afterPropertiesSet()
+
+		if (!conf.requestMap.className) {
+			return
+		}
+
+		hasHttpMethod = ReflectionUtils.requestmapClassSupportsHttpMethod()
+
+		Requestmap = getDomainClassClass(conf.requestMap.className)
 	}
 }

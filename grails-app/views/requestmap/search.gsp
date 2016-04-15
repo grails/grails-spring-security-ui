@@ -1,84 +1,59 @@
 <html>
-
-<head>
-	<meta name='layout' content='springSecurityUI'/>
-	<g:set var="entityName" value="${message(code: 'requestmap.label', default: 'Requestmap')}"/>
-	<title><g:message code="default.list.label" args="[entityName]"/></title>
-</head>
-
-<body>
-
-<div class="body">
-
-	<s2ui:form width='100%' height='200' elementId='formContainer'
-	           titleCode='spring.security.ui.requestmap.search'>
-
-	<g:form action='requestmapSearch' name='requestmapSearchForm'>
-
-		<br/>
-
-		<table>
-			<tbody>
-			<tr>
-				<td><g:message code='requestmap.url.label' default='URL'/>:</td>
-				<td><g:textField name='url' size='50' maxlength='255' autocomplete='off' value='${url}'/></td>
-			</tr>
-			<tr>
-				<td><g:message code='requestmap.configAttribute.label' default='Config Attribute'/>:</td>
-				<td><g:textField name='configAttribute' size='50' maxlength='255' autocomplete='off' value='${configAttribute}'/></td>
-			</tr>
-			<tr><td colspan='2'>&nbsp;</td></tr>
-			<tr>
-				<td colspan='2'><s2ui:submitButton elementId='search' form='requestmapSearchForm' messageCode='spring.security.ui.search'/></td>
-			</tr>
-			</tbody>
-		</table>
-	</g:form>
-
-	</s2ui:form>
-
-	<g:if test='${searched}'>
-
-<%
-def queryParams = [url: url, configAttribute: configAttribute]
-%>
-
-	<div class="list">
-	<table>
-		<thead>
-		<tr>
-			<g:sortableColumn property="url" title="${message(code: 'requestmap.url.label', default: 'URL')}" params="${queryParams}"/>
-			<g:sortableColumn property="configAttribute" title="${message(code: 'requestmap.configAttribute.label', default: 'Config Attribute')}" params="${queryParams}"/>
-		</tr>
-		</thead>
-		<tbody>
-		<g:each in="${results}" status="i" var="requestmap">
-		<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-			<td><g:link action="edit" id="${requestmap.id}">${fieldValue(bean: requestmap, field: "url")}</g:link></td>
-			<td>${fieldValue(bean: requestmap, field: "configAttribute")}</td>
-		</tr>
-		</g:each>
-		</tbody>
-	</table>
-	</div>
-
-	<div class="paginateButtons">
-		<g:paginate total="${totalCount}" params="${queryParams}" />
-	</div>
-
-	<div style="text-align:center">
-		<s2ui:paginationSummary total="${totalCount}"/>
-	</div>
-
-	</g:if>
-
-</div>
-
-<script>
-$(document).ready(function() {
-	$("#url").focus();
-});
-</script>
-
-</body>
+	<head>
+		<meta name="layout" content="${layoutUi}"/>
+		<s2ui:title messageCode='spring.security.ui.requestmap.search'/>
+	</head>
+	<body>
+		<div class="body">
+			<s2ui:formContainer type='search' beanType='requestmap' height='350'>
+				<s2ui:searchForm colspan='2'>
+					<tr>
+						<td><g:message code='requestmap.url.label' default='URL'/>:</td>
+						<td><g:textField name='url' size='50' maxlength='255' autocomplete='off' value='${url}'/></td>
+					</tr>
+					<tr>
+						<td><g:message code='requestmap.configAttribute.label' default='Config Attribute'/>:</td>
+						<td><g:textField name='configAttribute' size='50' maxlength='255' autocomplete='off' value='${configAttribute}'/></td>
+					</tr>
+					<g:if test='${hasHttpMethod}'>
+					<tr>
+						<td><g:message code='requestmap.httpMethod.label' default='HttpMethod'/>:</td>
+						<td>
+							<g:select name='httpMethod' from='${org.springframework.http.HttpMethod.values()}' value='${httpMethod}' noSelection="['null': 'All']"/>
+						</td>
+					</tr>
+					</g:if>
+				</s2ui:searchForm>
+			</s2ui:formContainer>
+			<g:if test='${searched}'>
+			<div class="list">
+			<table>
+				<thead>
+				<tr>
+					<s2ui:sortableColumn property='url' titleDefault='URL'/>
+					<s2ui:sortableColumn property='configAttribute' titleDefault='Config Attribute'/>
+					<g:if test='${hasHttpMethod}'>
+					<s2ui:sortableColumn property='httpMethod' titleDefault='HttpMethod'/>
+					</g:if>
+				</tr>
+				</thead>
+				<tbody>
+				<g:each in='${results}' status='i' var='requestmap'>
+				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+					<td><g:link action='edit' id='${requestmap.id}'>${uiPropertiesStrategy.getProperty(requestmap, 'url')}</g:link></td>
+					<td>${uiPropertiesStrategy.getProperty(requestmap, 'configAttribute')}</td>
+					<g:if test='${hasHttpMethod}'>
+					<td>${uiPropertiesStrategy.getProperty(requestmap, 'httpMethod')}</td>
+					</g:if>
+				</tr>
+				</g:each>
+				</tbody>
+			</table>
+			</div>
+			<s2ui:paginate total='${totalCount}'/>
+			</g:if>
+		</div>
+		<s2ui:ajaxSearch paramName='url'/>
+		<s2ui:ajaxSearch paramName='configAttribute' focus='false'/>
+	</body>
 </html>

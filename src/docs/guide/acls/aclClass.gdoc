@@ -1,14 +1,16 @@
-The default action for the AclClass controller is search. The @className@ field has an Ajax autocomplete to assist in finding instances. Leave the className field empty to return all instances.
+The default action for the AclClass controller is search. By default only the standard fields are available but this is customizable with the [s2ui-override|Scripts] script - see [the section on configuration|guide:customization] for details.
+
+The @className@ field has an Ajax autocomplete to assist in finding instances. Leave the field empty to return all instances.
 
 !acl_class_search_start.png!
 
-Results are shown paginated in groups of 10. The class name column header is clickable and will sort the results by that field:
+Searching is case-insensitive and the search string can appear anywhere in the field. Results are shown paginated in groups of 10 and you can click on the @className@ column header to sort the results by that field:
 
 !acl_class_search_results.png!
 
 h4. AclClass Edit
 
-After clicking through an instance you get to the edit page (there are no view pages):
+After clicking through an AclClass you get to the edit page (there are no view pages):
 
 !acl_class_edit.png!
 
@@ -21,4 +23,3 @@ h4. AclClass Create
 You can create new instances by going to @/aclClass/create@ or by clicking the @Create@ action in the @Class@ menu under @ACL@.
 
 !acl_class_create.png!
-

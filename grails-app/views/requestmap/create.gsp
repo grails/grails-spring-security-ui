@@ -1,56 +1,29 @@
 <html>
-
-<head>
-	<meta name='layout' content='springSecurityUI'/>
-	<g:set var="entityName" value="${message(code: 'requestmap.label', default: 'Requestmap')}"/>
-	<title><g:message code="default.create.label" args="[entityName]"/></title>
-</head>
-
-<body>
-
-<div class="body">
-
-	<s2ui:form width='100%' height='225' elementId='formContainer'
-	           titleCode='default.create.label' titleCodeArgs='[entityName]'>
-
-	<g:form action="save" name='requestmapCreateForm'>
-		<div class="dialog">
-
-			<br/>
-
-			<table>
-				<tbody>
-
-					<s2ui:textFieldRow name='url' labelCode='requestmap.url.label' bean="${requestmap}"
-					                   size='50' labelCodeDefault='URL' value="${requestmap?.url}"/>
-
-					<s2ui:textFieldRow name='configAttribute' labelCode='requestmap.configAttribute.label'
-					                   size='50' bean="${requestmap}" labelCodeDefault='Config Attribute'
-					                   value="${requestmap?.configAttribute}"/>
-
-					<tr><td>&nbsp;</td></tr>
-
-					<tr class="prop">
-						<td valign="top">
-							<s2ui:submitButton elementId='create' form='requestmapCreateForm' messageCode='default.button.create.label'/>
-						</td>
-					</tr>
-
-				</tbody>
-			</table>
+	<head>
+		<meta name="layout" content="${layoutUi}"/>
+		<s2ui:title messageCode='default.create.label' entityNameMessageCode='requestmap.label' entityNameDefault='Requestmap'/>
+	</head>
+	<body>
+		<div class="body">
+			<s2ui:formContainer type='save' beanType='requestmap' focus='url' height='350'>
+				<s2ui:form>
+					<div class="dialog">
+						<br/>
+						<table>
+							<tbody>
+								<s2ui:textFieldRow name='url' size='50' labelCodeDefault='URL'/>
+								<s2ui:textFieldRow name='configAttribute' size='50' labelCodeDefault='Config Attribute'/>
+								<g:if test='${hasHttpMethod}'>
+								<s2ui:selectRow name='httpMethod' noSelection="['': '']" labelCodeDefault='HttpMethod'
+							                   from='${org.springframework.http.HttpMethod.values()}' optionKey='${{it}}'/>
+								</g:if>
+								<tr><td>&nbsp;</td></tr>
+								<tr class="prop"><td valign="top"><s2ui:submitButton/></td></tr>
+							</tbody>
+						</table>
+					</div>
+				</s2ui:form>
+			</s2ui:formContainer>
 		</div>
-
-	</g:form>
-
-	</s2ui:form>
-
-</div>
-
-<script>
-$(document).ready(function() {
-	$('#url').focus();
-});
-</script>
-
-</body>
+	</body>
 </html>

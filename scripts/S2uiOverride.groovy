@@ -1,4 +1,4 @@
-/* Copyright 2009-2012 SpringSource.
+/* Copyright 2009-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ USAGE = """
 
 	Copies plugin controllers and GSPs to the application so they can be overridden.
 
-	<type> can be one of user, role, requestmap, securityinfo, aclsid, aclobjectidentity,
-	aclentry, aclclass, persistentlogin, register, registrationcode, auth, or layout (not case-sensitive)
+	<type> can be one of aclclass, aclentry, aclobjectidentity, aclsid, persistentlogin,
+	register, registrationcode, requestmap, role, securityinfo, user, auth, or layout (not case-sensitive)
 
 	<controller-package> is required for any type that has a controller (i.e. all but 'auth' and 'layout')
 
@@ -34,47 +34,45 @@ overwriteAll = false
 pluginViewsDir = "$springSecurityUiPluginDir/grails-app/views"
 appGrailsApp = "$basedir/grails-app"
 
-templateAttributes = [:]
 templateDir = "$springSecurityUiPluginDir/src/templates"
 templateEngine = new SimpleTemplateEngine()
 
-controllers = [aclclass: 'AclClass',
-               aclentry: 'AclEntry',
+controllers = [aclclass:          'AclClass',
+               aclentry:          'AclEntry',
                aclobjectidentity: 'AclObjectIdentity',
-               aclsid: 'AclSid',
-               persistentlogin: 'PersistentLogin',
-               register: 'Register',
-               registrationcode: 'RegistrationCode',
-               requestmap: 'Requestmap',
-               role: 'Role',
-               securityinfo: 'SecurityInfo',
-               user: 'User']
+               aclsid:            'AclSid',
+               persistentlogin:   'PersistentLogin',
+               register:          'Register',
+               registrationcode:  'RegistrationCode',
+               requestmap:        'Requestmap',
+               role:              'Role',
+               securityinfo:      'SecurityInfo',
+               user:              'User']
 
 target(s2uiOverride: 'Copy plugin UI files to the project so they can be overridden') {
-	copyFiles()
-}
-
-private void copyFiles() {
 
 	String[] typeAndPackage = parseArgs()
 	if (!typeAndPackage) {
 		return
 	}
-	if (typeAndPackage.length == 1) {
-		if ('layout'.equals(typeAndPackage[0])) {
-			// special case for springSecurityUI.gsp
-			copyFile "$pluginViewsDir/layouts/springSecurityUI.gsp",
-			         "$appGrailsApp/views/layouts/springSecurityUI.gsp"
 
-			ant.mkdir dir: "$appGrailsApp/views/includes"
-			copyFile "$pluginViewsDir/includes/_ajaxLogin.gsp",
-				      "$appGrailsApp/views/includes/_ajaxLogin.gsp"
+	File appViewsDir = new File(appGrailsApp, 'views')
+	File appLayoutsDir = new File(appViewsDir, 'layouts')
+	File pluginLayoutsDir = new File(pluginViewsDir, 'layouts')
+
+	if (typeAndPackage.length == 1) {
+		if ('layout' == typeAndPackage[0]) {
+			// special case for springSecurityUI.gsp
+			copyFile new File(pluginLayoutsDir, 'springSecurityUI.gsp'),
+			         appLayoutsDir
+
+			copyFile new File(pluginViewsDir, 'includes/_ajaxLogin.gsp'),
+			         new File(appViewsDir, 'includes')
 		}
-		else if ('auth'.equals(typeAndPackage[0])) {
+		else if ('auth' == typeAndPackage[0]) {
 			// special case for auth.gsp
-			ant.mkdir dir: "$appGrailsApp/views/login"
-			copyFile "$pluginViewsDir/login/auth.gsp",
-				      "$appGrailsApp/views/login/auth.gsp"
+			copyFile new File(pluginViewsDir, 'login/auth.gsp'),
+			         new File(appViewsDir, 'login')
 		}
 		return
 	}
@@ -82,39 +80,88 @@ private void copyFiles() {
 	String type = typeAndPackage[0]
 	String controller = controllers[type.toLowerCase()]
 	if (!controller) {
-		errorMessage "\nERROR: unknown type '$type'\n${USAGE}"
+		errorMessage "\nUnknown type '$type'\n$USAGE"
 		return
 	}
 
 	printMessage "Copying $type resources"
 
 	String packageName = typeAndPackage[1].trim()
-	if ('grails.plugin.springsecurity.ui'.equals(packageName)) {
-		errorMessage "\nERROR: The controller package cannot be the same as the plugin controller\n"
+	if ('grails.plugin.springsecurity.ui' == packageName) {
+		errorMessage "\nThe controller package cannot be the same as the plugin controller\n"
 		return
 	}
 
-	// copy controller
-	String dir = packageName.replaceAll('\\.', '/')
-	ant.mkdir dir: "$appGrailsApp/controllers/$dir"
+	// generate the controller
+	generateController controller, packageName
 
-	templateAttributes.packageDeclaration = "package $packageName"
-	generateFile "$templateDir/${controller}Controller.groovy.template",
-	             "$appGrailsApp/controllers/$dir/${controller}Controller.groovy"
+	// copy the GSPs
+	String directoryName = GrailsNameUtils.getPropertyName(controller)
+	File gspDirectory = new File(appViewsDir, directoryName)
 
-	// copy GSPs
-	dir = GrailsNameUtils.getPropertyName(controller)
-	ant.mkdir dir: "$appGrailsApp/views/$dir"
-	for (gsp in new File(pluginViewsDir + '/' + dir).listFiles()) {
-		if (gsp.name.toLowerCase().endsWith('.gsp')) {
-			copyFile gsp.path, "$appGrailsApp/views/$dir/${gsp.name}"
+	for (file in new File(pluginViewsDir, directoryName).listFiles()) {
+		if (file.name.toLowerCase().endsWith('.gsp')) {
+			copyFile file, gspDirectory
 		}
 	}
 
 	if ('register'.equalsIgnoreCase(type)) {
-		copyFile "$pluginViewsDir/layouts/register.gsp",
-		         "$appGrailsApp/views/layouts/register.gsp"
+		copyFile new File(pluginLayoutsDir, 'register.gsp'), appLayoutsDir
 	}
+}
+
+copyFile = { File file, File destinationDirectory ->
+
+	destinationDirectory.mkdirs()
+
+	if (okToWrite(new File(destinationDirectory, file.name))) {
+		ant.copy file: file, todir: destinationDirectory, overwrite: true
+	}
+}
+
+generateController = { String controller, String packageName ->
+	String directoryName = packageName.replaceAll('\\.', '/')
+	File destinationDirectory = new File(appGrailsApp, "controllers/$directoryName")
+	destinationDirectory.mkdirs()
+
+	File outputFile = new File(destinationDirectory, controller + 'Controller.groovy')
+	if (!okToWrite(outputFile)) return
+
+	File templateFile = new File(templateDir, controller + 'Controller.groovy.template')
+	if (!templateFile.exists()) {
+		errorMessage "\n$templateFile.path doesn't exist"
+		return
+	}
+
+	outputFile.withWriter { writer ->
+		templateEngine.createTemplate(templateFile.text).make(packageDeclaration: "package $packageName").writeTo writer
+	}
+
+	printMessage "Generated $outputFile.absolutePath"
+}
+
+printMessage = { String message -> event('StatusUpdate', [message]) }
+errorMessage = { String message -> event('StatusError', [message]) }
+
+okToWrite = { File file ->
+
+	if (overwriteAll || !file.exists()) {
+		return true
+	}
+
+	String propertyName = "file.overwrite.$file.name"
+	ant.input(addProperty: propertyName, message: "$file exists, ok to overwrite?",
+	          validargs: 'y,n,a', defaultvalue: 'y')
+
+	if (ant.antProject.properties."$propertyName" == 'n') {
+		return false
+	}
+
+	if (ant.antProject.properties."$propertyName" == 'a') {
+		overwriteAll = true
+	}
+
+	true
 }
 
 private parseArgs() {
@@ -129,60 +176,5 @@ private parseArgs() {
 	errorMessage USAGE
 	null
 }
-
-okToWrite = { String dest ->
-
-	def file = new File(dest)
-	if (overwriteAll || !file.exists()) {
-		return true
-	}
-
-	String propertyName = "file.overwrite.$file.name"
-	ant.input(addProperty: propertyName, message: "$dest exists, ok to overwrite?",
-	          validargs: 'y,n,a', defaultvalue: 'y')
-
-	if (ant.antProject.properties."$propertyName" == 'n') {
-		return false
-	}
-
-	if (ant.antProject.properties."$propertyName" == 'a') {
-		overwriteAll = true
-	}
-
-	true
-}
-
-copyFile = { String from, String to ->
-	if (!okToWrite(to)) {
-		return
-	}
-
-	ant.copy file: from, tofile: to, overwrite: true
-}
-
-generateFile = { String templatePath, String outputPath ->
-	if (!okToWrite(outputPath)) {
-		return
-	}
-
-	File templateFile = new File(templatePath)
-	if (!templateFile.exists()) {
-		errorMessage "\nERROR: $templatePath doesn't exist"
-		return
-	}
-
-	File outFile = new File(outputPath)
-
-	ant.mkdir dir: outFile.parentFile
-
-	outFile.withWriter { writer ->
-		templateEngine.createTemplate(templateFile.text).make(templateAttributes).writeTo(writer)
-	}
-
-	printMessage "generated $outFile.absolutePath"
-}
-
-printMessage = { String message -> event('StatusUpdate', [message]) }
-errorMessage = { String message -> event('StatusError', [message]) }
 
 setDefaultTarget 's2uiOverride'
