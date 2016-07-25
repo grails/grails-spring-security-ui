@@ -6,7 +6,7 @@ import org.openqa.selenium.phantomjs.PhantomJSDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 
 //System.setProperty 'webdriver.chrome.driver', 'c:/dev/chromedriver.exe'
-//System.setProperty 'phantomjs.binary.path', ''
+System.setProperty 'phantomjs.binary.path', '/home/aaron/phantomjs/bin/phantomjs'
 
 //driver = { new ChromeDriver() }
 driver = { new PhantomJSDriver(new DesiredCapabilities()) }

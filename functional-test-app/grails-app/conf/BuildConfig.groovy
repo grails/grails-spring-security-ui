@@ -34,8 +34,8 @@ grails.project.dependency.resolution = {
 		mavenCentral()
 	}
 
-	String gebVersion = '0.12.2'
-	String seleniumVersion = '2.48.2'
+	String gebVersion = '0.13.1'
+	String seleniumVersion = '2.53.1'
 
 	dependencies {
 		runtime 'com.h2database:h2:1.4.190'
@@ -54,7 +54,7 @@ grails.project.dependency.resolution = {
 //		}
 		// TODO switch back to com.github.detro:phantomjsdriver when this
 		// issue is resolved: https://github.com/detro/ghostdriver/issues/397
-		test 'com.codeborne:phantomjsdriver:1.2.1', {
+		test 'com.codeborne:phantomjsdriver:1.3.0', {
 			transitive = false
 		}
 	}
@@ -65,7 +65,7 @@ grails.project.dependency.resolution = {
 		runtime ':hibernate4:4.3.8.1'
 		runtime ':mail:1.0.7'
 
-		compile ':spring-security-ui:1.0-SNAPSHOT'
+		compile ':spring-security-ui:1.0-RC3'
 
 		if (extended) {
 			runtime ':spring-security-acl:2.0.1'
