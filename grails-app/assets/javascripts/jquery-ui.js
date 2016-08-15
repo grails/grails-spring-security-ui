@@ -1,1 +1,1 @@
-//=require jquery-ui/jquery-ui-${grails.plugin.springsecurity.ui.Constants.JQUERY_UI_VERSION}.js
+//=require jquery-ui/jquery-ui-1.10.3.custom.js
