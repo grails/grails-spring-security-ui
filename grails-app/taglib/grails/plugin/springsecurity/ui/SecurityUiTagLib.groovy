@@ -190,7 +190,8 @@ class SecurityUiTagLib {
 		def bean
 		String beanName = attrs.remove('beanName')
 		if (beanName) {
-			bean = pageScope.s2uiBean = pageScope.s2uiBeanType = pageScope[beanName]
+			pageScope.s2uiBeanType = beanName
+			bean = pageScope.s2uiBean = pageScope[beanName]
 			assert bean
 		}
 		else {
