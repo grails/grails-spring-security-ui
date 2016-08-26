@@ -56,7 +56,8 @@ def asciidoctorAttributes = [
 	'source-highlighter' : 'prettify',
 	 toc                 : 'left',
 	 toc2                : '',
-	 toclevels           : '2'
+	 toclevels           : '2',
+	 'imagesdir'		 : 'images',
 ]
 
 import org.asciidoctor.gradle.AsciidoctorTask
@@ -68,6 +69,12 @@ tasks.withType(AsciidoctorTask) {
 	sourceDir = file('src/docs')
 	sources {
 		include 'index.adoc'
+	}
+	resources {
+		from (sourceDir) {
+			include "images/**/*.png"
+		}
+		into './'
 	}
 }
 
@@ -110,3 +117,4 @@ task docs(dependsOn: [asciidoc, asciidocMobi]) << {
 		include '**/*.png'
 	}
 }
+
