@@ -17,6 +17,14 @@ git clone https://${GH_TOKEN}@github.com/grails-plugins/grails-spring-security-u
 
 cd gh-pages
 
+git rm v3/*.png
+mv  ../build/docs/*.png v3
+git add v3/*.png
+
+git rm v3/acls/*.png
+mv  ../build/docs/acls/*.png v3/acls
+git add v3/acls/*.png
+
 git rm v3/spring-security-ui-*.epub
 mv  ../build/docs/spring-security-ui-*.epub v3
 git add v3/spring-security-ui-*.epub
