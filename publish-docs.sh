@@ -22,6 +22,7 @@ mv  ../build/docs/*.png v3
 git add v3/*.png
 
 git rm v3/acls/*.png
+mkdir v3/acls
 mv  ../build/docs/acls/*.png v3/acls
 git add v3/acls/*.png
 
