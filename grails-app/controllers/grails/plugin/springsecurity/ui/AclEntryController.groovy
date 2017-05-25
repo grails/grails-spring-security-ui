@@ -25,6 +25,13 @@ class AclEntryController extends AbstractS2UiDomainController {
 		params.granting = true
 		super.create()
 	}
+	def edit() {
+def aclEntry = findById()
+if (!aclEntry) return
+
+[aclEntry: aclEntry, sids: lookupAclSidClass().list()]
+}
+
 
 	def save() {
 		doSave uiAclStrategy.saveAclEntry(params)
