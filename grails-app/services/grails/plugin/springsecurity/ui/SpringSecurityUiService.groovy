@@ -15,6 +15,7 @@
 package grails.plugin.springsecurity.ui
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.ui.strategy.AclStrategy
@@ -27,7 +28,6 @@ import grails.plugin.springsecurity.ui.strategy.RegistrationCodeStrategy
 import grails.plugin.springsecurity.ui.strategy.RequestmapStrategy
 import grails.plugin.springsecurity.ui.strategy.RoleStrategy
 import grails.plugin.springsecurity.ui.strategy.UserStrategy
-import grails.transaction.Transactional
 import grails.util.GrailsNameUtils
 import groovy.util.logging.Slf4j
 import org.springframework.context.MessageSource
@@ -513,7 +513,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 			log.warn message.toString()
 		}
 
-		rollbackAndDiscard bean
+		rollbackAndDiscard bean, transactionStatus
 	}
 
 	void handleException(Throwable t, bean, Map properties, source, String operation,

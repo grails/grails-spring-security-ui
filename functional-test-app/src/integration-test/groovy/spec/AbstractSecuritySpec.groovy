@@ -3,7 +3,7 @@ package spec
 import geb.driver.CachingDriverFactory
 import geb.spock.GebReportingSpec
 import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import spock.lang.Stepwise
 
 @Integration
@@ -11,6 +11,11 @@ import spock.lang.Stepwise
 abstract class AbstractSecuritySpec extends GebReportingSpec {
 
 	void setup() {
+		if ( hasProperty('serverPort') ) {
+			browser.baseUrl = "http://localhost:${getProperty('serverPort')}/"
+		} else {
+			browser.baseUrl = 'http://localhost:8080/'
+		}
 		logout()
 	}
 
@@ -19,7 +24,8 @@ abstract class AbstractSecuritySpec extends GebReportingSpec {
 	}
 
 	protected void logout() {
-		go SpringSecurityUtils.securityConfig.logout.filterProcessesUrl
+		String url = SpringSecurityUtils.securityConfig.logout.filterProcessesUrl
+		go url
 		browser.clearCookies()
 	}
 

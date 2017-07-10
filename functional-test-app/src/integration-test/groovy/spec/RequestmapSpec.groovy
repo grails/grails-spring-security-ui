@@ -3,7 +3,20 @@ package spec
 import page.requestmap.RequestmapCreatePage
 import page.requestmap.RequestmapEditPage
 import page.requestmap.RequestmapSearchPage
+import spock.lang.IgnoreIf
 
+@IgnoreIf({
+	if (!System.getProperty('geb.env')) {
+		return true
+	}
+	if (System.getProperty('geb.env') == 'phantomjs' && !System.getProperty('phantomjs.binary.path')) {
+		return true
+	}
+	if (System.getProperty('geb.env') == 'chrome' && !System.getProperty('webdriver.chrome.driver')) {
+		return true
+	}
+	false
+})
 class RequestmapSpec extends AbstractSecuritySpec {
 
 	void testFindAll() {

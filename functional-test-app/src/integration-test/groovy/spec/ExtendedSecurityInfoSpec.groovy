@@ -1,5 +1,22 @@
 package spec
 
+import spock.lang.IgnoreIf
+
+@IgnoreIf({
+	if ( System.getProperty('TEST_CONFIG') != 'extended' ) {
+		return true
+	}
+    if (!System.getProperty('geb.env')) {
+        return true
+    }
+	if (System.getProperty('geb.env') == 'phantomjs' && !System.getProperty('phantomjs.binary.path')) {
+		return true
+	}
+	if (System.getProperty('geb.env') == 'chrome' && !System.getProperty('webdriver.chrome.driver')) {
+		return true
+	}
+	false
+})
 class ExtendedSecurityInfoSpec extends AbstractSecuritySpec {
 
 	void testConfig() {
@@ -59,14 +76,14 @@ class ExtendedSecurityInfoSpec extends AbstractSecuritySpec {
 		assertContentContains 'org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter'
 		assertContentContains 'grails.plugin.springsecurity.web.filter.GrailsRememberMeAuthenticationFilter'
 		assertContentContains 'grails.plugin.springsecurity.web.filter.GrailsAnonymousAuthenticationFilter'
-		assertContentContains 'org.springframework.security.web.access.ExceptionTranslationFilter'
+
 		assertContentContains 'org.springframework.security.web.access.intercept.FilterSecurityInterceptor'
 		assertContentContains 'grails.plugin.springsecurity.web.authentication.logout.MutableLogoutFilter'
 		assertContentContains 'grails.plugin.springsecurity.web.authentication.GrailsUsernamePasswordAuthenticationFilter'
 		assertContentContains 'org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter'
 		assertContentContains 'grails.plugin.springsecurity.web.filter.GrailsRememberMeAuthenticationFilter'
 		assertContentContains 'grails.plugin.springsecurity.web.filter.GrailsAnonymousAuthenticationFilter'
-		assertContentContains 'org.springframework.security.web.access.ExceptionTranslationFilter'
+		//assertContentContains 'org.springframework.security.web.access.ExceptionTranslationFilter'
 		assertContentContains 'org.springframework.security.web.access.intercept.FilterSecurityInterceptor'
 		assertContentContains 'org.springframework.security.web.authentication.switchuser.SwitchUserFilter'
 	}

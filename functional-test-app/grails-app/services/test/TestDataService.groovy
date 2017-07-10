@@ -1,11 +1,12 @@
 package test
 
+import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.acl.AclClass
 import grails.plugin.springsecurity.acl.AclEntry
 import grails.plugin.springsecurity.acl.AclObjectIdentity
 import grails.plugin.springsecurity.acl.AclSid
 import grails.plugin.springsecurity.ui.RegistrationCode
-import grails.transaction.Transactional
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -17,6 +18,7 @@ class TestDataService {
 	def aclService
 	def aclUtilService
 	def objectIdentityRetrievalStrategy
+	SpringSecurityService springSecurityService
 
 	void reset() {
 		deleteData()
@@ -28,7 +30,7 @@ class TestDataService {
 		createRequestmaps()
 		createRegistrationCodes()
 
-		if (System.getProperty('testconfig') == 'extended') {
+		if (System.getProperty('TEST_CONFIG') == 'extended') {
 			createPersistentTokens()
 			createAcls()
 		}
@@ -68,6 +70,7 @@ class TestDataService {
 		save new Requestmap('/secure/**', 'ROLE_ADMIN')
 		save new Requestmap('/j_spring_security_switch_user', 'ROLE_RUN_AS,IS_AUTHENTICATED_FULLY')
 		save new Requestmap('/**', 'permitAll')
+		springSecurityService.clearCachedRequestmaps()
 	}
 
 	protected void createUsersAndRoles() {
