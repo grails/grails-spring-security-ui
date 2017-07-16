@@ -23,9 +23,8 @@ apply plugin:"org.grails.grails-gsp"
 repositories {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
+    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
 }
-
-
 
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-logging"
