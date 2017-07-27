@@ -11,7 +11,7 @@ rm -rf build
 
 EXIT_STATUS=0
 # Only publish if the branch is on master, and it is not a PR
-if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
+if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == '3.0.x' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
   echo "Publishing archives for branch $TRAVIS_BRANCH"
   if [[ -n $TRAVIS_TAG ]]; then
       echo "Pushing build to Bintray"
@@ -42,10 +42,10 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
 
   # If there is a tag present then this becomes the latest
   if [[ -n $TRAVIS_TAG ]]; then
-        git rm -rf latest/
-        mkdir -p latest
-        cp -r ../docs/build/docs/. ./latest/
-        git add latest/*
+        # git rm -rf latest/
+        # mkdir -p latest
+        # cp -r ../docs/build/docs/. ./latest/
+        # git add latest/*
 
         version="$TRAVIS_TAG" # eg: v3.0.1
         version=${version:1} # 3.0.1
