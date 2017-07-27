@@ -18,11 +18,13 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.ui.strategy.AclStrategy
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
 import grails.plugin.springsecurity.ui.strategy.QueryStrategy
+import groovy.util.logging.Slf4j
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
+@Slf4j
 abstract class AbstractS2UiDomainController extends AbstractS2UiController {
 
 	static allowedMethods = [save: 'POST', update: 'POST', delete: 'POST']
@@ -119,9 +121,7 @@ abstract class AbstractS2UiDomainController extends AbstractS2UiController {
 	}
 
 	protected doSearch(Closure projection = null, Closure criteria) {
-		if (logger.traceEnabled) {
-			logger.trace 'Search params: ' + params
-		}
+		log.trace 'Search params: {}', params.toString()
 
 		def criterias = [criteria]
 		if (projection) criterias << projection
@@ -146,9 +146,7 @@ abstract class AbstractS2UiDomainController extends AbstractS2UiController {
 			}
 		}
 
-		if (logger.traceEnabled) {
-			logger.trace 'Search: firstResult ' + offset + ' maxResults ' + max + sortBy
-		}
+		log.trace 'Search: firstResult {}  maxResults {} {}', offset as String, max as String, sortBy as String
 
 		uiQueryStrategy.runCriteria(clazz, criterias, [max: max, offset: offset])
 	}
@@ -221,17 +219,13 @@ abstract class AbstractS2UiDomainController extends AbstractS2UiController {
 			propertyName = toPropertyName(paramName)
 		}
 		def value = params[paramName]
-		traceCriterion 'ilike', paramName, propertyName, value
+		log.trace '{}', traceCriterion('ilike', paramName, propertyName, value)
 		if (value) {
 			delegate.ilike propertyName, '%' + value + '%'
 		}
 	}
 
-	protected void traceCriterion(String type, String paramName, String propertyName, value) {
-		if (!logger.traceEnabled) {
-			return
-		}
-
+	protected String traceCriterion(String type, String paramName, String propertyName, value) {
 		def sb = new StringBuilder()
 		if (type == 'ilike') {
 			sb << type
@@ -258,7 +252,7 @@ abstract class AbstractS2UiDomainController extends AbstractS2UiController {
 			sb << value
 		}
 
-		logger.trace sb.toString()
+		sb.toString()
 	}
 
 	protected void renderSearch(Map model, String... queryParamNames) {
