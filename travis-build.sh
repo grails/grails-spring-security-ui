@@ -21,7 +21,15 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == '3.0.x' && $TRAVIS_PULL_REQUEST 
       ./gradlew :spring-security-ui:artifactoryPublish || EXIT_STATUS=$?
   fi
 
+  if [[ $EXIT_STATUS !=0 ]]; then
+    exit $EXIT_STATUS
+  fi
+
   ./gradlew :docs:docs || EXIT_STATUS=$?
+
+  if [[ $EXIT_STATUS !=0 ]]; then
+    exit $EXIT_STATUS
+  fi
 
   git config --global user.name "$GIT_NAME"
   git config --global user.email "$GIT_EMAIL"
@@ -61,8 +69,11 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == '3.0.x' && $TRAVIS_PULL_REQUEST 
         git add "$majorVersion/*"
   fi
 
-  git commit -a -m "Updating docs for Travis build: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
-  git push origin HEAD
+  if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' ]]; then
+      git commit -a -m "Updating docs for Travis build: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
+      git push origin HEAD
+  fi
+
   cd ..
   rm -rf gh-pages
 fi
