@@ -7,9 +7,15 @@ echo "TRAVIS_PULL_REQUEST : $TRAVIS_PULL_REQUEST"
 echo "Publishing archives for branch $TRAVIS_BRANCH"
 rm -rf build
 
-./gradlew -q clean check install --stacktrace
-
 EXIT_STATUS=0
+
+./gradlew -q clean check install --stacktrace || EXIT_STATUS=$?
+
+if (( $EXIT_STATUS > 0))
+then
+  exit $EXIT_STATUS
+fi
+
 # Only publish if the branch is on master, and it is not a PR
 if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == '3.0.x' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
   echo "Publishing archives for branch $TRAVIS_BRANCH"
@@ -21,14 +27,16 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == '3.0.x' && $TRAVIS_PULL_REQUEST 
       ./gradlew :spring-security-ui:artifactoryPublish || EXIT_STATUS=$?
   fi
 
-  if [[ $EXIT_STATUS !=0 ]]; then
-    exit $EXIT_STATUS
+  if (( $EXIT_STATUS > 0))
+  then
+     exit $EXIT_STATUS
   fi
 
   ./gradlew :docs:docs || EXIT_STATUS=$?
 
-  if [[ $EXIT_STATUS !=0 ]]; then
-    exit $EXIT_STATUS
+  if (( $EXIT_STATUS > 0))
+  then
+     exit $EXIT_STATUS
   fi
 
   git config --global user.name "$GIT_NAME"
