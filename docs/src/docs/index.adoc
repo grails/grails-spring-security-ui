@@ -3,6 +3,8 @@ Burt Beckwith
 
 include::introduction.adoc[]
 
+include::installation.adoc[]
+
 include::user.adoc[]
 
 include::role.adoc[]

@@ -32,7 +32,8 @@ def asciidoctorAttributes = [
         'source-highlighter' : 'prettify',
         toc                 : 'left',
         toc2                : '',
-        toclevels           : '2'
+        toclevels           : '2',
+        projectVersion      : project.projectVersion
 ]
 
 

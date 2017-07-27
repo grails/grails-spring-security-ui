@@ -1,0 +1,5 @@
+== Installation
+
+To use this plugin in your project, add the following dependency to the `dependencies` block of your `build.gradle`:
+
+`compile 'org.grails.plugins:spring-security-ui:{projectVersion}'`
