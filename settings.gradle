@@ -1,1 +1,9 @@
-rootProject.name = 'spring-security-ui'
+include 'plugin'
+include 'docs'
+
+include 'examples/simple'
+include 'examples/extended'
+
+rootProject.name = 'grails-spring-security-ui'
+
+findProject(':plugin').name = 'spring-security-ui'

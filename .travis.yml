@@ -5,15 +5,15 @@ cache:
   - "$HOME/.gradle/caches"
   - "$HOME/.gradle/wrapper"
 before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 jdk:
 - oraclejdk8
 install: true
 script: "./travis-build.sh"
 env:
   global:
-  - GIT_NAME="Graeme Rocher"
-  - GIT_EMAIL="graeme.rocher@gmail.com"
-  - secure: GDkuFYVkqkJYjJWT3hzBKuk92/KjgqLVZMCMOpwftLfyDiudGbwpl+za2F8Wgqmram66b2s1sGeA867H27xJBpVEddaME7Yr874WRkUo0wGYTgVstpd0yTqDDJ7YasyMdKAsutbWOpHjSBXTTbtZmodJcFsnrrcecoG5bgOPF18=
-  - secure: ZKEYvwW6qjZKL9YqTSstDJM5QGflppVum/e6TTyPe0x51akhHJdFLOTtBLtVhFEfngK2a9SjpVo0GRaX8L4eGfsN392Y7XN5jziKQArFcQY5oGul5FdGzuH3W02GSVuKKUMdRgw2hwxdfIut+WF/S5SxBlRVMJIi4B/jdbbzdQo=
-  - secure: x3e8N+7Va/mcxsq7syuTkkGrHpLkNwiFRzT+NKZU2QHEmjk1Rg9dZ4iyzxvy55Tu27YXhSxH5zEwq/StJI8vjse6m0rTpdXvoSf87XA4SLJNEj4dONajo3nktPpEMDOQM+aMNMg9dexhfJ51Mdq8PAnvV9CChRUeZT5CN+baTBI=
+  - secure: IcaIl4ovzdqrrqAZj2o1xj7gwpioJdxewM13LRv0z88xLCOxeUeyIL++vepcuqYbxGZNTsEjtzsJrUwO3UkZpYgSaQagqvtFG1n5/rnIo3kTXypsjK9agrAvenI+cmry5lwm8DcPirKape3ndXRDbpViOgdl4kjfGOiqqaIQzms=
+  - secure: JbkNywQe0C6NILsbPvmugM93kjxWnJ+bAm1UVKa+buqKmYdfIUXy5mgjkNp+z+8Q9by+79T+hsvtPyIccM+KCl09lJGr6x6wWfpRIIyVqytMvHhcdYpCAE3+uIHmzIZyWzsvjBpw3JAtSu9dI42DSDCVjrSyWpClB3JEpniLz2g=
+  - secure: 20i/GdaObR4E85CeGkfR1Gwgp5j9Ad3sR64jlem99nXLT2bQQtt+5+H6Z/tEE8zc48K84aPg3+JNJnPN0lEmXtvIETEfe4xz0k+Y9+b7W126HnUgvgjNlLO70UTLpBkgovNaePHEBKM4KtoWTrSlOn31Fn2+9bSLgvxWf7EwjyY=
+  - secure: aVzGU8h0AjBGkr/6iosWLQECnxpqQ197DKWOAyBwY2+qX92W8F0opGsQCQjJ3vVtotV/J5XQkQ/Smm/fBQNs1zBaZtlkXloKo1pe2/c87LD5Oqu4ZY/otrT6K46KB0TY6XLJgbdKsal+yt5+5WkcoD73ksb7lQiKu0Qovd9u7gg=
+  - secure: foqsoPY9e7Y81qVvCPHupLllYXbNwc3WHVUQxqfDK0PCebJ3+GTZsA5D5034wD6rInsGlgktcXQ5V3BlEfXOagNz7ZanzSKoCSFJVCPX9NWaNeCF7KXmsZ/F0hbDf+rQ6HOcpxFGb3TWZ3RPI6QRelJVwV0cB0lwqHSkeD8m0BM=
