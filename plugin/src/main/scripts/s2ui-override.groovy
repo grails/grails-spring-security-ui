@@ -105,10 +105,9 @@ for (resource in resources(directoryName + '/*.gsp')) {
 }
 
 if ('register' == type) {
-	copy 'layouts/register.gsp', layoutsDir
-}
-
-private void copy(pathOrResource, File destinationDirectory) {
-	destinationDirectory.mkdirs()
-	copy resource(pathOrResource), destinationDirectory
+	layoutsDir.mkdirs()
+	render  template('register.gsp.template'),
+			new File(layoutsDir, 'register.gsp'),
+			[:],
+			false
 }
