@@ -29,7 +29,7 @@ class RegisterControllerSpec extends Specification {
 		RegisterController.checkPasswordMaxLength password, command
 		RegisterController.checkPasswordRegex password, command
 
-		'command.password.error.strength' == RegisterController.passwordValidator(password, command)
+		'command.password.error.length' == RegisterController.passwordValidator(password, command)[0]
 	}
 
 	void 'passwordValidator validation fails if the password is too short'() {
@@ -57,7 +57,7 @@ class RegisterControllerSpec extends Specification {
 		!RegisterController.checkPasswordMaxLength(password, command)
 		RegisterController.checkPasswordRegex password, command
 
-		'command.password.error.strength' == RegisterController.passwordValidator(password, command)
+		'command.password.error.length' == RegisterController.passwordValidator(password, command)[0]
 	}
 
 	void 'passwordValidator validation fails if the password is too long'() {
