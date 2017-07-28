@@ -219,6 +219,7 @@ class RegisterSpec extends AbstractSecuritySpec {
 
 		when:
 		go 'user/edit?username=' + un
+		sleep(1000)
 
 		then:
 		assertHtmlContains 'User not found'
