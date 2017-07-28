@@ -18,7 +18,7 @@ apply plugin:"idea"
 apply plugin:"org.grails.grails-plugin"
 apply plugin:"org.grails.grails-plugin-publish"
 apply plugin:"org.grails.grails-gsp"
-apply plugin:"asset-pipeline"
+apply plugin: "com.bertramlabs.asset-pipeline"
 apply plugin: 'com.jfrog.artifactory'
 
 repositories {
@@ -56,3 +56,7 @@ dependencies {
 apply from: "${rootProject.projectDir}/gradle/testVerbose.gradle"
 apply from: "${rootProject.projectDir}/gradle/grailsPublish.gradle"
 apply from: "${rootProject.projectDir}/gradle/artifactoryPublish.gradle"
+
+assets {
+    packagePlugin = true
+}
