@@ -27,6 +27,8 @@ The Spring Security UI plugin provides CRUD screens and other user management wo
 
 === Release History
 
+* July 28, 2017
+** 3.0.2 release
 * July 27, 2017
 ** 3.0.1 release
 * April 15, 2016
