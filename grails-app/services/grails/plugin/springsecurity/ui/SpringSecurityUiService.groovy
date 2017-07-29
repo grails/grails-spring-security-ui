@@ -407,7 +407,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 
 			try {
 				if (instance.metaClass.getMetaProperty(propertyName)?.getter) {
-					value = value[propertyName]
+					value = value."${propertyName}"
 					if (value == null) return
 				}
 				else {
