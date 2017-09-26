@@ -425,14 +425,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Spring Security UI Plugin - Reference Documentation</h1>
 <div class="details">
 <span id="author" class="author">Burt Beckwith</span><br>
-<span id="revnumber">version 3.1.0.BUILD-SNAPSHOT</span>
+<span id="revnumber">version unspecified</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#introduction">1. Introduction to the Spring Security UI Plugin</a>
 <ul class="sectlevel2">
-<li><a href="#release-history">1.1. Release History</a></li>
+<li><a href="#installation">1.1. Installation</a></li>
+<li><a href="#release-history">1.2. Release History</a></li>
 </ul>
 </li>
 <li><a href="#user">2. User Management</a>
@@ -527,6 +528,20 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="paragraph">
 <p>The Spring Security UI plugin provides CRUD screens and other user management workflows. Non-default functionality is available only if the feature is available; this includes the ACL controllers and views which are enabled if the <a href="http://grails.org/plugin/spring-security-acl">ACL plugin</a> is installed, Requestmaps support which is available if <code>grails.plugin.springsecurity.securityConfigType</code> is set to <code>"Requestmap"</code> or <code>SecurityConfigType.Requestmap</code> in <code>application.groovy</code>, and persistent cookies support which is enabled if it has been configured with the <code>s2-create-persistent-token</code> script.</p>
 </div>
+<div class="sect2">
+<h3 id="installation">1.1. Installation</h3>
+<div class="paragraph">
+<p>Add an entry in the <code>dependencies</code> block of your <code>build.gradle</code> file, changing the version as needed:</p>
+</div>
+<div class="listingblock">
+<div class="title"><code>build.gradle</code></div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">dependencies {
+   ...
+   compile 'org.grails.plugins:spring-security-ui:3.1.0'
+   ...</code></pre>
+</div>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -534,35 +549,61 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<div class="paragraph">
-<p>To support both Grails 3.0.x and 3.1.x applications, the plugin depends on version 5.0.x of the hibernate4 plugin and the grails-data-mapping libraries. Because of the way that dependency resolution works across Grails versions, you must add explicit dependencies for the hibernate4 plugin and the GORM libraries to ensure that everything is in sync. As of this writing the current release version of the hibernate4 plugin is '5.0.4' and '5.0.4.RELEASE' for the grails-data-mapping libraries. In addition to adding a dependency for this plugin, add these to the <code>dependencies</code> block of your <code>build.gradle</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">compile 'org.grails.plugins:hibernate4:5.0.4'
-
-compile 'org.grails:grails-datastore-core:5.0.4.RELEASE'
-compile 'org.grails:grails-datastore-gorm-support:5.0.4.RELEASE'
-compile 'org.grails:grails-datastore-gorm:5.0.4.RELEASE'
-compile 'org.grails:grails-datastore-simple:5.0.4.RELEASE'
-compile 'org.grails:grails-datastore-gorm-hibernate4:5.0.4.RELEASE'
-compile 'org.grails:grails-datastore-gorm-hibernate-core:5.0.4.RELEASE'</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If you use MongoDB or another NoSQL datastore other than Hibernate, retain the supporting dependencies but update the datastore-specific dependencies as necessary.</p>
-</div>
-<div class="paragraph">
-<p>Also be sure to update the versions when new releases are available.</p>
-</div>
+Version 3.1.0 is only compatible with Grails 3.3.x or higher.
 </td>
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<p>For previous Grails 3 versions ( 3.0.x, 3.1.x and 3.2.x ) use:</p>
+</div>
+<div class="listingblock">
+<div class="title"><code>build.gradle</code></div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">dependencies {
+   ...
+   compile 'org.grails.plugins:spring-security-ui:3.0.2'
+   ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Also be sure to update the versions when new releases are available.</p>
+</div>
+</div>
 <div class="sect2">
-<h3 id="release-history">1.1. Release History</h3>
+<h3 id="release-history">1.2. Release History</h3>
 <div class="ulist">
 <ul>
+<li>
+<p>Sep 26, 2017</p>
+<div class="ulist">
+<ul>
+<li>
+<p>3.1.0 release</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Jul 28, 2017</p>
+<div class="ulist">
+<ul>
+<li>
+<p>3.0.2 release</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Jul 27, 2017</p>
+<div class="ulist">
+<ul>
+<li>
+<p>3.0.1 release</p>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>April 15, 2016</p>
 <div class="ulist">
@@ -2179,8 +2220,8 @@ beans = {
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 3.1.0.BUILD-SNAPSHOT<br>
-Last updated 2017-07-29 15:41:08 UTC
+Version unspecified<br>
+Last updated 2017-09-26 09:57:05 +02:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
