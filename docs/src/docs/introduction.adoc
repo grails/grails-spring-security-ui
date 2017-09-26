@@ -3,28 +3,39 @@
 
 The Spring Security UI plugin provides CRUD screens and other user management workflows. Non-default functionality is available only if the feature is available; this includes the ACL controllers and views which are enabled if the http://grails.org/plugin/spring-security-acl[ACL plugin] is installed, Requestmaps support which is available if `grails.plugin.springsecurity.securityConfigType` is set to `"Requestmap"` or `SecurityConfigType.Requestmap` in `application.groovy`, and persistent cookies support which is enabled if it has been configured with the `s2-create-persistent-token` script.
 
-[NOTE]
-====
-To support both Grails 3.0.x and 3.1.x applications, the plugin depends on version 5.0.x of the hibernate4 plugin and the grails-data-mapping libraries. Because of the way that dependency resolution works across Grails versions, you must add explicit dependencies for the hibernate4 plugin and the GORM libraries to ensure that everything is in sync. As of this writing the current release version of the hibernate4 plugin is '5.0.4' and '5.0.4.RELEASE' for the grails-data-mapping libraries. In addition to adding a dependency for this plugin, add these to the `dependencies` block of your `build.gradle`:
+
+=== Installation
+
+Add an entry in the `dependencies` block of your `build.gradle` file, changing the version as needed:
 
 [source,groovy]
+[subs="attributes"]
+.`build.gradle`
 ----
-compile 'org.grails.plugins:hibernate4:5.0.4'
-
-compile 'org.grails:grails-datastore-core:5.0.4.RELEASE'
-compile 'org.grails:grails-datastore-gorm-support:5.0.4.RELEASE'
-compile 'org.grails:grails-datastore-gorm:5.0.4.RELEASE'
-compile 'org.grails:grails-datastore-simple:5.0.4.RELEASE'
-compile 'org.grails:grails-datastore-gorm-hibernate4:5.0.4.RELEASE'
-compile 'org.grails:grails-datastore-gorm-hibernate-core:5.0.4.RELEASE'
+dependencies {
+   ...
+   compile 'org.grails.plugins:spring-security-ui:{projectVersion}'
+   ...
 ----
 
-If you use MongoDB or another NoSQL datastore other than Hibernate, retain the supporting dependencies but update the datastore-specific dependencies as necessary.
+NOTE: Version 3.1.0 is only compatible with Grails 3.3.x or higher.
+
+For previous Grails 3 versions ( 3.0.x, 3.1.x and 3.2.x ) use:
+
+[source,groovy]
+[subs="attributes"]
+.`build.gradle`
+----
+dependencies {
+   ...
+   compile 'org.grails.plugins:spring-security-ui:3.0.2'
+   ...
+----
 
 Also be sure to update the versions when new releases are available.
-====
 
 === Release History
+
 * Sep 26, 2017
 ** 3.1.0 release
 * Jul 28, 2017
