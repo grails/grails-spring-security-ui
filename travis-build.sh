@@ -7,22 +7,46 @@ echo "TRAVIS_PULL_REQUEST : $TRAVIS_PULL_REQUEST"
 echo "Publishing archives for branch $TRAVIS_BRANCH"
 rm -rf build
 
-./gradlew -q clean check install --stacktrace
-#./run-all-tests.sh
-
 EXIT_STATUS=0
+
+./gradlew -q clean
+./gradlew -q check || EXIT_STATUS=$?
+
+if [[ $EXIT_STATUS -ne 0 ]]; then
+    echo "Check failed"
+    exit $EXIT_STATUS
+fi
+
+./gradlew install --stacktrace || EXIT_STATUS=$?
+if [[ $EXIT_STATUS -ne 0 ]]; then
+    echo "Check failed"
+    exit $EXIT_STATUS
+fi
+
 # Only publish if the branch is on master, and it is not a PR
 if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
   echo "Publishing archives for branch $TRAVIS_BRANCH"
   if [[ -n $TRAVIS_TAG ]]; then
       echo "Pushing build to Bintray"
-      ./gradlew bintrayUpload || EXIT_STATUS=$?
+      ./gradlew :spring-security-ui:bintrayUpload || EXIT_STATUS=$?
+      if [[ $EXIT_STATUS -ne 0 ]]; then
+        echo "Publishing to Bintray Failed"
+        exit $EXIT_STATUS
+      fi
   else
       echo "Publishing snapshot to OJO"
-      ./gradlew artifactoryPublish || EXIT_STATUS=$?
+      ./gradlew :spring-security-ui:artifactoryPublish || EXIT_STATUS=$?
+      if [[ $EXIT_STATUS -ne 0 ]]; then
+        echo "Publishing to OJO Failed"
+        exit $EXIT_STATUS
+      fi
   fi
 
-  ./gradlew docs || EXIT_STATUS=$?
+  ./gradlew :docs:docs || EXIT_STATUS=$?
+  if [[ $EXIT_STATUS -ne 0 ]]; then
+    echo "Generating docs failed"
+    exit $EXIT_STATUS
+  fi
 
   git config --global user.name "$GIT_NAME"
   git config --global user.email "$GIT_EMAIL"
@@ -36,17 +60,17 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
   if [[ $TRAVIS_BRANCH == 'master' ]]; then
 
     mkdir -p snapshot
-    cp -r ../build/docs/. ./snapshot/
+    cp -r ../docs/build/docs/. ./snapshot/
     git add snapshot/*
 
   fi
 
   # If there is a tag present then this becomes the latest
   if [[ -n $TRAVIS_TAG ]]; then
-        git rm -rf latest/
-        mkdir -p latest
-        cp -r ../build/docs/. ./latest/
-        git add latest/*
+         git rm -rf latest/
+         mkdir -p latest
+         cp -r ../docs/build/docs/. ./latest/
+         git add latest/*
 
         version="$TRAVIS_TAG" # eg: v3.0.1
         version=${version:1} # 3.0.1
@@ -54,18 +78,21 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
         majorVersion="${majorVersion}x" # 3.0.x
 
         mkdir -p "$version"
-        cp -r ../build/docs/. "./$version/"
+        cp -r ../docs/build/docs/. "./$version/"
         git add "$version/*"
 
         git rm -rf "$majorVersion"
-        cp -r ../build/docs/. "./$majorVersion/"
+        cp -r ../docs/build/docs/. "./$majorVersion/"
         git add "$majorVersion/*"
   fi
 
-  git commit -a -m "Updating docs for Travis build: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
-  git push origin HEAD
+  if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' ]]; then
+      git commit -a -m "Updating docs for Travis build: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
+      git push origin HEAD
+  fi
+
   cd ..
   rm -rf gh-pages
 fi
 
-exit $EXIT_STATUS
+exit 0
