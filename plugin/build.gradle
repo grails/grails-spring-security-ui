@@ -61,3 +61,46 @@ apply from: "${rootProject.projectDir}/gradle/testVerbose.gradle"
 assets {
     packagePlugin = true
 }
+
+task copyGspIntoTemplates {
+    ext.inputFolders = ['aclClass',
+                            'aclEntry',
+                            'aclObjectIdentity',
+                            'aclSid',
+                            'includes',
+                            'layouts',
+                            'login',
+                            'persistentLogin',
+                            'register',
+                            'registrationCode',
+                            'requestmap',
+                            'role',
+                            'securityInfo',
+                            'user']
+    doLast {
+        mkdir "${project.projectDir}/src/main/templates/views"
+        for ( String folder : inputFolders ) {
+            mkdir "${project.projectDir}/src/main/templates/views/${folder}"
+        }
+        for ( int i = 0; i < inputFolders.size(); i++ ) {
+            copy {
+                from(fileTree("${project.projectDir}/grails-app/views/${inputFolders[i]}")) {
+                    include '*.gsp'
+                }
+                into "${project.projectDir}/src/main/templates/views/${inputFolders[i]}"
+            }
+        }
+    }
+}
+
+task removeGspFromTemplates {
+    doLast {
+        for ( String folder : copyGspIntoTemplates.inputFolders ) {
+            delete "${project.projectDir}/src/main/templates/views/${folder}"
+        }
+        delete "${project.projectDir}/src/main/templates/views"
+    }
+
+}
+
+compileAstJava.dependsOn copyGspIntoTemplates
