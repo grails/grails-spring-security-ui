@@ -16,8 +16,6 @@ package grails.plugin.springsecurity.ui
 
 import grails.core.GrailsApplication
 import grails.plugin.springsecurity.SpringSecurityUtils
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -31,8 +29,6 @@ abstract class AbstractS2UiController implements InitializingBean {
 	// needed for afterPropertiesSet since accessing the Trait's
 	// grailsApplication looks for a current thread-bound request
 	private @Autowired GrailsApplication application
-
-	protected final Logger logger = LoggerFactory.getLogger(getClass())
 
 	protected findUserByUsername(String username) {
 		if (username) {
