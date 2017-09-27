@@ -47,28 +47,17 @@ dependencies {
     provided "org.grails:grails-plugin-services"
     provided "org.grails:grails-plugin-domain-class"
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:$assetPipelineVersion"
+    compile "org.grails.plugins:spring-security-core:$springSecurityCoreVersion"
     testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-plugin-testing"
-
     testCompile "org.grails:grails-web-testing-support"
-    compile "org.grails.plugins:spring-security-core:$springSecurityCoreVersion"
-}
 
-bootRun {
-    jvmArgs('-Dspring.output.ansi.enabled=always')
-    addResources = true
 }
-// enable if you wish to package this plugin as a standalone application
-bootRepackage.enabled = false
 
 apply from: "${rootProject.projectDir}/gradle/grailsPublish.gradle"
 apply from: "${rootProject.projectDir}/gradle/artifactoryPublish.gradle"
+apply from: "${rootProject.projectDir}/gradle/testVerbose.gradle"
 
 assets {
     packagePlugin = true
 }
-
-test {
-    systemProperties System.properties
-}
-apply from: "${rootProject.projectDir}/gradle/testVerbose.gradle"
