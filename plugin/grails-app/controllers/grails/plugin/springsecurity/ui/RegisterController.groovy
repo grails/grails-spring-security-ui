@@ -218,13 +218,14 @@ class RegisterController extends AbstractS2UiController {
 	}
 
 	static final passwordValidator = { String password, command ->
-		if (command.username && command.username == password) {
+		if (command.username && command.username.equals(password)) {
 			return 'command.password.error.username'
 		}
 
-		if (!checkPasswordMinLength(password, command) ||
-		    !checkPasswordMaxLength(password, command) ||
-		    !checkPasswordRegex(password, command)) {
+		if (!checkPasswordMinLength(password, command) || !checkPasswordMaxLength(password, command)) {
+			return ['command.password.error.length', passwordMinLength, passwordMaxLength]
+		}
+		if (!checkPasswordRegex(password, command)) {
 			return 'command.password.error.strength'
 		}
 	}

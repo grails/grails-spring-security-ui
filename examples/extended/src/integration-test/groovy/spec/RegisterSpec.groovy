@@ -45,8 +45,8 @@ class RegisterSpec extends AbstractSecuritySpec {
 		when:
 		username = 'admin'
 		email = 'foo'
-		$('#password') << 'abc'
-		$('#password2') << 'def'
+		$('#password') << 'abcdefghijk'
+		$('#password2') << 'mnopqrstuwzy'
 		submit()
 
 		then:
@@ -168,8 +168,8 @@ class RegisterSpec extends AbstractSecuritySpec {
 
 		when:
 		go 'register/resetPassword?t=' + code
-		$('#password') << 'abc'
-		$('#password2') << 'def'
+		$('#password') << 'abcdefghijk'
+		$('#password2') << 'mnopqrstuwzy'
 		submit()
 
 		then:
