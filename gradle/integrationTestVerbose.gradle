@@ -1,4 +1,4 @@
-integrationTest {
+tasks.withType(Test) {
     afterTest { desc, result ->
         logger.quiet " -- Executed test ${desc.name} [${desc.className}] with result: ${result.resultType}"
     }
