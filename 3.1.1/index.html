@@ -538,7 +538,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">dependencies {
    ...
-   compile 'org.grails.plugins:spring-security-ui:3.1.0'
+   compile 'org.grails.plugins:spring-security-ui:3.1.1'
    ...</code></pre>
 </div>
 </div>
@@ -1554,11 +1554,30 @@ grails.plugin.springsecurity.ui.forgotPassword.emailSubject = '...'</code></pre>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>grails s2ui-override &lt;type&gt; &lt;controller-package&gt;</pre>
+<pre>grails s2ui-override &lt;type&gt; [&lt;controller-package&gt;]</pre>
 </div>
 </div>
 <div class="paragraph">
 <p>The script will copy an empty controller that extends the corresponding plugin controller into your application so you can override individual actions and methods as needed. It also copies the controller&#8217;s GSPs. The exceptions are 'auth' and 'layout' which only copy GSPs.</p>
+</div>
+<div class="paragraph">
+<p>For <code>auth</code> and <code>layout</code>, you do not supply a package name.</p>
+</div>
+<div class="paragraph">
+<p>For example:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>grails s2ui-override auth</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For the other types <code>aclclass</code>, <code>aclentry</code>, <code>aclobjectidentity</code>, <code>aclsid</code>, <code>persistentlogin</code>,<code>register</code>, <code>registrationcode</code>, <code>requestmap</code>, <code>role</code>, <code>securityinfo</code>, <code>user</code>, you supply a package name as command parameter. That it is to say:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>grails s2ui-override persistentlogin com.company.myapp</pre>
+</div>
 </div>
 <div class="paragraph">
 <p>The files copied for each type are summarized here:</p>
@@ -2221,7 +2240,7 @@ beans = {
 <div id="footer">
 <div id="footer-text">
 Version unspecified<br>
-Last updated 2017-09-26 09:57:05 +02:00
+Last updated 2017-09-27 13:23:12 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
