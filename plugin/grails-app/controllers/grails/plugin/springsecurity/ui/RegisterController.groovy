@@ -209,7 +209,7 @@ class RegisterController extends AbstractS2UiController {
 		registerEmailFrom = conf.ui.register.emailFrom ?: ''
 		registerEmailSubject = conf.ui.register.emailSubject ?: ''
 		registerPostRegisterUrl = conf.ui.register.postRegisterUrl ?: ''
-		registerPostResetUrl = conf.ui.register.postResetUrl ?: ''
+		registerPostResetUrl = conf.ui.forgotPassword.postResetUrl ?: ''
 		successHandlerDefaultTargetUrl = conf.successHandler.defaultTargetUrl ?: '/'
 
 		passwordMaxLength = conf.ui.password.maxLength instanceof Number ? conf.ui.password.maxLength : 64
