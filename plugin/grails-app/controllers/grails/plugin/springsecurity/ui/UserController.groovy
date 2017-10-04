@@ -86,17 +86,12 @@ class UserController extends AbstractS2UiDomainController {
 		if (!userRoleNames) {
 			return [:]
 		}
-		Map granted = [:]
-		Map notGranted = [:]
+		Map roleMap = [:]
 		for (role in sortedRoles()) {
 			String authority = role[authorityNameField]
-			if (userRoleNames.contains(authority)) {
-				granted[(role)] = userRoleNames.contains(authority)
-			} else {
-				notGranted[(role)] = userRoleNames.contains(authority)
-			}
+			roleMap[(role)] = userRoleNames.contains(authority)
 		}
-		return granted + notGranted
+		return roleMap
 	}
 
 	protected List sortedRoles() {
