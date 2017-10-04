@@ -77,19 +77,26 @@ class UserController extends AbstractS2UiDomainController {
 	protected Map buildUserModel(user) {
 
 		Set userRoleNames = user[authoritiesPropertyName].collect { it[authorityNameField] }
-		def granted = [:]
-		def notGranted = [:]
+		Map roleMap = buildRoleMap(userRoleNames)
+
+		[roleMap: roleMap, tabData: tabData, user: user]
+	}
+
+	protected Map buildRoleMap(Set userRoleNames) {
+		if (!userRoleNames) {
+			return [:]
+		}
+		Map granted = [:]
+		Map notGranted = [:]
 		for (role in sortedRoles()) {
 			String authority = role[authorityNameField]
 			if (userRoleNames.contains(authority)) {
 				granted[(role)] = userRoleNames.contains(authority)
-			}
-			else {
+			} else {
 				notGranted[(role)] = userRoleNames.contains(authority)
 			}
 		}
-
-		[roleMap: granted + notGranted, tabData: tabData, user: user]
+		return granted + notGranted
 	}
 
 	protected List sortedRoles() {
