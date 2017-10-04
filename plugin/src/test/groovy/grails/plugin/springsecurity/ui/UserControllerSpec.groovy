@@ -28,6 +28,7 @@ class UserControllerSpec extends Specification implements ControllerUnitTest<Use
 
         then: "the user is only granted access to roles with which they are associated"
         results == expectedResults
+        results instanceof LinkedHashMap
 
         where:
         rolesAssignedToUser                                | expectedResults
