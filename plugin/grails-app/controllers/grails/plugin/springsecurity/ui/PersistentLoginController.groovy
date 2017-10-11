@@ -14,6 +14,7 @@
  */
 package grails.plugin.springsecurity.ui
 
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ui.strategy.PersistentLoginStrategy
 
 /**
@@ -29,14 +30,29 @@ class PersistentLoginController extends AbstractS2UiDomainController {
 	}
 
 	def update() {
-		doUpdate { persistentLogin ->
-			uiPersistentLoginStrategy.updatePersistentLogin params, persistentLogin
+		withForm {
+			doUpdate { persistentLogin ->
+				uiPersistentLoginStrategy.updatePersistentLogin params, persistentLogin
+			}
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.username])}"
+			redirectToSearch()
+			return
 		}
 	}
 
 	def delete() {
-		tryDelete { persistentLogin ->
-			uiPersistentLoginStrategy.deletePersistentLogin persistentLogin
+		withForm {
+			tryDelete { persistentLogin ->
+				uiPersistentLoginStrategy.deletePersistentLogin persistentLogin
+			}
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.username])}"
+			redirectToSearch()
 		}
 	}
 
