@@ -14,6 +14,7 @@
  */
 package grails.plugin.springsecurity.ui
 
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ui.strategy.UserStrategy
 
 /**
@@ -33,9 +34,9 @@ class UserController extends AbstractS2UiDomainController {
 			doSave uiUserStrategy.saveUser(params, roleNamesFromParams(), params.password)
 		}.invalidToken {
 			response.status = 500
-			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
-			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.className])}"
-			redirect action: create
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.username])}"
+			redirect(action: "create")
 			return
 		}
 	}
@@ -45,14 +46,29 @@ class UserController extends AbstractS2UiDomainController {
 	}
 
 	def update() {
-		doUpdate { user ->
-			uiUserStrategy.updateUser params, user, roleNamesFromParams()
+		withForm {
+			doUpdate { user ->
+				uiUserStrategy.updateUser params, user, roleNamesFromParams()
+			}
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.username])}"
+			redirectToSearch()
+			return
 		}
 	}
 
 	def delete() {
-		tryDelete { user ->
-			uiUserStrategy.deleteUser user
+		withForm{
+			tryDelete { user ->
+				uiUserStrategy.deleteUser user
+			}
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.username])}"
+			redirectToSearch()
 		}
 	}
 

@@ -11,7 +11,7 @@
 </head>
 <body>
 <h3><g:message code='default.edit.label' args='[entityName]'/></h3>
-<s2ui:form type='update' beanName='user' focus='username' class='button-style'>
+<s2ui:form type='update' beanName='user' focus='username' class='button-style' useToken='true'>
 	<s2ui:tabs elementId='tabs' height='375' data='${tabData}'>
 		<s2ui:tab name='userinfo' height='275'>
 			<table>
