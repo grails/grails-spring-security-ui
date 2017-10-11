@@ -5,7 +5,7 @@
 </head>
 <body>
 <h3><g:message code='default.edit.label' args='[entityName]'/></h3>
-<s2ui:form type='update' beanName='role'>
+<s2ui:form type='update' beanName='role' useToken="true">
 	<s2ui:tabs elementId='tabs' height='150' data='${tabData}'>
 		<s2ui:tab name='roleinfo' height='150'>
 			<table>

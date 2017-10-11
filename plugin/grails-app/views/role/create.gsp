@@ -6,7 +6,7 @@
 <body>
 <div class="body">
 	<s2ui:formContainer type='save' beanType='role' focus='authority' height='300'>
-		<s2ui:form>
+		<s2ui:form useToken="true">
 			<div class="dialog">
 				<br/>
 				<table>
