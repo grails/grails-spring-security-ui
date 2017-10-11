@@ -5,7 +5,7 @@
 </head>
 <body>
 <h3><g:message code='default.create.label' args='[entityName]'/></h3>
-<s2ui:form type='save' beanName='user' focus='username'>
+<s2ui:form type='save' beanName='user' focus='username' useToken='true'>
 	<s2ui:tabs elementId='tabs' height='375' data='${tabData}'>
 		<s2ui:tab name='userinfo' height='280'>
 			<table>

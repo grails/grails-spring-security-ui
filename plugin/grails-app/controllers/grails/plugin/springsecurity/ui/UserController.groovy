@@ -29,7 +29,15 @@ class UserController extends AbstractS2UiDomainController {
 	}
 
 	def save() {
-		doSave uiUserStrategy.saveUser(params, roleNamesFromParams(), params.password)
+		withForm {
+			doSave uiUserStrategy.saveUser(params, roleNamesFromParams(), params.password)
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${springSecurityService.currentUser.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.className])}"
+			redirect action: create
+			return
+		}
 	}
 
 	def edit() {
