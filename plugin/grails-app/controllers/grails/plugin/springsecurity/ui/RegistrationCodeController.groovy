@@ -14,6 +14,7 @@
  */
 package grails.plugin.springsecurity.ui
 
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ui.strategy.RegistrationCodeStrategy
 
 /**
@@ -29,14 +30,29 @@ class RegistrationCodeController extends AbstractS2UiDomainController {
 	}
 
 	def update() {
-		doUpdate { registrationCode ->
-			uiRegistrationCodeStrategy.updateRegistrationCode params, registrationCode
+		withForm {
+			doUpdate { registrationCode ->
+				uiRegistrationCodeStrategy.updateRegistrationCode params, registrationCode
+			}
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.username])}"
+			redirectToSearch()
+			return
 		}
 	}
 
 	def delete() {
-		tryDelete { registrationCode ->
-			uiRegistrationCodeStrategy.deleteRegistrationCode registrationCode
+		withForm {
+			tryDelete { registrationCode ->
+				uiRegistrationCodeStrategy.deleteRegistrationCode registrationCode
+			}
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.username])}"
+			redirectToSearch()
 		}
 	}
 
