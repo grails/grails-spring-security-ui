@@ -14,6 +14,8 @@
  */
 package grails.plugin.springsecurity.ui
 
+import grails.plugin.springsecurity.SpringSecurityUtils
+
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
@@ -24,7 +26,15 @@ class AclSidController extends AbstractS2UiDomainController {
 	}
 
 	def save() {
-		doSave uiAclStrategy.saveAclSid(params)
+		withForm {
+			doSave uiAclStrategy.saveAclSid(params)
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.username])}"
+			redirect(action: "create")
+			return
+		}
 	}
 
 	def edit() {
@@ -32,14 +42,29 @@ class AclSidController extends AbstractS2UiDomainController {
 	}
 
 	def update() {
-		doUpdate { aclSid ->
-			uiAclStrategy.updateAclSid params, aclSid
+		withForm {
+			doUpdate { aclSid ->
+				uiAclStrategy.updateAclSid params, aclSid
+			}
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.username])}"
+			redirectToSearch()
+			return
 		}
 	}
 
 	def delete() {
-		tryDelete { aclSid ->
-			uiAclStrategy.deleteAclSid aclSid
+		withForm {
+			tryDelete { aclSid ->
+				uiAclStrategy.deleteAclSid aclSid
+			}
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.username])}"
+			redirectToSearch()
 		}
 	}
 
