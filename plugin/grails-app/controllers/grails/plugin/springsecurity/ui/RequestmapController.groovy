@@ -35,10 +35,11 @@ class RequestmapController extends AbstractS2UiDomainController {
 
 	def save() {
 		withForm {
-			if (!(param('url'))) params.remove('url') {
-				doSave(uiRequestmapStrategy.saveRequestmap(params)) {
-					springSecurityService.clearCachedRequestmaps()
-				}
+			if (!(param('url'))) {
+				params.remove('url')
+			}
+			doSave(uiRequestmapStrategy.saveRequestmap(params)) {
+				springSecurityService.clearCachedRequestmaps()
 			}
 		}.invalidToken {
 			response.status = 500
@@ -55,10 +56,11 @@ class RequestmapController extends AbstractS2UiDomainController {
 
 	def update() {
 		withForm {
-			if (!(param('url'))) params.remove('url') {
-				doUpdate { requestmap ->
-					uiRequestmapStrategy.updateRequestmap params, requestmap
-				}
+			if (!(param('url'))) {
+				params.remove('url')
+			}
+			doUpdate { requestmap ->
+				uiRequestmapStrategy.updateRequestmap params, requestmap
 			}
 		}.invalidToken {
 			response.status = 500
