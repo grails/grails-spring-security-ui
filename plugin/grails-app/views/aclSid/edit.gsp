@@ -32,7 +32,7 @@
 			</div>
 		</s2ui:form>
 	</s2ui:formContainer>
-	<g:if test='${aclSid}'><s2ui:deleteButtonForm instanceId='${aclSid.id}'/></g:if>
+	<g:if test='${aclSid}'><s2ui:deleteButtonForm instanceId='${aclSid.id}' useToken="true"/></g:if>
 </div>
 </body>
 </html>

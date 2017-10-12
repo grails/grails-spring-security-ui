@@ -28,7 +28,7 @@
 			</div>
 		</s2ui:form>
 	</s2ui:formContainer>
-	<g:if test='${registrationCode}'><s2ui:deleteButtonForm instanceId='${registrationCode.id}'/></g:if>
+	<g:if test='${registrationCode}'><s2ui:deleteButtonForm instanceId='${registrationCode.id}' useToken="true"/></g:if>
 </div>
 <s2ui:ajaxSearch paramName='username'/>
 </body>

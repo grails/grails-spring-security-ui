@@ -130,16 +130,22 @@ class SecurityUiTagLib {
 
 	/**
 	 * @attr instanceId REQUIRED the id of the domain class instance
+	 * @attr useToken OPTIONAL
 	 */
 	def deleteButtonForm = { attrs ->
 		attrs = [:] + attrs
+		boolean useToken = extractFormUseToken(attrs)
 
 		def id = getRequiredAttribute(attrs, 'instanceId', 'deleteButton')
 
 		attrs.action = 'delete'
 
 		out << """
-			<form action="${createLink(attrs)}" method="post" name="deleteForm" id="deleteForm">
+			<form action="${createLink(attrs)}" method="post" name="deleteForm" id="deleteForm">"""
+
+		writeTokenFields(useToken)
+
+		out << """
 				<input type="hidden" name="id" value="$id" />
 			</form>
 			<div id="deleteConfirmDialog" title="${message(code:'default.button.delete.confirm.message')}"></div>"""
@@ -193,12 +199,7 @@ class SecurityUiTagLib {
 		out << """
 			<form action="$link"$cssClass method="post" name="$name" id="$name"$autocomplete>"""
 
-		if (useToken) {
-			def tokensHolder = SynchronizerTokensHolder.store(session)
-			out << """
-					${hiddenField(name: SynchronizerTokensHolder.TOKEN_KEY, value: tokensHolder.generateToken(request.forwardURI))}
-					${hiddenField(name: SynchronizerTokensHolder.TOKEN_URI, value: request.forwardURI)}"""
-		}
+		writeTokenFields(useToken)
 
 		if (type == 'update') {
 			out << """
@@ -220,6 +221,15 @@ class SecurityUiTagLib {
 		pageScope.s2uiBeanType = null
 		pageScope.s2uiFormName = null
 		pageScope.s2uiFormType = null
+	}
+
+	protected void writeTokenFields(boolean useToken) {
+		if (useToken) {
+			def tokensHolder = SynchronizerTokensHolder.store(session)
+			out << """
+					${hiddenField(name: SynchronizerTokensHolder.TOKEN_KEY, value: tokensHolder.generateToken(request.forwardURI))}
+					${hiddenField(name: SynchronizerTokensHolder.TOKEN_URI, value: request.forwardURI)}"""
+		}
 	}
 
 	protected boolean extractFormUseToken(Map attrs) {

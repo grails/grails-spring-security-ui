@@ -26,6 +26,6 @@
 		<g:if test='${role}'><s2ui:deleteButton/></g:if>
 	</div>
 </s2ui:form>
-<g:if test='${role}'><s2ui:deleteButtonForm instanceId='${role.id}'/></g:if>
+<g:if test='${role}'><s2ui:deleteButtonForm instanceId='${role.id}' useToken="true"/></g:if>
 </body>
 </html>

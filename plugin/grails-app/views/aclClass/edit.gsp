@@ -27,7 +27,7 @@
 			</div>
 		</s2ui:form>
 	</s2ui:formContainer>
-	<g:if test='${aclClass}'><s2ui:deleteButtonForm instanceId='${aclClass.id}'/></g:if>
+	<g:if test='${aclClass}'><s2ui:deleteButtonForm instanceId='${aclClass.id}' useToken="true"/></g:if>
 </div>
 </body>
 </html>

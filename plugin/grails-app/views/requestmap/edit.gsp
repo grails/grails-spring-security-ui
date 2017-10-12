@@ -29,7 +29,7 @@
 		</s2ui:form>
 	</s2ui:formContainer>
 	<g:if test='${requestmap}'>
-		<s2ui:deleteButtonForm instanceId='${requestmap.id}'/>
+		<s2ui:deleteButtonForm instanceId='${requestmap.id}' useToken="true"/>
 	</g:if>
 </div>
 </body>

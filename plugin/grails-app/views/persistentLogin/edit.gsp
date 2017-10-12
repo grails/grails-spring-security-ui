@@ -34,7 +34,7 @@
 			</div>
 		</s2ui:form>
 	</s2ui:formContainer>
-	<g:if test='${persistentLogin}'><s2ui:deleteButtonForm instanceId='${persistentLogin.series}'/></g:if>
+	<g:if test='${persistentLogin}'><s2ui:deleteButtonForm instanceId='${persistentLogin.series}' useToken="true"/></g:if>
 </div>
 </body>
 </html>
