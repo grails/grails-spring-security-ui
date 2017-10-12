@@ -15,6 +15,7 @@
 package grails.plugin.springsecurity.ui
 
 import grails.plugin.springsecurity.ReflectionUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ui.strategy.RequestmapStrategy
 import org.springframework.http.HttpMethod
 
@@ -33,9 +34,18 @@ class RequestmapController extends AbstractS2UiDomainController {
 	}
 
 	def save() {
-		if (!(param('url'))) params.remove('url')
-		doSave(uiRequestmapStrategy.saveRequestmap(params)) {
-			springSecurityService.clearCachedRequestmaps()
+		withForm {
+			if (!(param('url'))) params.remove('url') {
+				doSave(uiRequestmapStrategy.saveRequestmap(params)) {
+					springSecurityService.clearCachedRequestmaps()
+				}
+			}
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.username])}"
+			redirect(action: "create")
+			return
 		}
 	}
 
@@ -44,15 +54,31 @@ class RequestmapController extends AbstractS2UiDomainController {
 	}
 
 	def update() {
-		if (!(param('url'))) params.remove('url')
-		doUpdate { requestmap ->
-			uiRequestmapStrategy.updateRequestmap params, requestmap
+		withForm {
+			if (!(param('url'))) params.remove('url') {
+				doUpdate { requestmap ->
+					uiRequestmapStrategy.updateRequestmap params, requestmap
+				}
+			}
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.username])}"
+			redirectToSearch()
+			return
 		}
 	}
 
 	def delete() {
-		tryDelete { requestmap ->
-			uiRequestmapStrategy.deleteRequestmap requestmap
+		withForm {
+			tryDelete { requestmap ->
+				uiRequestmapStrategy.deleteRequestmap requestmap
+			}
+		}.invalidToken {
+			response.status = 500
+			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+			flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.username])}"
+			redirectToSearch()
 		}
 	}
 

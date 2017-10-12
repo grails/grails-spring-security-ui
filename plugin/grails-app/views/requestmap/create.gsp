@@ -6,7 +6,7 @@
 <body>
 <div class="body">
 	<s2ui:formContainer type='save' beanType='requestmap' focus='url' height='350'>
-		<s2ui:form>
+		<s2ui:form useToken="true">
 			<div class="dialog">
 				<br/>
 				<table>
