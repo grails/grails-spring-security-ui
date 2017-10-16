@@ -15,6 +15,7 @@
 package grails.plugin.springsecurity.ui
 
 import grails.converters.JSON
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ui.strategy.AclStrategy
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
 import grails.plugin.springsecurity.ui.strategy.QueryStrategy
@@ -62,6 +63,16 @@ abstract class AbstractS2UiDomainController extends AbstractS2UiController {
 		redirectToEdit instance.id
 	}
 
+	protected doSaveWithInvalidToken(String flashArg = "") {
+		if (!flashArg) {
+			flashArg = "${message(code: 'spring.security.ui.invalid.form.default.arg')}"
+		}
+		response.status = 500
+		log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+		flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [flashArg])}"
+		redirect action: 'create'
+	}
+
 	protected void renderCreate(Map model) {
 		render view: 'create', model: model
 	}
@@ -94,6 +105,16 @@ abstract class AbstractS2UiDomainController extends AbstractS2UiController {
 		}
 	}
 
+	protected doUpdateWithInvalidToken(String flashArg = "") {
+		if (!flashArg) {
+			flashArg = "${message(code: 'spring.security.ui.invalid.form.default.arg')}"
+		}
+		response.status = 500
+		log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+		flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [flashArg])}"
+		redirectToSearch()
+	}
+
 	protected void renderEdit(Map model) {
 		render view: 'edit', model: model
 	}
@@ -111,6 +132,16 @@ abstract class AbstractS2UiDomainController extends AbstractS2UiController {
 			flashNotDeleted()
 			redirectToEdit()
 		}
+	}
+
+	protected doDeleteWithInvalidToken(String flashArg = "") {
+		if (!flashArg) {
+			flashArg = "${message(code: 'spring.security.ui.invalid.form.default.arg')}"
+		}
+		response.status = 500
+		log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+		flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [flashArg])}"
+		redirectToSearch()
 	}
 
 	protected abstract search()
