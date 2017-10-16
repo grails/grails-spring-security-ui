@@ -34,11 +34,7 @@ class RoleController extends AbstractS2UiDomainController {
 		withForm {
 			doSave uiRoleStrategy.saveRole(params)
 		}.invalidToken {
-			response.status = 500
-			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
-			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.username])}"
-			redirect(action: "create")
-			return
+			doSaveWithInvalidToken(params.username)
 		}
 	}
 
@@ -52,11 +48,7 @@ class RoleController extends AbstractS2UiDomainController {
 				uiRoleStrategy.updateRole params, role
 			}
 		}.invalidToken {
-			response.status = 500
-			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
-			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.username])}"
-			redirectToSearch()
-			return
+			doUpdateWithInvalidToken(params.username)
 		}
 	}
 
@@ -66,10 +58,7 @@ class RoleController extends AbstractS2UiDomainController {
 				uiRoleStrategy.deleteRole role
 			}
 		}.invalidToken {
-			response.status = 500
-			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
-			flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.username])}"
-			redirectToSearch()
+			doDeleteWithInvalidToken()
 		}
 	}
 

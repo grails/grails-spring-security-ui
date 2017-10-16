@@ -35,11 +35,7 @@ class RegistrationCodeController extends AbstractS2UiDomainController {
 				uiRegistrationCodeStrategy.updateRegistrationCode params, registrationCode
 			}
 		}.invalidToken {
-			response.status = 500
-			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
-			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.username])}"
-			redirectToSearch()
-			return
+			doUpdateWithInvalidToken(params.username)
 		}
 	}
 
@@ -49,10 +45,7 @@ class RegistrationCodeController extends AbstractS2UiDomainController {
 				uiRegistrationCodeStrategy.deleteRegistrationCode registrationCode
 			}
 		}.invalidToken {
-			response.status = 500
-			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
-			flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.username])}"
-			redirectToSearch()
+			doDeleteWithInvalidToken()
 		}
 	}
 

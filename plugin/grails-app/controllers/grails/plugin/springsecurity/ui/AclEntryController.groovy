@@ -32,11 +32,7 @@ class AclEntryController extends AbstractS2UiDomainController {
 		withForm {
 			doSave uiAclStrategy.saveAclEntry(params)
 		}.invalidToken {
-			response.status = 500
-			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
-			flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [params.username])}"
-			redirect(action: "create")
-			return
+			doSaveWithInvalidToken(params.username)
 		}
 	}
 
@@ -50,11 +46,7 @@ class AclEntryController extends AbstractS2UiDomainController {
 				uiAclStrategy.updateAclEntry params, aclEntry
 			}
 		}.invalidToken {
-			response.status = 500
-			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
-			flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [params.username])}"
-			redirectToSearch()
-			return
+			doUpdateWithInvalidToken(params.username)
 		}
 	}
 
@@ -64,10 +56,7 @@ class AclEntryController extends AbstractS2UiDomainController {
 				uiAclStrategy.deleteAclEntry aclEntry
 			}
 		}.invalidToken {
-			response.status = 500
-			log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
-			flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [params.username])}"
-			redirectToSearch()
+			doDeleteWithInvalidToken()
 		}
 	}
 
