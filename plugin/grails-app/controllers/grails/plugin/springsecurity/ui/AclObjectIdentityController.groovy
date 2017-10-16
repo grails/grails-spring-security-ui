@@ -14,8 +14,6 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.plugin.springsecurity.SpringSecurityUtils
-
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */

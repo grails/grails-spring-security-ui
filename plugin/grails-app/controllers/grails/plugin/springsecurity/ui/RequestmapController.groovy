@@ -15,7 +15,6 @@
 package grails.plugin.springsecurity.ui
 
 import grails.plugin.springsecurity.ReflectionUtils
-import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ui.strategy.RequestmapStrategy
 import org.springframework.http.HttpMethod
 
@@ -42,7 +41,7 @@ class RequestmapController extends AbstractS2UiDomainController {
 				springSecurityService.clearCachedRequestmaps()
 			}
 		}.invalidToken {
-			doSaveWithInvalidToken(params.username)
+			doSaveWithInvalidToken(params.url)
 		}
 	}
 
@@ -59,7 +58,7 @@ class RequestmapController extends AbstractS2UiDomainController {
 				uiRequestmapStrategy.updateRequestmap params, requestmap
 			}
 		}.invalidToken {
-			doUpdateWithInvalidToken(params.username)
+			doUpdateWithInvalidToken(params.url)
 		}
 	}
 

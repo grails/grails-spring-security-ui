@@ -14,7 +14,6 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ui.strategy.RoleStrategy
 import grails.util.GrailsNameUtils
 
@@ -34,7 +33,7 @@ class RoleController extends AbstractS2UiDomainController {
 		withForm {
 			doSave uiRoleStrategy.saveRole(params)
 		}.invalidToken {
-			doSaveWithInvalidToken(params.username)
+			doSaveWithInvalidToken(params.authority)
 		}
 	}
 
@@ -48,7 +47,7 @@ class RoleController extends AbstractS2UiDomainController {
 				uiRoleStrategy.updateRole params, role
 			}
 		}.invalidToken {
-			doUpdateWithInvalidToken(params.username)
+			doUpdateWithInvalidToken(params.authority)
 		}
 	}
 

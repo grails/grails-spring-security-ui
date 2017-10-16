@@ -14,7 +14,6 @@
  */
 package grails.plugin.springsecurity.ui
 
-import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ui.strategy.RegistrationCodeStrategy
 
 /**
@@ -35,7 +34,7 @@ class RegistrationCodeController extends AbstractS2UiDomainController {
 				uiRegistrationCodeStrategy.updateRegistrationCode params, registrationCode
 			}
 		}.invalidToken {
-			doUpdateWithInvalidToken(params.username)
+			doUpdateWithInvalidToken()
 		}
 	}
 
