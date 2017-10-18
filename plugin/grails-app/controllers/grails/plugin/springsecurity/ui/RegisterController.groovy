@@ -18,6 +18,7 @@ import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.ui.strategy.MailStrategy
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
 import grails.plugin.springsecurity.ui.strategy.RegistrationCodeStrategy
+import grails.util.Holders
 import groovy.text.SimpleTemplateEngine
 import org.springframework.security.authentication.dao.SaltSource
 
@@ -178,9 +179,11 @@ class RegisterController extends AbstractS2UiController {
 	}
 
 	protected String generateLink(String action, Map linkParams, boolean absolute = false) {
-		String base = absolute ? null : "$request.scheme://$request.serverName:$request.serverPort$request.contextPath"
+		String base = "$request.scheme://$request.serverName:$request.serverPort$request.contextPath"
+		if (absolute && Holders.config.grails.serverURL) {
+			base = grailsApplication.config.grails.serverURL
+		}
 		createLink(
-				absolute: absolute,
 				base: base,
 				controller: 'register',
 				action: action,

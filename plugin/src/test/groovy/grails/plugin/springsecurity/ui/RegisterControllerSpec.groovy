@@ -2,7 +2,6 @@ package grails.plugin.springsecurity.ui
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.testing.web.controllers.ControllerUnitTest
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 class RegisterControllerSpec extends Specification implements ControllerUnitTest<RegisterController> {
@@ -125,10 +124,9 @@ class RegisterControllerSpec extends Specification implements ControllerUnitTest
         !RegisterController.passwordValidator(password, command)
     }
 
-    @IgnoreRest
     void "verify generateLink functionality"() {
         given: "the grails.serverUrl is set"
-        config.grails.serverUrl = 'http://grails.org'
+        config.grails.serverURL = 'http://grails.org'
 
         when: "the generateLink method is called"
         def results = controller.generateLink(action, linkParams, absolute)
