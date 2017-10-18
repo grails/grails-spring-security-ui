@@ -1,9 +1,11 @@
 package grails.plugin.springsecurity.ui
 
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.testing.web.controllers.ControllerUnitTest
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 
-class RegisterControllerSpec extends Specification {
+class RegisterControllerSpec extends Specification implements ControllerUnitTest<RegisterController> {
 
 	void setup() {
 		SpringSecurityUtils.setSecurityConfig [:] as ConfigObject
@@ -122,6 +124,23 @@ class RegisterControllerSpec extends Specification {
 
 		!RegisterController.passwordValidator(password, command)
 	}
+
+    @IgnoreRest
+    void "verify generateLink functionality"() {
+		given: "the grails.serverUrl is set"
+		config.grails.serverUrl='http://grails.org'
+
+        when: "the generateLink method is called"
+        def results = controller.generateLink(action, linkParams, absolute)
+
+		then: "the configured grails.serverUrl is used if the absolute parameter is true"
+		results == expectedUrl
+
+        where:
+        absolute | action | linkParams               | expectedUrl
+        false    | 'shipit' | [foo: 'foo', bar: 'bar'] | 'http://localhost:80/register/shipit?foo=foo&bar=bar'
+		true     | 'shipit' | [foo: 'foo', bar: 'bar'] | 'http://grails.org/register/shipit?foo=foo&bar=bar'
+    }
 
 	private void updateFromConfig() {
 		new RegisterController().afterPropertiesSet()

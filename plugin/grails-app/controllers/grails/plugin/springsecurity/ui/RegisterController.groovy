@@ -177,9 +177,14 @@ class RegisterController extends AbstractS2UiController {
 		redirect uri: registerPostResetUrl ?: successHandlerDefaultTargetUrl
 	}
 
-	protected String generateLink(String action, linkParams) {
-		createLink(base: "$request.scheme://$request.serverName:$request.serverPort$request.contextPath",
-		           controller: 'register', action: action, params: linkParams)
+	protected String generateLink(String action, Map linkParams, boolean absolute = false) {
+		String base = absolute ? null : "$request.scheme://$request.serverName:$request.serverPort$request.contextPath"
+		createLink(
+				absolute: absolute,
+				base: base,
+				controller: 'register',
+				action: action,
+				params: linkParams)
 	}
 
 	protected String evaluate(s, binding) {
