@@ -526,7 +526,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="introduction">1. Introduction to the Spring Security UI Plugin</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Spring Security UI plugin provides CRUD screens and other user management workflows. Non-default functionality is available only if the feature is available; this includes the ACL controllers and views which are enabled if the <a href="http://grails.org/plugin/spring-security-acl">ACL plugin</a> is installed, Requestmaps support which is available if <code>grails.plugin.springsecurity.securityConfigType</code> is set to <code>"Requestmap"</code> or <code>SecurityConfigType.Requestmap</code> in <code>application.groovy</code>, and persistent cookies support which is enabled if it has been configured with the <code>s2-create-persistent-token</code> script.</p>
+<p>The Spring Security UI plugin provides CRUD screens and other user management workflows.</p>
+</div>
+<div class="paragraph">
+<p>The CRUD screens are protected from cross-site request forgery (CSRF) attacks through the use of the <code>useToken</code> attribute in forms. More information is available at <a href="http://docs.grails.org/latest/guide/theWebLayer.html#formtokens" class="bare">http://docs.grails.org/latest/guide/theWebLayer.html#formtokens</a>.</p>
+</div>
+<div class="paragraph">
+<p>Non-default functionality is available only if the feature is available; this includes the ACL controllers and views which are enabled if the <a href="http://grails.org/plugin/spring-security-acl">ACL plugin</a> is installed, Requestmaps support which is available if <code>grails.plugin.springsecurity.securityConfigType</code> is set to <code>"Requestmap"</code> or <code>SecurityConfigType.Requestmap</code> in <code>application.groovy</code>, and persistent cookies support which is enabled if it has been configured with the <code>s2-create-persistent-token</code> script.</p>
 </div>
 <div class="sect2">
 <h3 id="installation">1.1. Installation</h3>
@@ -2240,7 +2246,7 @@ beans = {
 <div id="footer">
 <div id="footer-text">
 Version unspecified<br>
-Last updated 2017-10-19 15:47:53 +00:00
+Last updated 2017-10-19 16:49:26 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
