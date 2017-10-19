@@ -29,14 +29,22 @@ class PersistentLoginController extends AbstractS2UiDomainController {
 	}
 
 	def update() {
-		doUpdate { persistentLogin ->
-			uiPersistentLoginStrategy.updatePersistentLogin params, persistentLogin
+		withForm {
+			doUpdate { persistentLogin ->
+				uiPersistentLoginStrategy.updatePersistentLogin params, persistentLogin
+			}
+		}.invalidToken {
+			doUpdateWithInvalidToken(params.username)
 		}
 	}
 
 	def delete() {
-		tryDelete { persistentLogin ->
-			uiPersistentLoginStrategy.deletePersistentLogin persistentLogin
+		withForm {
+			tryDelete { persistentLogin ->
+				uiPersistentLoginStrategy.deletePersistentLogin persistentLogin
+			}
+		}.invalidToken {
+			doDeleteWithInvalidToken()
 		}
 	}
 

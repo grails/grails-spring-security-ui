@@ -30,7 +30,11 @@ class UserController extends AbstractS2UiDomainController {
 	}
 
 	def save() {
-		doSave uiUserStrategy.saveUser(params, roleNamesFromParams(), params.password)
+		withForm {
+			doSave uiUserStrategy.saveUser(params, roleNamesFromParams(), params.password)
+		}.invalidToken {
+			doSaveWithInvalidToken(params.username)
+		}
 	}
 
 	def edit() {
@@ -38,14 +42,22 @@ class UserController extends AbstractS2UiDomainController {
 	}
 
 	def update() {
-		doUpdate { user ->
-			uiUserStrategy.updateUser params, user, roleNamesFromParams()
+		withForm {
+			doUpdate { user ->
+				uiUserStrategy.updateUser params, user, roleNamesFromParams()
+			}
+		}.invalidToken {
+			doUpdateWithInvalidToken(params.username)
 		}
 	}
 
 	def delete() {
-		tryDelete { user ->
-			uiUserStrategy.deleteUser user
+		withForm{
+			tryDelete { user ->
+				uiUserStrategy.deleteUser user
+			}
+		}.invalidToken {
+			doDeleteWithInvalidToken()
 		}
 	}
 

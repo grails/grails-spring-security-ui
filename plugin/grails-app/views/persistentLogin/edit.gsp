@@ -6,7 +6,7 @@
 <body>
 <div class="body">
 	<s2ui:formContainer type='update' beanType='persistentLogin' focus='token' height='350'>
-		<s2ui:form idName='series'>
+		<s2ui:form idName='series' useToken="true">
 			<div class="dialog">
 				<br/>
 				<table>
@@ -34,7 +34,7 @@
 			</div>
 		</s2ui:form>
 	</s2ui:formContainer>
-	<g:if test='${persistentLogin}'><s2ui:deleteButtonForm instanceId='${persistentLogin.series}'/></g:if>
+	<g:if test='${persistentLogin}'><s2ui:deleteButtonForm instanceId='${persistentLogin.series}' useToken="true"/></g:if>
 </div>
 </body>
 </html>

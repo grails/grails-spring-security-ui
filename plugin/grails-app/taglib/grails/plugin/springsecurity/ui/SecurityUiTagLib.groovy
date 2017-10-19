@@ -16,6 +16,7 @@ package grails.plugin.springsecurity.ui
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
+import org.grails.web.servlet.mvc.SynchronizerTokensHolder
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -129,16 +130,22 @@ class SecurityUiTagLib {
 
 	/**
 	 * @attr instanceId REQUIRED the id of the domain class instance
+	 * @attr useToken OPTIONAL
 	 */
 	def deleteButtonForm = { attrs ->
 		attrs = [:] + attrs
+		boolean useToken = extractFormUseToken(attrs)
 
 		def id = getRequiredAttribute(attrs, 'instanceId', 'deleteButton')
 
 		attrs.action = 'delete'
 
 		out << """
-			<form action="${createLink(attrs)}" method="post" name="deleteForm" id="deleteForm">
+			<form action="${createLink(attrs)}" method="post" name="deleteForm" id="deleteForm">"""
+
+		writeTokenFields(useToken)
+
+		out << """
 				<input type="hidden" name="id" value="$id" />
 			</form>
 			<div id="deleteConfirmDialog" title="${message(code:'default.button.delete.confirm.message')}"></div>"""
@@ -174,54 +181,25 @@ class SecurityUiTagLib {
 	 * @attr focus    the element to focus on document ready
 	 * @attr idName   the name of the id property if it's not 'id'
 	 * @attr type     'save', 'update', 'login' if provided, only when not a child of formContainer
+	 * @attr useToken 'true' or 'false'.  Set to 'true' to prevent CSRF attacks
 	 */
 	def form = { attrs, body ->
 		attrs = [:] + attrs
 
-		String type = attrs.remove('type')
-		if (type) {
-			pageScope.s2uiFormType = type
-		}
-		else {
-			type = pageScope.s2uiFormType
-		}
-		assert type
-
-		def bean
-		String beanName = attrs.remove('beanName')
-		if (beanName) {
-			pageScope.s2uiBeanType = beanName
-			bean = pageScope.s2uiBean = pageScope[beanName]
-			assert bean
-		}
-		else {
-			bean = pageScope.s2uiBean
-		}
-
-		String cssClass = attrs.remove('class') ?: ''
-		if (cssClass) {
-			cssClass = """class="$cssClass" """
-		}
-
+		boolean useToken = extractFormUseToken(attrs)
+		String type = extractFormType(attrs)
+		def bean = extractFormBean(attrs)
+		String cssClass = extractFormCssClass(attrs)
 		String idName = attrs.remove('idName')
-		def id
-		if (bean && !(bean instanceof CommandObject)) {
-			id = idName ? bean[idName] : bean.id
-		}
-
+		def id = extractFormId(bean, idName)
 		String name = pageScope.s2uiFormName = type + 'Form'
 		String autocomplete = (type == 'login' || type.endsWith('Password')) ? ' autocomplete="off"' : ''
-
-		String link
-		if (type == 'login') {
-			link = "$request.contextPath$SpringSecurityUtils.securityConfig.apf.filterProcessesUrl"
-		}
-		else {
-			link = createLink(type)
-		}
+		String link = generateFormLink(type)
 
 		out << """
 			<form action="$link"$cssClass method="post" name="$name" id="$name"$autocomplete>"""
+
+		writeTokenFields(useToken)
 
 		if (type == 'update') {
 			out << """
@@ -243,6 +221,74 @@ class SecurityUiTagLib {
 		pageScope.s2uiBeanType = null
 		pageScope.s2uiFormName = null
 		pageScope.s2uiFormType = null
+	}
+
+	protected void writeTokenFields(boolean useToken) {
+		if (useToken) {
+			def tokensHolder = SynchronizerTokensHolder.store(session)
+			out << """
+					${hiddenField(name: SynchronizerTokensHolder.TOKEN_KEY, value: tokensHolder.generateToken(request.forwardURI))}
+					${hiddenField(name: SynchronizerTokensHolder.TOKEN_URI, value: request.forwardURI)}"""
+		}
+	}
+
+	protected boolean extractFormUseToken(Map attrs) {
+		boolean useToken = false
+		if (attrs.containsKey('useToken')) {
+			useToken = attrs['useToken'].asBoolean()
+			attrs.remove('useToken')
+		}
+		return useToken
+	}
+
+	protected String generateFormLink(String type) {
+		String link
+		if (type == 'login') {
+			link = "$request.contextPath$SpringSecurityUtils.securityConfig.apf.filterProcessesUrl"
+		} else {
+			link = createLink(type)
+		}
+		return link
+	}
+
+	protected Object extractFormId(bean, String idName) {
+		def id
+		if (bean && !(bean instanceof CommandObject)) {
+			id = idName ? bean[idName] : bean.id
+		}
+		return id
+	}
+
+	protected String extractFormCssClass(Map attrs) {
+		String cssClass = attrs.remove('class') ?: ''
+		if (cssClass) {
+			cssClass = """class="$cssClass" """
+		}
+		return cssClass
+	}
+
+	protected Object extractFormBean(Map attrs) {
+		def bean
+		String beanName = attrs.remove('beanName')
+		if (beanName) {
+			pageScope.s2uiBeanType = beanName
+			bean = pageScope.s2uiBean = pageScope[beanName]
+			assert bean
+		} else {
+			bean = pageScope.s2uiBean
+		}
+		return bean
+	}
+
+	protected String extractFormType(Map attrs) {
+		String type = attrs.remove('type')
+		if (type) {
+			pageScope.s2uiFormType = type
+		} else {
+			type = pageScope.s2uiFormType
+		}
+		assert type
+		return type
 	}
 
 	/**

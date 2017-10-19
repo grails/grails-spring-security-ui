@@ -27,7 +27,11 @@ class AclEntryController extends AbstractS2UiDomainController {
 	}
 
 	def save() {
-		doSave uiAclStrategy.saveAclEntry(params)
+		withForm {
+			doSave uiAclStrategy.saveAclEntry(params)
+		}.invalidToken {
+			doSaveWithInvalidToken(params.username)
+		}
 	}
 
 	def edit() {
@@ -35,14 +39,22 @@ class AclEntryController extends AbstractS2UiDomainController {
 	}
 
 	def update() {
-		doUpdate { aclEntry ->
-			uiAclStrategy.updateAclEntry params, aclEntry
+		withForm {
+			doUpdate { aclEntry ->
+				uiAclStrategy.updateAclEntry params, aclEntry
+			}
+		}.invalidToken {
+			doUpdateWithInvalidToken(params.username)
 		}
 	}
 
 	def delete() {
-		tryDelete { aclEntry ->
-			uiAclStrategy.deleteAclEntry aclEntry
+		withForm {
+			tryDelete { aclEntry ->
+				uiAclStrategy.deleteAclEntry aclEntry
+			}
+		}.invalidToken {
+			doDeleteWithInvalidToken()
 		}
 	}
 

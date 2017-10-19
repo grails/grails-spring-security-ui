@@ -6,7 +6,7 @@
 <body>
 <div class="body">
 	<s2ui:formContainer type='update' beanType='aclSid' focus='sid'>
-		<s2ui:form>
+		<s2ui:form useToken="true">
 			<div class="dialog">
 				<br/>
 				<table>
@@ -32,7 +32,7 @@
 			</div>
 		</s2ui:form>
 	</s2ui:formContainer>
-	<g:if test='${aclSid}'><s2ui:deleteButtonForm instanceId='${aclSid.id}'/></g:if>
+	<g:if test='${aclSid}'><s2ui:deleteButtonForm instanceId='${aclSid.id}' useToken="true"/></g:if>
 </div>
 </body>
 </html>

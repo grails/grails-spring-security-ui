@@ -29,14 +29,22 @@ class RegistrationCodeController extends AbstractS2UiDomainController {
 	}
 
 	def update() {
-		doUpdate { registrationCode ->
-			uiRegistrationCodeStrategy.updateRegistrationCode params, registrationCode
+		withForm {
+			doUpdate { registrationCode ->
+				uiRegistrationCodeStrategy.updateRegistrationCode params, registrationCode
+			}
+		}.invalidToken {
+			doUpdateWithInvalidToken()
 		}
 	}
 
 	def delete() {
-		tryDelete { registrationCode ->
-			uiRegistrationCodeStrategy.deleteRegistrationCode registrationCode
+		withForm {
+			tryDelete { registrationCode ->
+				uiRegistrationCodeStrategy.deleteRegistrationCode registrationCode
+			}
+		}.invalidToken {
+			doDeleteWithInvalidToken()
 		}
 	}
 

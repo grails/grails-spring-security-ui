@@ -411,7 +411,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 					if (value == null) return
 				}
 				else {
-					log.error "Attempted to read non-existent property $currentPath in $instance"
+					log.error 'Attempted to read non-existent property {} in {}', currentPath as String, instance as String
 					return
 				}
 			}
@@ -496,24 +496,25 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	void handleValidationErrors(bean, source, String operation, TransactionStatus transactionStatus) {
-
-		if (log.isWarnEnabled()) {
-			def message = new StringBuilder()
-			message << 'Problem in ' << source << ' at "' << operation <<
-					message << '" ' << (isAttached(bean) ? 'updating' : 'creating') << ' '
-			message << bean.getClass().simpleName << ': ' << bean
-
-			def locale = LocaleContextHolder.getLocale()
-			for (fieldErrors in bean.errors) {
-				for (error in fieldErrors.allErrors) {
-					message << '\n\t' << messageSource.getMessage(error, locale)
-				}
-			}
-
-			log.warn message.toString()
-		}
-
+		log.warn('Problem in {} at "{}" {} {} : {} {}',
+				source as String,
+				operation as String,
+				isAttached(bean) ? 'updating' : 'creating',
+				bean.getClass().simpleName,
+				bean as String,
+				beanErrors(bean))
 		rollbackAndDiscard bean, transactionStatus
+	}
+
+	String beanErrors(bean) {
+		StringBuilder message = new StringBuilder()
+		def locale = LocaleContextHolder.getLocale()
+		for (fieldErrors in bean.errors) {
+			for (error in fieldErrors.allErrors) {
+				message << '\n\t' << messageSource.getMessage(error, locale)
+			}
+		}
+		message.toString()
 	}
 
 	void handleException(Throwable t, bean, Map properties, source, String operation,
@@ -557,19 +558,15 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 
 	Closure<?> buildProjection(String path, String criterionMethod, List args) {
 
-		log.debug "Building projection for path '$path': $criterionMethod($args)"
+		log.debug "Building projection for path '{}': {}({})", path, criterionMethod, args.toString()
 
 		def invoker = { String projectionName, Closure<?> subcriteria ->
-			if (log.traceEnabled) {
-				log.trace "Invoking projection $projectionName"
-			}
+			log.trace 'Invoking projection {}', projectionName
 			delegate."$projectionName"(subcriteria)
 		}
 
 		def closure = { ->
-			if (log.traceEnabled) {
-				log.trace "Invoking criterion $criterionMethod($args)"
-			}
+			log.trace 'Invoking criterion {}({})', criterionMethod, args as String
 			delegate."$criterionMethod"(args)
 		}
 
@@ -662,8 +659,8 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 			}
 		}
 
-		if (discardedNames && log.warnEnabled) {
-			log.warn 'Discarding transient properties ' + discardedNames + ' from ' + bean
+		if ( discardedNames ) {
+			log.warn 'Discarding transient properties {} from {}', discardedNames as String, bean as String
 		}
 	}
 

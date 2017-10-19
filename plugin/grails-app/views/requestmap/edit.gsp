@@ -6,7 +6,7 @@
 <body>
 <div class="body">
 	<s2ui:formContainer type='update' beanType='requestmap' focus='url' height='350'>
-		<s2ui:form>
+		<s2ui:form useToken="true">
 			<div class="dialog">
 				<br/>
 				<table>
@@ -29,7 +29,7 @@
 		</s2ui:form>
 	</s2ui:formContainer>
 	<g:if test='${requestmap}'>
-		<s2ui:deleteButtonForm instanceId='${requestmap.id}'/>
+		<s2ui:deleteButtonForm instanceId='${requestmap.id}' useToken="true"/>
 	</g:if>
 </div>
 </body>

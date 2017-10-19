@@ -6,7 +6,7 @@
 <body>
 <div class="body">
 	<s2ui:formContainer type='update' beanType='registrationCode' height='350'>
-		<s2ui:form>
+		<s2ui:form useToken="true">
 			<div class="dialog">
 				<br/>
 				<table>
@@ -28,7 +28,7 @@
 			</div>
 		</s2ui:form>
 	</s2ui:formContainer>
-	<g:if test='${registrationCode}'><s2ui:deleteButtonForm instanceId='${registrationCode.id}'/></g:if>
+	<g:if test='${registrationCode}'><s2ui:deleteButtonForm instanceId='${registrationCode.id}' useToken="true"/></g:if>
 </div>
 <s2ui:ajaxSearch paramName='username'/>
 </body>

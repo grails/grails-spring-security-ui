@@ -11,7 +11,7 @@
 </head>
 <body>
 <h3><g:message code='default.edit.label' args='[entityName]'/></h3>
-<s2ui:form type='update' beanName='user' focus='username' class='button-style'>
+<s2ui:form type='update' beanName='user' focus='username' class='button-style' useToken='true'>
 	<s2ui:tabs elementId='tabs' height='375' data='${tabData}'>
 		<s2ui:tab name='userinfo' height='275'>
 			<table>
@@ -41,7 +41,7 @@
 		<g:if test='${canRunAs}'><a id="runAsButton">${message(code:'spring.security.ui.runas.submit')}</a></g:if>
 	</div>
 </s2ui:form>
-<g:if test='${user}'><s2ui:deleteButtonForm instanceId='${user.id}'/></g:if>
+<g:if test='${user}'><s2ui:deleteButtonForm instanceId='${user.id}' useToken="true"/></g:if>
 <g:if test='${canRunAs}'>
 <form name="runAsForm" action="${request.contextPath}${securityConfig.switchUser.switchUserUrl}" method='post'>
 	<g:hiddenField name='${securityConfig.switchUser.usernameParameter}' value='${username}'/>

@@ -24,7 +24,11 @@ class AclObjectIdentityController extends AbstractS2UiDomainController {
 	}
 
 	def save() {
-		doSave uiAclStrategy.saveAclObjectIdentity(params)
+		withForm {
+			doSave uiAclStrategy.saveAclObjectIdentity(params)
+		}.invalidToken {
+			doSaveWithInvalidToken(params.username)
+		}
 	}
 
 	def edit() {
@@ -32,14 +36,22 @@ class AclObjectIdentityController extends AbstractS2UiDomainController {
 	}
 
 	def update() {
-		doUpdate { aclObjectIdentity ->
-			uiAclStrategy.updateAclObjectIdentity params, aclObjectIdentity
+		withForm {
+			doUpdate { aclObjectIdentity ->
+				uiAclStrategy.updateAclObjectIdentity params, aclObjectIdentity
+			}
+		}.invalidToken {
+			doUpdateWithInvalidToken(params.username)
 		}
 	}
 
 	def delete() {
-		tryDelete { aclObjectIdentity ->
-			uiAclStrategy.deleteAclObjectIdentity aclObjectIdentity
+		withForm {
+			tryDelete { aclObjectIdentity ->
+				uiAclStrategy.deleteAclObjectIdentity aclObjectIdentity
+			}
+		}.invalidToken {
+			doDeleteWithInvalidToken()
 		}
 	}
 

@@ -30,7 +30,11 @@ class RoleController extends AbstractS2UiDomainController {
 	}
 
 	def save() {
-		doSave uiRoleStrategy.saveRole(params)
+		withForm {
+			doSave uiRoleStrategy.saveRole(params)
+		}.invalidToken {
+			doSaveWithInvalidToken(params.authority)
+		}
 	}
 
 	def edit() {
@@ -38,14 +42,22 @@ class RoleController extends AbstractS2UiDomainController {
 	}
 
 	def update() {
-		doUpdate { role ->
-			uiRoleStrategy.updateRole params, role
+		withForm {
+			doUpdate { role ->
+				uiRoleStrategy.updateRole params, role
+			}
+		}.invalidToken {
+			doUpdateWithInvalidToken(params.authority)
 		}
 	}
 
 	def delete() {
-		tryDelete { role ->
-			uiRoleStrategy.deleteRole role
+		withForm {
+			tryDelete { role ->
+				uiRoleStrategy.deleteRole role
+			}
+		}.invalidToken {
+			doDeleteWithInvalidToken()
 		}
 	}
 

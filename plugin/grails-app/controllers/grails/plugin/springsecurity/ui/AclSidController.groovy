@@ -24,7 +24,11 @@ class AclSidController extends AbstractS2UiDomainController {
 	}
 
 	def save() {
-		doSave uiAclStrategy.saveAclSid(params)
+		withForm {
+			doSave uiAclStrategy.saveAclSid(params)
+		}.invalidToken {
+			doSaveWithInvalidToken(params.username)
+		}
 	}
 
 	def edit() {
@@ -32,14 +36,22 @@ class AclSidController extends AbstractS2UiDomainController {
 	}
 
 	def update() {
-		doUpdate { aclSid ->
-			uiAclStrategy.updateAclSid params, aclSid
+		withForm {
+			doUpdate { aclSid ->
+				uiAclStrategy.updateAclSid params, aclSid
+			}
+		}.invalidToken {
+			doUpdateWithInvalidToken(params.username)
 		}
 	}
 
 	def delete() {
-		tryDelete { aclSid ->
-			uiAclStrategy.deleteAclSid aclSid
+		withForm {
+			tryDelete { aclSid ->
+				uiAclStrategy.deleteAclSid aclSid
+			}
+		}.invalidToken {
+			doDeleteWithInvalidToken()
 		}
 	}
 
