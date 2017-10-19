@@ -68,7 +68,7 @@ abstract class AbstractS2UiDomainController extends AbstractS2UiController {
 			flashArg = "${message(code: 'spring.security.ui.invalid.form.default.arg')}"
 		}
 		response.status = 500
-		log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+		log.warn('User: {} possible CSRF or double submit: {}', SpringSecurityUtils.authentication.principal.id as String, params as String)
 		flash.message = "${message(code: 'spring.security.ui.invalid.save.form', args: [flashArg])}"
 		redirect action: 'create'
 	}
@@ -110,7 +110,7 @@ abstract class AbstractS2UiDomainController extends AbstractS2UiController {
 			flashArg = "${message(code: 'spring.security.ui.invalid.form.default.arg')}"
 		}
 		response.status = 500
-		log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+		log.warn('User: {} possible CSRF or double submit: {}', SpringSecurityUtils.authentication.principal.id as String, params as String)
 		flash.message = "${message(code: 'spring.security.ui.invalid.update.form', args: [flashArg])}"
 		redirectToSearch()
 	}
@@ -139,7 +139,7 @@ abstract class AbstractS2UiDomainController extends AbstractS2UiController {
 			flashArg = "${message(code: 'spring.security.ui.invalid.form.default.arg')}"
 		}
 		response.status = 500
-		log.warn("User: ${SpringSecurityUtils.authentication.principal.id} possible CSRF or double submit: $params")
+		log.warn('User: {} possible CSRF or double submit: {}', SpringSecurityUtils.authentication.principal.id as String, params as String)
 		flash.message = "${message(code: 'spring.security.ui.invalid.delete.form', args: [flashArg])}"
 		redirectToSearch()
 	}
