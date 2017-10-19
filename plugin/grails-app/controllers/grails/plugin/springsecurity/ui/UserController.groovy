@@ -15,6 +15,7 @@
 package grails.plugin.springsecurity.ui
 
 import grails.plugin.springsecurity.ui.strategy.UserStrategy
+import groovy.transform.CompileStatic
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -89,19 +90,27 @@ class UserController extends AbstractS2UiDomainController {
 	protected Map buildUserModel(user) {
 
 		Set userRoleNames = user[authoritiesPropertyName].collect { it[authorityNameField] }
-		def granted = [:]
-		def notGranted = [:]
-		for (role in sortedRoles()) {
+		Map roleMap = buildRoleMap(userRoleNames, sortedRoles())
+
+		[roleMap: roleMap, tabData: tabData, user: user]
+	}
+
+	@CompileStatic
+	protected Map buildRoleMap(Set userRoleNames, List sortedRoles) {
+		if (!userRoleNames) {
+			return [:]
+		}
+		Map granted = [:]
+		Map notGranted = [:]
+		for (role in sortedRoles) {
 			String authority = role[authorityNameField]
 			if (userRoleNames.contains(authority)) {
-				granted[(role)] = userRoleNames.contains(authority)
-			}
-			else {
-				notGranted[(role)] = userRoleNames.contains(authority)
+				granted[(role)] = true
+			} else {
+				notGranted[(role)] = false
 			}
 		}
-
-		[roleMap: granted + notGranted, tabData: tabData, user: user]
+		granted + notGranted
 	}
 
 	protected List sortedRoles() {
