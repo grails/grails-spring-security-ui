@@ -78,7 +78,7 @@ class UserController extends AbstractS2UiDomainController {
 	protected Map buildUserModel(user) {
 
 		Set userRoleNames = user[authoritiesPropertyName].collect { it[authorityNameField] }
-		Map roleMap = buildRoleMap(userRoleNames)
+		Map roleMap = buildRoleMap(userRoleNames, sortedRoles())
 
 		[roleMap: roleMap, tabData: tabData, user: user]
 	}
