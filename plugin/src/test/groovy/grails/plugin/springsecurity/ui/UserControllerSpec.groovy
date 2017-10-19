@@ -15,16 +15,10 @@ class UserControllerSpec extends Specification implements ControllerUnitTest<Use
         controller.authorityNameField = "authority"
 
         and: "we mock the returning of all Role instances within the database"
-        controller.metaClass.sortedRoles = {
-            [
-                    ADMIN_ROLE,
-                    SUPER_ADMIN_ROLE,
-                    USER_ROLE
-            ]
-        }
+        List sortedRoles = [ADMIN_ROLE, SUPER_ADMIN_ROLE, USER_ROLE]
 
         when: "we call buildRoleMap with the role names associated to the user"
-        Map results = controller.buildRoleMap(rolesAssignedToUser)
+        Map results = controller.buildRoleMap(rolesAssignedToUser, sortedRoles)
 
         then: "the user is only granted access to roles with which they are associated"
         results == expectedResults
