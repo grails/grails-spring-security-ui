@@ -3,7 +3,9 @@ package grails.plugin.springsecurity.ui
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.testing.web.controllers.ControllerUnitTest
 import spock.lang.Specification
+import spock.lang.Unroll
 
+@Unroll
 class RegisterControllerSpec extends Specification implements ControllerUnitTest<RegisterController> {
 
     void setup() {
@@ -124,20 +126,23 @@ class RegisterControllerSpec extends Specification implements ControllerUnitTest
         !RegisterController.passwordValidator(password, command)
     }
 
-    void "verify generateLink functionality"() {
+    void "verify generateLink for ('#action', #linkParams, '#shouldUseServerUrl') is #expectedUrl"() {
         given: "the grails.serverUrl is set"
-        config.grails.serverURL = 'http://grails.org'
+        if (isConfigured) {
+            config.grails.serverURL = 'http://grails.org'
+        }
 
         when: "the generateLink method is called"
-        def results = controller.generateLink(action, linkParams, absolute)
+        def results = controller.generateLink(action, linkParams, shouldUseServerUrl)
 
         then: "the configured grails.serverUrl is used if the absolute parameter is true"
         results == expectedUrl
 
         where:
-        absolute | action   | linkParams               | expectedUrl
-        false    | 'shipit' | [foo: 'foo', bar: 'bar'] | 'http://localhost:80/register/shipit?foo=foo&bar=bar'
-        true     | 'shipit' | [foo: 'foo', bar: 'bar'] | 'http://grails.org/register/shipit?foo=foo&bar=bar'
+        isConfigured | shouldUseServerUrl | action   | linkParams               | expectedUrl
+        false        | false              | 'shipit' | [foo: 'foo', bar: 'bar'] | 'http://localhost:80/register/shipit?foo=foo&bar=bar'
+        false        | true               | 'shipit' | [foo: 'foo', bar: 'bar'] | 'http://localhost:80/register/shipit?foo=foo&bar=bar'
+        true         | true               | 'shipit' | [foo: 'foo', bar: 'bar'] | 'http://grails.org/register/shipit?foo=foo&bar=bar'
     }
 
     private void updateFromConfig() {

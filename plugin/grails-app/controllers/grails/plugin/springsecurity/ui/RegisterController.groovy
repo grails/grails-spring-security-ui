@@ -178,9 +178,17 @@ class RegisterController extends AbstractS2UiController {
 		redirect uri: registerPostResetUrl ?: successHandlerDefaultTargetUrl
 	}
 
-	protected String generateLink(String action, Map linkParams, boolean absolute = false) {
+	/**
+	 *
+	 * @param action
+	 * @param linkParams
+	 * @param shouldUseServerUrl if true, will utilize the configured grails.serverURL from application.yml if it exists otherwise the base url will be
+	 * constructed the same as it always has been
+	 * @return
+	 */
+	protected String generateLink(String action, Map linkParams, boolean shouldUseServerUrl = false) {
 		String base = "$request.scheme://$request.serverName:$request.serverPort$request.contextPath"
-		if (absolute && Holders.config.grails.serverURL) {
+		if (shouldUseServerUrl && Holders.config.grails.serverURL) {
 			base = grailsApplication.config.grails.serverURL
 		}
 		createLink(
