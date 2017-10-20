@@ -179,12 +179,11 @@ class RegisterController extends AbstractS2UiController {
 	}
 
 	/**
-	 *
+	 * Creates a grails application link from a set of attributes.
 	 * @param action
 	 * @param linkParams
-	 * @param shouldUseServerUrl if true, will utilize the configured grails.serverURL from application.yml if it exists otherwise the base url will be
-	 * constructed the same as it always has been
-	 * @return
+	 * @param shouldUseServerUrl (optional) - If true, will utilize the configured grails.serverURL from application.yml if it exists otherwise the base url will be constructed the same as it always has been
+	 * @return String representing the relative or absolute URL
 	 */
 	protected String generateLink(String action, Map linkParams, boolean shouldUseServerUrl = false) {
 		String base = "$request.scheme://$request.serverName:$request.serverPort$request.contextPath"
