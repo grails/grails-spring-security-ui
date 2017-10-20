@@ -18,6 +18,7 @@ import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.ui.strategy.MailStrategy
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
 import grails.plugin.springsecurity.ui.strategy.RegistrationCodeStrategy
+import grails.util.Holders
 import groovy.text.SimpleTemplateEngine
 import org.springframework.security.authentication.dao.SaltSource
 
@@ -177,9 +178,23 @@ class RegisterController extends AbstractS2UiController {
 		redirect uri: registerPostResetUrl ?: successHandlerDefaultTargetUrl
 	}
 
-	protected String generateLink(String action, linkParams) {
-		createLink(base: "$request.scheme://$request.serverName:$request.serverPort$request.contextPath",
-		           controller: 'register', action: action, params: linkParams)
+	/**
+	 * Creates a grails application link from a set of attributes.
+	 * @param action
+	 * @param linkParams
+	 * @param shouldUseServerUrl (optional) - If true, will utilize the configured grails.serverURL from application.yml if it exists otherwise the base url will be constructed the same as it always has been
+	 * @return String representing the relative or absolute URL
+	 */
+	protected String generateLink(String action, Map linkParams, boolean shouldUseServerUrl = false) {
+		String base = "$request.scheme://$request.serverName:$request.serverPort$request.contextPath"
+		if (shouldUseServerUrl && Holders.config.grails.serverURL) {
+			base = grailsApplication.config.grails.serverURL
+		}
+		createLink(
+				base: base,
+				controller: 'register',
+				action: action,
+				params: linkParams)
 	}
 
 	protected String evaluate(s, binding) {
