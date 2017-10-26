@@ -14,6 +14,8 @@
  */
 package grails.plugin.springsecurity.ui
 
+import grails.config.Config
+import grails.core.support.GrailsConfigurationAware
 import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.ui.strategy.MailStrategy
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
@@ -25,7 +27,7 @@ import org.springframework.security.authentication.dao.SaltSource
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-class RegisterController extends AbstractS2UiController {
+class RegisterController extends AbstractS2UiController implements GrailsConfigurationAware {
 
 	static defaultAction = 'register'
 
@@ -40,6 +42,13 @@ class RegisterController extends AbstractS2UiController {
 
 	/** Dependency injection for the 'uiPropertiesStrategy' bean. */
 	PropertiesStrategy uiPropertiesStrategy
+
+	String serverURL
+
+	@Override
+	void setConfiguration(Config co) {
+		serverURL = co.getProperty('grails.serverURL', String)
+	}
 
 	def register(RegisterCommand registerCommand) {
 
@@ -188,8 +197,8 @@ class RegisterController extends AbstractS2UiController {
 	protected String generateLink(String action, Map linkParams, boolean shouldUseServerUrl = false) {
 		String base = "$request.scheme://$request.serverName:$request.serverPort$request.contextPath"
 
-		if (shouldUseServerUrl && Holders.config.grails.serverURL) {
-			base = grailsApplication.config.grails.serverURL
+		if (shouldUseServerUrl && serverURL) {
+			base = serverURL
 		}
 
 		createLink(
