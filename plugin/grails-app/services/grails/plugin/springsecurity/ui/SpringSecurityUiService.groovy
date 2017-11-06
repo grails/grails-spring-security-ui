@@ -205,15 +205,15 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	@Transactional
-	RegistrationCode sendForgotPasswordMail(String username, String emailAddress,
-	                                        Closure emailBodyGenerator) {
+	RegistrationCode sendForgotPasswordMail(String username, String emailAddress, Closure emailBodyGenerator) {
 
-		RegistrationCode registrationCode = save(username: username, RegistrationCode,
-			'sendForgotPasswordMail', transactionStatus)
+		RegistrationCode registrationCode = save(username: username, RegistrationCode, 'sendForgotPasswordMail', transactionStatus)
 		if (!registrationCode.hasErrors()) {
-			String body = emailBodyGenerator(registrationCode.token)
-			uiMailStrategy.sendForgotPasswordMail(to: emailAddress, from: forgotPasswordEmailFrom,
-		                                         subject: forgotPasswordEmailSubject, html: body)
+			uiMailStrategy.sendForgotPasswordMail(
+					to: emailAddress,
+					from: forgotPasswordEmailFrom,
+					subject: messageSource.getMessage('spring.security.ui.forgotPassword.email.subject', [].toArray(), LocaleContextHolder.locale),
+					html: emailBodyGenerator(registrationCode.token))
 		}
 
 		registrationCode
@@ -670,7 +670,6 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 
 	protected boolean encodePassword
 	protected String forgotPasswordEmailFrom
-	protected String forgotPasswordEmailSubject
 	protected List<String> registerDefaultRoleNames
 
 	protected Class<?> AclClass
@@ -691,7 +690,6 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		encodePassword = encode instanceof Boolean ? encode : false
 
 		forgotPasswordEmailFrom = conf.ui.forgotPassword.emailFrom ?: ''
-		forgotPasswordEmailSubject = conf.ui.forgotPassword.emailSubject ?: ''
 
 		registerDefaultRoleNames = conf.ui.register.defaultRoleNames ?: []
 

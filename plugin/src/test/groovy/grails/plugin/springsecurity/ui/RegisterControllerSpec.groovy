@@ -10,13 +10,14 @@ class RegisterControllerSpec extends Specification implements ControllerUnitTest
 
 	void setup() {
 		SpringSecurityUtils.setSecurityConfig [:] as ConfigObject
+		messageSource.addMessage 'spring.security.ui.register.email.subject', Locale.US, 'Registration Subject'
+		controller.messageSource = messageSource
 		updateFromConfig()
 	}
 
 	void cleanup() {
 		SpringSecurityUtils.resetSecurityConfig()
 	}
-
 	void 'passwordValidator validation fails if the password is the same as the username'() {
 		expect:
 		'command.password.error.username' == RegisterController.passwordValidator('username', [username: 'username'])
@@ -129,7 +130,7 @@ class RegisterControllerSpec extends Specification implements ControllerUnitTest
     void "verify generateLink for ('#action', #linkParams, '#shouldUseServerUrl') is #expectedUrl"() {
         given: "the grails.serverUrl is set"
         if (isConfigured) {
-            config.grails.serverURL = 'http://grails.org'
+			controller.serverURL = 'http://grails.org'
         }
 
         when: "the generateLink method is called"

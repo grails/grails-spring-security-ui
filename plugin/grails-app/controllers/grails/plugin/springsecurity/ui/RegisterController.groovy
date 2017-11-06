@@ -16,12 +16,14 @@ package grails.plugin.springsecurity.ui
 
 import grails.config.Config
 import grails.core.support.GrailsConfigurationAware
+import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.ui.strategy.MailStrategy
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
 import grails.plugin.springsecurity.ui.strategy.RegistrationCodeStrategy
-import grails.util.Holders
 import groovy.text.SimpleTemplateEngine
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.security.authentication.dao.SaltSource
 
 /**
@@ -44,6 +46,13 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 	PropertiesStrategy uiPropertiesStrategy
 
 	String serverURL
+
+	PageRenderer groovyPageRenderer
+	MessageSource messageSource
+
+	static final String EMAIL_LAYOUT = "/layouts/email"
+	static final String FORGOT_PASSWORD_TEMPLATE = "/register/_forgotPasswordMail"
+	static final String VERIFY_REGISTRATION_TEMPLATE = "/register/_verifyRegistrationMail"
 
 	@Override
 	void setConfiguration(Config co) {
@@ -75,19 +84,37 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 		[emailSent: true, registerCommand: registerCommand]
 	}
 
-	protected void sendVerifyRegistrationMail(RegistrationCode registrationCode, user, String email) {
-		String url = generateLink('verifyRegistration', [t: registrationCode.token])
+    protected void sendVerifyRegistrationMail(RegistrationCode registrationCode, user, String email) {
+        String url = generateLink('verifyRegistration', [t: registrationCode.token])
+        String body = renderRegistrationMailBody(url, user)
 
-		def body = registerEmailBody
-		if (body.contains('$')) {
-			body = evaluate(body, [user: user, url: url])
+        uiMailStrategy.sendVerifyRegistrationMail(
+                to: email,
+                from: registerEmailFrom,
+                subject: registerEmailSubject,
+                html: body
+        )
+    }
+
+	/**
+	 * Render the email body using text from DefaultUiSecurityConfig if it exists.  If not, render using gsps
+	 * @param url
+	 * @param user
+	 * @return html mail goodness
+	 */
+	protected String renderRegistrationMailBody(String url, user) {
+		if (registerEmailBody) {
+			def body = registerEmailBody
+			if (body.contains('$')) {
+				body = evaluate(body, [user: user, url: url])
+			}
+			return body.toString()
 		}
 
-		uiMailStrategy.sendVerifyRegistrationMail(
-			to: email,
-			from: registerEmailFrom,
-			subject: registerEmailSubject,
-			html: body.toString())
+		renderEmail(VERIFY_REGISTRATION_TEMPLATE, EMAIL_LAYOUT, [
+				url     : url,
+				username: user.username
+		])
 	}
 
 	def verifyRegistration() {
@@ -130,30 +157,45 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 
 		def user = findUserByUsername(forgotPasswordCommand.username)
 		if (!user) {
-			forgotPasswordCommand.errors.rejectValue 'username',
-				'spring.security.ui.forgotPassword.user.notFound'
+			forgotPasswordCommand.errors.rejectValue 'username', 'spring.security.ui.forgotPassword.user.notFound'
 			return [forgotPasswordCommand: forgotPasswordCommand]
 		}
 
 		String email = uiPropertiesStrategy.getProperty(user, 'email')
 		if (!email) {
-			forgotPasswordCommand.errors.rejectValue 'username',
-				'spring.security.ui.forgotPassword.noEmail'
+			forgotPasswordCommand.errors.rejectValue 'username', 'spring.security.ui.forgotPassword.noEmail'
 			return [forgotPasswordCommand: forgotPasswordCommand]
 		}
 
-		RegistrationCode registrationCode = uiRegistrationCodeStrategy.sendForgotPasswordMail(
+		uiRegistrationCodeStrategy.sendForgotPasswordMail(
 				forgotPasswordCommand.username, email) { String registrationCodeToken ->
 
 			String url = generateLink('resetPassword', [t: registrationCodeToken])
 			String body = forgotPasswordEmailBody
-			if (body.contains('$')) {
-				body = evaluate(body, [user: user, url: url])
+
+			if (!body) {
+				body = renderEmail(
+						FORGOT_PASSWORD_TEMPLATE, EMAIL_LAYOUT,
+						[
+								url     : url,
+								username: user.username
+						]
+				)
+			} else {
+				(body.contains('$')) {
+					body = evaluate(body, [user: user, url: url])
+				}
 			}
 
 			body
 		}
+
 		[emailSent: true, forgotPasswordCommand: forgotPasswordCommand]
+	}
+
+	private String renderEmail(String viewPath, String layoutPath, Map model) {
+		String content = groovyPageRenderer.render(view: viewPath, model: model)
+		return groovyPageRenderer.render(view: layoutPath, model: model << [content: content])
 	}
 
 	def resetPassword(ResetPasswordCommand resetPasswordCommand) {
@@ -233,7 +275,7 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 		forgotPasswordEmailBody = conf.ui.forgotPassword.emailBody ?: ''
 		registerEmailBody = conf.ui.register.emailBody ?: ''
 		registerEmailFrom = conf.ui.register.emailFrom ?: ''
-		registerEmailSubject = conf.ui.register.emailSubject ?: ''
+		registerEmailSubject = conf.ui.register.emailSubject ?: messageSource ? messageSource.getMessage('spring.security.ui.register.email.subject', [].toArray(), LocaleContextHolder.locale) : '' ?: ''
 		registerPostRegisterUrl = conf.ui.register.postRegisterUrl ?: ''
 		registerPostResetUrl = conf.ui.forgotPassword.postResetUrl ?: ''
 		successHandlerDefaultTargetUrl = conf.successHandler.defaultTargetUrl ?: '/'
