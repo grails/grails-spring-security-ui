@@ -10,23 +10,28 @@ class RegisterControllerSpec extends Specification implements ControllerUnitTest
 
 	void setup() {
 		SpringSecurityUtils.setSecurityConfig [:] as ConfigObject
-		messageSource.addMessage 'spring.security.ui.register.email.subject', Locale.US, 'Registration Subject'
-		controller.messageSource = messageSource
-		updateFromConfig()
 	}
 
 	void cleanup() {
 		SpringSecurityUtils.resetSecurityConfig()
 	}
+
 	void 'passwordValidator validation fails if the password is the same as the username'() {
+		given:
+		addRegisterEmailSubjectToMessageSource()
+
 		expect:
 		'command.password.error.username' == RegisterController.passwordValidator('username', [username: 'username'])
 	}
 
 	void 'passwordValidator validation strength check fails if the password is too short'() {
+		given:
+		addRegisterEmailSubjectToMessageSource()
+
 		when:
 		def command = [username: 'username']
 		String password = 'h!Z7'
+		updateFromConfig()
 
 		then:
 		!RegisterController.checkPasswordMinLength(password, command)
@@ -37,6 +42,9 @@ class RegisterControllerSpec extends Specification implements ControllerUnitTest
 	}
 
 	void 'passwordValidator validation fails if the password is too short'() {
+		given:
+		addRegisterEmailSubjectToMessageSource()
+
 		when:
 		def command = [username: 'username']
 		String password = 'h!Z7'
@@ -52,6 +60,9 @@ class RegisterControllerSpec extends Specification implements ControllerUnitTest
 	}
 
 	void 'passwordValidator validation strength check fails if the password is too long'() {
+		given:
+		addRegisterEmailSubjectToMessageSource()
+
 		when:
 		def command = [username: 'username']
 		String password = 'h!Z7aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1'
@@ -65,6 +76,9 @@ class RegisterControllerSpec extends Specification implements ControllerUnitTest
 	}
 
 	void 'passwordValidator validation fails if the password is too long'() {
+		given:
+		addRegisterEmailSubjectToMessageSource()
+
 		when:
 		def command = [username: 'username']
 		String password = 'h!Z7aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1'
@@ -81,6 +95,7 @@ class RegisterControllerSpec extends Specification implements ControllerUnitTest
 
 	void 'passwordValidator validation fails if the default regex does not match'() {
 		when:
+		addRegisterEmailSubjectToMessageSource()
 		def command = [username: 'username']
 		String password = 'password'
 
@@ -104,6 +119,7 @@ class RegisterControllerSpec extends Specification implements ControllerUnitTest
 
 	void 'passwordValidator validation fails if an updated regex does not match'() {
 		when:
+		addRegisterEmailSubjectToMessageSource()
 		def command = [username: 'username']
 		String password = 'h!Z7abcd'
 		SpringSecurityUtils.securityConfig.ui.password.validationRegex = '^.*s3cr3t.*$'
@@ -127,11 +143,14 @@ class RegisterControllerSpec extends Specification implements ControllerUnitTest
 		!RegisterController.passwordValidator(password, command)
 	}
 
-    void "verify generateLink for ('#action', #linkParams, '#shouldUseServerUrl') is #expectedUrl"() {
+	void "verify generateLink for ('#action', #linkParams, '#shouldUseServerUrl') is #expectedUrl"() {
         given: "the grails.serverUrl is set"
         if (isConfigured) {
 			controller.serverURL = 'http://grails.org'
         }
+
+		and: "the email subject exist in i18 messages"
+		addRegisterEmailSubjectToMessageSource()
 
         when: "the generateLink method is called"
         def results = controller.generateLink(action, linkParams, shouldUseServerUrl)
@@ -146,7 +165,32 @@ class RegisterControllerSpec extends Specification implements ControllerUnitTest
         true         | true               | 'shipit' | [foo: 'foo', bar: 'bar'] | 'http://grails.org/register/shipit?foo=foo&bar=bar'
     }
 
+	void "register email subject is loaded from config if config exists"() {
+		given:
+		addRegisterEmailSubjectToMessageSource()
+		if(hasConfig) {
+			SpringSecurityUtils.securityConfig.ui.register.emailSubject = 'This is from the config'
+		}
+		updateFromConfig()
+
+		when:
+		String results = controller.registerEmailSubject
+
+		then:
+		results == expectedResults
+
+		where:
+		hasConfig | expectedResults
+		true      | 'This is from the config'
+		false     | 'New Account'
+	}
+
 	private void updateFromConfig() {
-		new RegisterController().afterPropertiesSet()
+		controller.messageSource = messageSource
+		controller.afterPropertiesSet()
+	}
+
+	protected void addRegisterEmailSubjectToMessageSource() {
+		messageSource.addMessage 'spring.security.ui.register.email.subject', Locale.US, 'New Account'
 	}
 }

@@ -181,10 +181,8 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 								username: user.username
 						]
 				)
-			} else {
-				(body.contains('$')) {
-					body = evaluate(body, [user: user, url: url])
-				}
+			} else if (body.contains('$')) {
+				body = evaluate(body, [user: user, url: url])
 			}
 
 			body
