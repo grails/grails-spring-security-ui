@@ -212,7 +212,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 			uiMailStrategy.sendForgotPasswordMail(
 					to: emailAddress,
 					from: forgotPasswordEmailFrom,
-					subject: messageSource.getMessage('spring.security.ui.forgotPassword.email.subject', [].toArray(), LocaleContextHolder.locale),
+					subject: forgotPasswordEmailSubject,
 					html: emailBodyGenerator(registrationCode.token))
 		}
 
@@ -670,6 +670,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 
 	protected boolean encodePassword
 	protected String forgotPasswordEmailFrom
+	protected String forgotPasswordEmailSubject
 	protected List<String> registerDefaultRoleNames
 
 	protected Class<?> AclClass
@@ -690,6 +691,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		encodePassword = encode instanceof Boolean ? encode : false
 
 		forgotPasswordEmailFrom = conf.ui.forgotPassword.emailFrom ?: ''
+		forgotPasswordEmailSubject = conf.ui.forgotPassword.emailSubject ?: messageSource ? messageSource.getMessage('spring.security.ui.forgotPassword.email.subject', [].toArray(), LocaleContextHolder.locale) : '' ?: ''
 
 		registerDefaultRoleNames = conf.ui.register.defaultRoleNames ?: []
 
