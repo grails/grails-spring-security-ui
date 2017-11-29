@@ -66,9 +66,12 @@ The files copied for each type are summarized here:
 
 * register
 ** `controller/RegisterController.groovy`
+** `views/layouts/email.gsp`
 ** `views/register/forgotPassword.gsp`
+** `views/register/_forgotPasswordMail.gsp`
 ** `views/register/register.gsp`
 ** `views/register/resetPassword.gsp`
+** `views/register/_verifyRegistrationMail.gsp`
 
 * registrationcode
 ** `controller/RegistrationCodeController.groovy`

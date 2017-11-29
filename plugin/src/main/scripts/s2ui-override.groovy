@@ -129,6 +129,8 @@ switch ( directoryName ) {
 		copy template('views/register/forgotPassword.gsp'), new File(viewsDir, 'register')
 		copy template('views/register/register.gsp'), new File(viewsDir, 'register')
 		copy template('views/register/resetPassword.gsp'), new File(viewsDir, 'register')
+		copy template('views/register/_forgotPasswordMail.gsp'), new File(viewsDir, 'register')
+		copy template('views/register/_verifyRegistrationMail.gsp'), new File(viewsDir, 'register')
 		break
 	case 'registrationCode':
 		copy template('views/registrationCode/search.gsp'), new File(viewsDir, 'registrationCode')
@@ -164,6 +166,7 @@ switch ( directoryName ) {
 
 if ('register' == type) {
 	copy template('views/layouts/register.gsp'), file('grails-app/views/layouts/')
+	copy template('views/layouts/email.gsp'), file('grails-app/views/layouts/')
 }
 
 private void copy(pathOrResource, File destinationDirectory) {
