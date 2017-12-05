@@ -691,7 +691,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		encodePassword = encode instanceof Boolean ? encode : false
 
 		forgotPasswordEmailFrom = conf.ui.forgotPassword.emailFrom ?: ''
-		forgotPasswordEmailSubject = conf.ui.forgotPassword.emailSubject ?: messageSource ? messageSource.getMessage('spring.security.ui.forgotPassword.email.subject', [].toArray(), LocaleContextHolder.locale) : '' ?: ''
+		forgotPasswordEmailSubject = conf.ui.forgotPassword.emailSubject ?: messageSource ? messageSource.getMessage('spring.security.ui.forgotPassword.email.subject', [].toArray(), 'Password Reset', LocaleContextHolder.locale) : '' ?: ''
 
 		registerDefaultRoleNames = conf.ui.register.defaultRoleNames ?: []
 
