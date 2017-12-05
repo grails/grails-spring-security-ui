@@ -1,10 +1,8 @@
 // See: http://www.gebish.org/manual/current/configuration.html
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.chrome.ChromeDriver
-quitCachedDriverOnShutdown = true
 
 environments {
-
 
 	chrome {
 		driver = { new ChromeDriver() }
