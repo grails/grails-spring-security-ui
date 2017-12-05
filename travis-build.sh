@@ -19,7 +19,7 @@ fi
 
 ./gradlew install --stacktrace || EXIT_STATUS=$?
 if [[ $EXIT_STATUS -ne 0 ]]; then
-    echo "Check failed"
+    echo "install failed"
     exit $EXIT_STATUS
 fi
 
