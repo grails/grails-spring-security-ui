@@ -1,3 +1,8 @@
+dist: trusty
+addons:
+  chrome: stable
+jdk:
+  - oraclejdk8
 language: groovy
 sudo: false
 cache:
@@ -6,8 +11,6 @@ cache:
   - "$HOME/.gradle/wrapper"
 before_cache:
 - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-jdk:
-- oraclejdk8
 install: true
 script: "./travis-build.sh"
 env:

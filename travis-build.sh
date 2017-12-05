@@ -10,7 +10,7 @@ rm -rf build
 EXIT_STATUS=0
 
 ./gradlew -q clean
-./gradlew -q check || EXIT_STATUS=$?
+./gradlew -q -Dgeb.env=chromeHeadless check || EXIT_STATUS=$?
 
 if [[ $EXIT_STATUS -ne 0 ]]; then
     echo "Check failed"

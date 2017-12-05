@@ -7,6 +7,8 @@ buildscript {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipelineVersion}"
+        classpath "gradle.plugin.com.energizedwork.webdriver-binaries:webdriver-binaries-gradle-plugin:1.2"
+        classpath "gradle.plugin.com.energizedwork:idea-gradle-plugins:1.4"
     }
 }
 
@@ -17,6 +19,8 @@ apply plugin:"eclipse"
 apply plugin:"idea"
 apply plugin:"war"
 apply plugin:"org.grails.grails-web"
+apply plugin:"com.energizedwork.webdriver-binaries"
+apply plugin:"com.energizedwork.idea-project-components"
 apply plugin: "com.bertramlabs.asset-pipeline"
 apply plugin:"org.grails.grails-gsp"
 
@@ -53,16 +57,14 @@ dependencies {
     runtime "org.apache.tomcat:tomcat-jdbc"
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:$assetPipelineVersion"
     testCompile "org.grails:grails-gorm-testing-support"
-    testCompile "org.grails.plugins:geb"
     testCompile "org.grails:grails-web-testing-support"
-    testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
-    testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
-
-    testCompile "com.codeborne:phantomjsdriver:1.3.0"
-    testRuntime "org.seleniumhq.selenium:selenium-support:2.53.1"
-    testCompile "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
-    testCompile "org.seleniumhq.selenium:selenium-firefox-driver:2.53.1"
-    testCompile "org.seleniumhq.selenium:selenium-chrome-driver:2.53.1"
+    testCompile("org.grails.plugins:geb") {
+        exclude group: 'org.gebish', module: 'geb-spock'
+    }
+    testCompile 'org.gebish:geb-spock:2.0'
+    testCompile "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"
+    testCompile "org.seleniumhq.selenium:selenium-remote-driver:3.6.0"
+    testCompile "org.seleniumhq.selenium:selenium-api:3.6.0"
 
     compile 'dumbster:dumbster:1.6', { transitive = false }
     compile "org.grails.plugins:mail:$mailVesion"
@@ -78,6 +80,11 @@ bootRun {
     addResources = true
 }
 
+webdriverBinaries {
+    chromedriver '2.32'
+    geckodriver '0.18.0'
+}
+
 assets {
     minifyJs = true
     minifyCss = true
@@ -85,6 +92,8 @@ assets {
 
 integrationTest {
     systemProperty "geb.build.reportsDir", reporting.file("${project.projectDir}/build/geb-reports")
-    systemProperties System.properties
+    systemProperty "geb.env", System.getProperty('geb.env')
+    systemProperty "webdriver.chrome.driver", System.getProperty('webdriver.chrome.driver')
+    systemProperty "webdriver.gecko.driver", System.getProperty('webdriver.gecko.driver')
 }
 apply from: "${rootProject.projectDir}/gradle/integrationTestVerbose.gradle"
