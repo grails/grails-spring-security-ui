@@ -273,7 +273,7 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 		forgotPasswordEmailBody = conf.ui.forgotPassword.emailBody ?: ''
 		registerEmailBody = conf.ui.register.emailBody ?: ''
 		registerEmailFrom = conf.ui.register.emailFrom ?: ''
-		registerEmailSubject = conf.ui.register.emailSubject ?: messageSource ? messageSource.getMessage('spring.security.ui.register.email.subject', [].toArray(), LocaleContextHolder.locale) : '' ?: ''
+		registerEmailSubject = conf.ui.register.emailSubject ?: messageSource ? messageSource.getMessage('spring.security.ui.register.email.subject', [].toArray(), 'New Account', LocaleContextHolder.locale) : '' ?: ''
 		registerPostRegisterUrl = conf.ui.register.postRegisterUrl ?: ''
 		registerPostResetUrl = conf.ui.forgotPassword.postResetUrl ?: ''
 		successHandlerDefaultTargetUrl = conf.successHandler.defaultTargetUrl ?: '/'
