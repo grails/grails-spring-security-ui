@@ -2,8 +2,6 @@
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 
-quitCachedDriverOnShutdown = true
-
 environments {
 
 	chrome {
