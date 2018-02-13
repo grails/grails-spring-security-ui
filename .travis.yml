@@ -4,7 +4,7 @@ addons:
 jdk:
   - oraclejdk8
 language: groovy
-sudo: false
+sudo: required
 cache:
   directories:
   - "$HOME/.gradle/caches"
