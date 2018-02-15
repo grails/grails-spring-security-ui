@@ -40,6 +40,10 @@ Also be sure to update the versions when new releases are available.
 
 === Release History
 
+* Feb 14, 2018
+** 3.1.2 release
+* Sep 27, 2017
+** 3.1.1 release
 * Sep 26, 2017
 ** 3.1.0 release
 * Jul 28, 2017
