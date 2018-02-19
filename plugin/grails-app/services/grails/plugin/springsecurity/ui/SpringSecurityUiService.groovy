@@ -320,7 +320,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 			return
 		}
 
-		UserRole.removeAll user
+		removeRoles user, roleNames
 		addRoles user, roleNames
 		removeUserFromCache user
 	}
@@ -334,10 +334,32 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 
 	protected void addRoles(user, List<String> roleNames) {
 		String authorityNameField = uiPropertiesStrategy.paramNameToPropertyName('authority', 'role')
-
 		try {
 			for (String roleName in roleNames) {
-				UserRole.create user, Role.findWhere((authorityNameField): roleName)
+				def role = Role.findWhere((authorityNameField): roleName)
+				if (!UserRole.findByUserAndRole(user,role)) {
+					UserRole.create user, Role.findWhere((authorityNameField): roleName)
+				}
+			}
+		}
+		catch (e) {
+			uiErrorsStrategy.handleException e, user, null, this, 'addRoles', transactionStatus
+		}
+	}
+
+	protected void removeRoles(user, List<String> roleNames) {
+		String authorityNameField = uiPropertiesStrategy.paramNameToPropertyName('authority', 'role')
+		try {
+			for (def existingRole in UserRole.findAllByUser(user)) {
+				Boolean delete = true
+				for (String roleName in roleNames) {
+					if (existingRole.role == Role.findWhere((authorityNameField): roleName)) {
+						delete = false
+					}
+				}
+				if (delete) {
+					existingRole.delete()
+				}
 			}
 		}
 		catch (e) {
