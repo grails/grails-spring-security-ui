@@ -14,6 +14,7 @@
  */
 package grails.plugin.springsecurity.ui.strategy
 
+import grails.plugin.springsecurity.ui.ForgotPasswordCommand
 import grails.plugin.springsecurity.ui.RegisterCommand
 import grails.plugin.springsecurity.ui.RegistrationCode
 import grails.plugin.springsecurity.ui.ResetPasswordCommand
@@ -40,6 +41,14 @@ class DefaultRegistrationCodeStrategy implements RegistrationCodeStrategy {
 		springSecurityUiService.register user, password, salt
 	}
 
+	def verifyRegistration(String token) {
+		springSecurityUiService.verifyRegistration(token)
+	}
+
+	def validateForgotPasswordExtraSecurity(ForgotPasswordCommand forgotPasswordCommand, user,domain, String forgotPasswordExraValidationProp, String validationUserLookUpProperty){
+		springSecurityUiService.validateForgotPasswordExtraSecurity(forgotPasswordCommand,user,domain,forgotPasswordExraValidationProp,validationUserLookUpProperty)
+	}
+
 	def createUser(RegisterCommand command) {
 		springSecurityUiService.createUser command
 	}
@@ -49,7 +58,15 @@ class DefaultRegistrationCodeStrategy implements RegistrationCodeStrategy {
 	}
 
 	RegistrationCode sendForgotPasswordMail(String username, String emailAddress, Closure emailBodyGenerator) {
-		springSecurityUiService.sendForgotPasswordMail username, emailAddress, emailBodyGenerator
+		this.sendForgotPasswordMail(username, emailAddress, emailBodyGenerator,true)
+	}
+
+	RegistrationCode sendForgotPasswordMail(String username,  String emailAddress,  Boolean sendMail) {
+		springSecurityUiService.sendForgotPasswordMail username, emailAddress, sendMail
+	}
+
+	RegistrationCode sendForgotPasswordMail(String username, String emailAddress, Closure emailBodyGenerator, Boolean sendMail) {
+		springSecurityUiService.sendForgotPasswordMail username, emailAddress, emailBodyGenerator, sendMail
 	}
 
 	def resetPassword(ResetPasswordCommand command, RegistrationCode registrationCode) {

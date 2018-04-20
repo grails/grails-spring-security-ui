@@ -4,8 +4,8 @@
 	<s2ui:title messageCode='spring.security.ui.forgotPassword.title'/>
 </head>
 <body>
-<s2ui:formContainer type='forgotPassword' focus='username' width='50%'>
-	<s2ui:form beanName='forgotPasswordCommand'>
+<s2ui:formContainer type='forgotPassword' focus='username' width='50%' >
+	<s2ui:form beanName='forgotPasswordCommand' useToken="true">
 		<g:if test='${emailSent}'>
 		<br/>
 		<g:message code='spring.security.ui.forgotPassword.sent'/>
@@ -15,6 +15,9 @@
 		<h3><g:message code='spring.security.ui.forgotPassword.description'/></h3>
 		<table>
 			<s2ui:textFieldRow name='username' size='25' labelCodeDefault='Username'/>
+			<g:if test="${forgotPasswordCommand.extraValidation.do != '' && forgotPasswordCommand.extraValidation.prop != ''}" >
+				<s2ui:textFieldRow name='extraValidationString' size='25' labelCodeDefault="${forgotPasswordCommand.extraValidation.do + ' ' +  forgotPasswordCommand.extraValidation.prop }"/>
+			</g:if>
 		</table>
 		<s2ui:submitButton elementId='submit' messageCode='spring.security.ui.forgotPassword.submit'/>
 		</g:else>

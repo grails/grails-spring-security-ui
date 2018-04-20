@@ -187,6 +187,42 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	@Transactional
+	def validateForgotPasswordExtraSecurity(ForgotPasswordCommand forgotPasswordCommand,user,domain,String forgotPasswordExraValidationProp,String validationUserLookUpProperty) {
+		def isvalid = true
+		String instance
+		if(domain instanceof Object) {
+			 	instance = this.getProperty(domain.findWhere((validationUserLookUpProperty): user),forgotPasswordExraValidationProp)
+				if (!instance || instance.size() == 0 || instance?.toLowerCase() != forgotPasswordCommand.extraValidationString?.toLowerCase()) {
+					forgotPasswordCommand.errors.rejectValue 'extraValidationString', 'spring.security.ui.forgotPassword.extraValidationString.notequal'
+					isvalid = false
+				}
+
+		} else {
+			forgotPasswordCommand.errors.rejectValue 'extraValidationString', 'spring.security.ui.forgotPassword.extraValidationString.config'
+			isvalid = false
+
+		}
+		isvalid
+	}
+
+	@Transactional
+	def verifyRegistration(String token) {
+		def conf = SpringSecurityUtils.securityConfig
+		RegistrationCode registrationCode = token ? RegistrationCode.findByToken(token) : null
+		def registerPostRegisterUrl = conf.ui.register.postRegisterUrl ?: ''
+		def successHandlerDefaultTargetUrl = conf.successHandler.defaultTargetUrl ?: '/'
+
+		if (!registrationCode) {
+			return [flashType:'error',flashmsg:'spring.security.ui.register.badCode',redirectmsg:successHandlerDefaultTargetUrl]
+		}
+		def user = this.finishRegistration(registrationCode)
+		if (!user || user.hasErrors()) {
+			return [flashType:'error',flashmsg:'spring.security.ui.register.badCode',redirectmsg:successHandlerDefaultTargetUrl]
+		}
+		[flashType:'message', flashmsg:'spring.security.ui.register.complete',redirectmsg:registerPostRegisterUrl ?: successHandlerDefaultTargetUrl]
+	}
+
+	@Transactional
 	def finishRegistration(RegistrationCode registrationCode) {
 
 		def user = findUserByUsername(registrationCode.username)
@@ -205,10 +241,20 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	@Transactional
+	RegistrationCode sendForgotPasswordMail(String username,  String emailAddress,  Boolean sendMail) {
+		sendForgotPasswordMail(username, emailAddress, null,sendMail)
+	}
+
+	@Transactional
 	RegistrationCode sendForgotPasswordMail(String username, String emailAddress, Closure emailBodyGenerator) {
+		sendForgotPasswordMail(username, emailAddress, emailBodyGenerator,true)
+	}
+
+	@Transactional
+	RegistrationCode sendForgotPasswordMail(String username, String emailAddress, Closure emailBodyGenerator, Boolean sendMail) {
 
 		RegistrationCode registrationCode = save(username: username, RegistrationCode, 'sendForgotPasswordMail', transactionStatus)
-		if (!registrationCode.hasErrors()) {
+		if (!registrationCode.hasErrors() && sendMail) {
 			uiMailStrategy.sendForgotPasswordMail(
 					to: emailAddress,
 					from: forgotPasswordEmailFrom,

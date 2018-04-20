@@ -14,6 +14,7 @@
  */
 package grails.plugin.springsecurity.ui.strategy
 
+import grails.plugin.springsecurity.ui.ForgotPasswordCommand
 import grails.plugin.springsecurity.ui.RegisterCommand
 import grails.plugin.springsecurity.ui.RegistrationCode
 import grails.plugin.springsecurity.ui.ResetPasswordCommand
@@ -30,6 +31,10 @@ interface RegistrationCodeStrategy {
 	RegistrationCode register(user, String password, salt)
 
 	def createUser(RegisterCommand command)
+
+	def verifyRegistration(String token)
+
+	def validateForgotPasswordExtraSecurity(ForgotPasswordCommand forgotPasswordCommand,user,domain,String forgotPasswordExraValidationProp, String validationUserLookUpProperty)
 
 	/**
 	 * Called when the user clicks the link in the registration email. If the user is found, unlocks
@@ -51,6 +56,11 @@ interface RegistrationCodeStrategy {
 	 */
 	RegistrationCode sendForgotPasswordMail(String username, String emailAddress,
 	                                        Closure emailBodyGenerator)
+
+	RegistrationCode sendForgotPasswordMail(String username,  String emailAddress,  Boolean sendMail)
+
+	RegistrationCode sendForgotPasswordMail(String username, String emailAddress,
+											Closure emailBodyGenerator,Boolean sendMail)
 
 	/**
 	 * If the user is found by the username in the RegistrationCode, updates the user's password from
