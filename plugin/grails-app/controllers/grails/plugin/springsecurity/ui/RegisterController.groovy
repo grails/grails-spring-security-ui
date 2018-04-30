@@ -310,7 +310,7 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 
 	protected String forgotPasswordEmailBody
 	protected Boolean requireForgotPassEmailValidation
-	protected static List<HashMap> forgotPasswordExraValidation
+	protected List<HashMap> forgotPasswordExraValidation
 	protected String registerEmailBody
 	protected String registerEmailFrom
 	protected String registerEmailSubject
@@ -330,8 +330,8 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 		RegisterCommand.usernamePropertyName = usernamePropertyName
 
 		forgotPasswordEmailBody = conf.ui.forgotPassword.emailBody ?: ''
-		requireForgotPassEmailValidation = Boolean.valueOf(conf.ui.forgotPassword.requireForgotPassEmailValidation)
-		forgotPasswordExraValidation = conf.ui.forgotPassword.forgotPasswordExraValidation  ?: [:]
+		requireForgotPassEmailValidation = conf.ui.forgotPassword.requireForgotPassEmailValidation instanceof groovy.util.ConfigObject ? true : Boolean.valueOf(conf.ui.forgotPassword.requireForgotPassEmailValidation)
+		forgotPasswordExraValidation = conf.ui.forgotPassword.forgotPasswordExraValidation  ?: []
 		registerEmailBody = conf.ui.register.emailBody ?: ''
 		registerEmailFrom = conf.ui.register.emailFrom ?: ''
 		validationUserLookUpProperty = conf.ui.forgotPassword.validationUserLookUpProperty ?: 'user'
@@ -339,7 +339,7 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 		registerPostRegisterUrl = conf.ui.register.postRegisterUrl ?: ''
 		registerPostResetUrl = conf.ui.forgotPassword.postResetUrl ?: ''
 		successHandlerDefaultTargetUrl = conf.successHandler.defaultTargetUrl ?: '/'
-		requireEmailValidation = Boolean.valueOf(conf.ui.register.requireEmailValidation)
+		requireEmailValidation = conf.ui.register.requireEmailValidation instanceof groovy.util.ConfigObject ? true : Boolean.valueOf(conf.ui.register.requireEmailValidation)
 		passwordMaxLength = conf.ui.password.maxLength instanceof Number ? conf.ui.password.maxLength : 64
 		passwordMinLength = conf.ui.password.minLength instanceof Number ? conf.ui.password.minLength : 8
 		passwordValidationRegex = conf.ui.password.validationRegex ?: '^.*(?=.*\\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&]).*$'
