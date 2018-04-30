@@ -17,18 +17,8 @@ package grails.plugin.springsecurity.ui
 
 class ForgotPasswordCommand implements CommandObject, grails.validation.Validateable  {
     String username
-    /* TODO: Add it so it supports multplie paramaters..default will be just one..This is fine for just entering some token but not great for anything else
-     * ie Challenge questions.
-     */
-    String extraValidationString
-    def extraValidation = [do:'',prop:'']
 
-    public void setExtraValidation(String domainObject,String DoProperty){
-        this.extraValidation.do = domainObject
-        this.extraValidation.prop = DoProperty
-    }
 
     static constraints = {
-        extraValidationString nullable: true
     }
 }

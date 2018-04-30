@@ -15,9 +15,6 @@
 		<h3><g:message code='spring.security.ui.forgotPassword.description'/></h3>
 		<table>
 			<s2ui:textFieldRow name='username' size='25' labelCodeDefault='Username'/>
-			<g:if test="${forgotPasswordCommand.extraValidation.do != '' && forgotPasswordCommand.extraValidation.prop != ''}" >
-				<s2ui:textFieldRow name='extraValidationString' size='25' labelCodeDefault="${forgotPasswordCommand.extraValidation.do + ' ' +  forgotPasswordCommand.extraValidation.prop }"/>
-			</g:if>
 		</table>
 		<s2ui:submitButton elementId='submit' messageCode='spring.security.ui.forgotPassword.submit'/>
 		</g:else>

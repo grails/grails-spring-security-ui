@@ -34,7 +34,9 @@ interface RegistrationCodeStrategy {
 
 	def verifyRegistration(String token)
 
-	def validateForgotPasswordExtraSecurity(ForgotPasswordCommand forgotPasswordCommand,user,domain,String forgotPasswordExraValidationProp, String validationUserLookUpProperty)
+
+
+	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExraValidation, String validationUserLookUpProperty)
 
 	/**
 	 * Called when the user clicks the link in the registration email. If the user is found, unlocks

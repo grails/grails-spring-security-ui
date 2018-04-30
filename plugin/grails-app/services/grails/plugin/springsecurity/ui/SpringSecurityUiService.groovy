@@ -187,22 +187,29 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	@Transactional
-	def validateForgotPasswordExtraSecurity(ForgotPasswordCommand forgotPasswordCommand,user,domain,String forgotPasswordExraValidationProp,String validationUserLookUpProperty) {
-		def isvalid = true
+	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExraValidation,String validationUserLookUpProperty) {
+		Boolean isvalid = true
 		String instance
-		if(domain instanceof Object) {
-			 	instance = this.getProperty(domain.findWhere((validationUserLookUpProperty): user),forgotPasswordExraValidationProp)
-				if (!instance || instance.size() == 0 || instance?.toLowerCase() != forgotPasswordCommand.extraValidationString?.toLowerCase()) {
-					forgotPasswordCommand.errors.rejectValue 'extraValidationString', 'spring.security.ui.forgotPassword.extraValidationString.notequal'
+		List<HashMap> rtnValidations = []
+		forgotPasswordExraValidation?.eachWithIndex{it,idx->
+			HashMap inst = forgotPasswordExraValidation.getAt(idx)
+				def domain = grailsApplication.getClassForName(inst.domain)
+				rtnValidations[idx] = [:]
+				if(domain instanceof Object) {
+					instance = this.getProperty(domain.findWhere((validationUserLookUpProperty): user),inst.prop)
+					rtnValidations[idx].valueTxt = params.get(inst.prop)
+					if (!instance || instance.size() == 0 || instance?.toLowerCase() != params.get(inst.prop)?.toLowerCase()) {
+						rtnValidations[idx].errorMsg = messageSource.getMessage('spring.security.ui.securityQuestions.extraValidationString.notequal',null,'Not Equal',LocaleContextHolder.getLocale())
+						isvalid = false
+					}
+				} else {
+					rtnValidations[idx].errorMsg = messageSource.getMessage('spring.security.ui.securityQuestions.extraValidationString.config',null,'Domain Not Found',LocaleContextHolder.getLocale())
 					isvalid = false
 				}
+				idx++
+			}
 
-		} else {
-			forgotPasswordCommand.errors.rejectValue 'extraValidationString', 'spring.security.ui.forgotPassword.extraValidationString.config'
-			isvalid = false
-
-		}
-		isvalid
+		[isvalid,rtnValidations]
 	}
 
 	@Transactional

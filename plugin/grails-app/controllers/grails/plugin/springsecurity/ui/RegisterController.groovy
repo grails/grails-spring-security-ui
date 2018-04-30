@@ -142,79 +142,111 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 	}
 
 	def forgotPassword(ForgotPasswordCommand forgotPasswordCommand) {
-		withForm {
+
 			if (!request.post) {
 				ForgotPasswordCommand fpc = new ForgotPasswordCommand()
-				fpc.setExtraValidation(forgotPasswordExraValidationDO,forgotPasswordExraValidationProp)
 				return [forgotPasswordCommand: fpc]
 			}
-
+		withForm {
 			if (forgotPasswordCommand.hasErrors()) {
-				forgotPasswordCommand.setExtraValidation(forgotPasswordExraValidationDO,forgotPasswordExraValidationProp)
+
 				return [forgotPasswordCommand: forgotPasswordCommand]
 			}
 
 			def user = findUserByUsername(forgotPasswordCommand.username)
 			if (!user) {
 				forgotPasswordCommand.errors.rejectValue 'username', 'spring.security.ui.forgotPassword.user.notFound'
-				forgotPasswordCommand.setExtraValidation(forgotPasswordExraValidationDO,forgotPasswordExraValidationProp)
+
 				return [forgotPasswordCommand: forgotPasswordCommand]
 			}
 
-			if(forgotPasswordExraValidationProp && forgotPasswordExraValidationDO && forgotPasswordExraValidationProp?.size() > 0) {
-				try{
-					if(!uiRegistrationCodeStrategy.validateForgotPasswordExtraSecurity(forgotPasswordCommand,user,getDomainClassClass(forgotPasswordExraValidationDO),forgotPasswordExraValidationProp, validationUserLookUpProperty)) {
-						forgotPasswordCommand.setExtraValidation(forgotPasswordExraValidationDO, forgotPasswordExraValidationProp)
-						return [forgotPasswordCommand: forgotPasswordCommand]
-					}
-				} catch(Exception e) {
-					forgotPasswordCommand.errors.rejectValue 'extraValidationString', 'spring.security.ui.forgotPassword.extraValidationString.config'
-					forgotPasswordCommand.setExtraValidation(forgotPasswordExraValidationDO,forgotPasswordExraValidationProp)
-					return [forgotPasswordCommand: forgotPasswordCommand]
-				}
-			}
-
-			String email = uiPropertiesStrategy.getProperty(user, 'email')
-			if(requireForgotPassEmailValidation) {
-				if (!email) {
-					forgotPasswordCommand.errors.rejectValue 'username', 'spring.security.ui.forgotPassword.noEmail'
-					return [forgotPasswordCommand: forgotPasswordCommand]
-				}
-
-				uiRegistrationCodeStrategy.sendForgotPasswordMail(
-						forgotPasswordCommand.username, email) { String registrationCodeToken ->
-
-					String url = generateLink('resetPassword', [t: registrationCodeToken])
-					String body = forgotPasswordEmailBody
-
-					if (!body) {
-						body = renderEmail(
-								FORGOT_PASSWORD_TEMPLATE, EMAIL_LAYOUT,
-								[
-										url     : url,
-										username: user.username
-								]
-						)
-					} else if (body.contains('$')) {
-						body = evaluate(body, [user: user, url: url])
-					}
-
-					body
-				}
-
-				[emailSent: true, forgotPasswordCommand: forgotPasswordCommand]
+			if (forgotPasswordExraValidation && forgotPasswordExraValidation.size() > 0) {
+				redirect uri: generateLink('securityQuestions', [username: forgotPasswordCommand.username])
 			} else {
-				String url = generateLink('resetPassword', [t: uiRegistrationCodeStrategy.sendForgotPasswordMail(forgotPasswordCommand.username, email,false)?.token ])
-				redirect uri: url
+				if (requireForgotPassEmailValidation) {
+					processForgotPasswordEmail(forgotPasswordCommand, user)
+				} else {
+					redirect uri: processForgotPasswordEmail(forgotPasswordCommand, user)
+				}
 			}
-
-
 		}.invalidToken {
 			flash.message = "Invalid Form Submission"
 			redirect(controller: "login", action: "auth")
 		}
-
 	}
+
+
+	def securityQuestions(){
+		if (forgotPasswordExraValidation && forgotPasswordExraValidation.size() > 0) {
+				def user = findUserByUsername(params.username)
+				SecurityQuestionsCommand sc = new SecurityQuestionsCommand()
+				try {
+					sc.username = params.username
+					if (!request.post) {
+						render(view:"secuirtyQuestions", model: [securityQuestionsCommand:sc,user:user,forgotPasswordExraValidation:forgotPasswordExraValidation,validationUserLookUpProperty:validationUserLookUpProperty])
+					} else {
+						withForm {
+							def rtn = uiRegistrationCodeStrategy.validateForgotPasswordExtraSecurity(params, user, forgotPasswordExraValidation, validationUserLookUpProperty)
+							if (!rtn[0]) {
+								sc.validations = rtn[1]
+								render(view: "secuirtyQuestions", model: [securityQuestionsCommand: sc, user: user, forgotPasswordExraValidation: forgotPasswordExraValidation, validationUserLookUpProperty: validationUserLookUpProperty])
+							} else if (requireForgotPassEmailValidation) {
+								ForgotPasswordCommand fc = new ForgotPasswordCommand()
+								fc.username = sc.username
+								render(view: "forgotPassword", processForgotPasswordEmail(fc, user))
+							} else {
+								ForgotPasswordCommand fc = new ForgotPasswordCommand()
+								fc.username = sc.username
+								redirect uri: processForgotPasswordEmail(fc, user)
+							}
+						}.invalidToken {
+							flash.message = "Invalid Form Submission"
+							redirect(controller: "login", action: "auth")
+						}
+					}
+				} catch (Exception e) {
+					log.error e
+					render(view: "secuirtyQuestions", model: [securityQuestionsCommand: sc,user: user, forgotPasswordExraValidation: forgotPasswordExraValidation, validationUserLookUpProperty: validationUserLookUpProperty])
+				}
+			} else {
+				redirect uri: generateLink('register')
+			}
+		}
+
+
+	protected def processForgotPasswordEmail(forgotPasswordCommand,user){
+		String email = uiPropertiesStrategy.getProperty(user, 'email')
+		if(requireForgotPassEmailValidation) {
+			if (!email) {
+				forgotPasswordCommand.errors.rejectValue 'username', 'spring.security.ui.forgotPassword.noEmail'
+				return [forgotPasswordCommand: forgotPasswordCommand]
+			}
+			uiRegistrationCodeStrategy.sendForgotPasswordMail(
+					forgotPasswordCommand.username, email) { String registrationCodeToken ->
+
+				String url = generateLink('resetPassword', [t: registrationCodeToken])
+				String body = forgotPasswordEmailBody
+
+				if (!body) {
+					body = renderEmail(
+							FORGOT_PASSWORD_TEMPLATE, EMAIL_LAYOUT,
+							[
+									url     : url,
+									username: user.username
+							]
+					)
+				} else if (body.contains('$')) {
+					body = evaluate(body, [user: user, url: url])
+				}
+
+				body
+			}
+			[emailSent: true, forgotPasswordCommand: forgotPasswordCommand]
+		} else {
+			return generateLink('resetPassword', [t: uiRegistrationCodeStrategy.sendForgotPasswordMail(forgotPasswordCommand.username, email,false)?.token ])
+		}
+	}
+
 
 	private String renderEmail(String viewPath, String layoutPath, Map model) {
 		String content = groovyPageRenderer.render(view: viewPath, model: model)
@@ -279,8 +311,7 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 
 	protected String forgotPasswordEmailBody
 	protected Boolean requireForgotPassEmailValidation
-	protected String forgotPasswordExraValidationDO
-	protected String forgotPasswordExraValidationProp
+	protected static List<HashMap> forgotPasswordExraValidation
 	protected String registerEmailBody
 	protected String registerEmailFrom
 	protected String registerEmailSubject
@@ -300,9 +331,8 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 		RegisterCommand.usernamePropertyName = usernamePropertyName
 
 		forgotPasswordEmailBody = conf.ui.forgotPassword.emailBody ?: ''
-		requireForgotPassEmailValidation = conf.ui.forgotPassword.requireForgotPassEmailValidation ? Boolean.valueOf(conf.ui.forgotPassword.requireForgotPassEmailValidation) : true
-		forgotPasswordExraValidationDO = conf.ui.forgotPassword.forgotPasswordExraValidationDO  ?: ''
-		forgotPasswordExraValidationProp = conf.ui.forgotPassword.forgotPasswordExraValidationProp ?: ''
+		requireForgotPassEmailValidation = Boolean.valueOf(conf.ui.forgotPassword.requireForgotPassEmailValidation)
+		forgotPasswordExraValidation = conf.ui.forgotPassword.forgotPasswordExraValidation  ?: [:]
 		registerEmailBody = conf.ui.register.emailBody ?: ''
 		registerEmailFrom = conf.ui.register.emailFrom ?: ''
 		validationUserLookUpProperty = conf.ui.forgotPassword.validationUserLookUpProperty ?: 'user'
@@ -310,7 +340,7 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 		registerPostRegisterUrl = conf.ui.register.postRegisterUrl ?: ''
 		registerPostResetUrl = conf.ui.forgotPassword.postResetUrl ?: ''
 		successHandlerDefaultTargetUrl = conf.successHandler.defaultTargetUrl ?: '/'
-		requireEmailValidation = conf.ui.register.requireEmailValidation ? Boolean.valueOf(conf.ui.register.requireEmailValidation) : true
+		requireEmailValidation = Boolean.valueOf(conf.ui.register.requireEmailValidation)
 		passwordMaxLength = conf.ui.password.maxLength instanceof Number ? conf.ui.password.maxLength : 64
 		passwordMinLength = conf.ui.password.minLength instanceof Number ? conf.ui.password.minLength : 8
 		passwordValidationRegex = conf.ui.password.validationRegex ?: '^.*(?=.*\\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&]).*$'

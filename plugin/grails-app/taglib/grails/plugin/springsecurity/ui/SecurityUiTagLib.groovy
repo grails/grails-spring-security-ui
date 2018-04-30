@@ -317,7 +317,7 @@ class SecurityUiTagLib {
 		if (type == 'search') {
 			title = message(code: 'spring.security.ui.' + beanType + '.search')
 		}
-		else if (type == 'forgotPassword' || type == 'register' || type == 'resetPassword') {
+		else if (type == 'forgotPassword' || type == 'register' || type == 'resetPassword' || type == 'securityQuestions') {
 			title = message(code: 'spring.security.ui.' + type + '.header')
 		}
 		else {
@@ -759,19 +759,61 @@ class SecurityUiTagLib {
 		writeDocumentReady out, """\t\$("#$id").tabs().show().resizable({minHeight: $height, minWidth: 100});"""
 	}
 
+	def cmdValidationFields= { attrs ->
+		attrs = [:] + attrs
+		def outtxt = ''
+		def validations = attrs.remove('myfields')
+		def validationItems = attrs.remove('validations') ?: []
+		def user = attrs.remove('user')
+		def validationUserLookUpProperty = attrs.remove('validationUserLookUpProperty')
+		validations?.eachWithIndex{ it,idx ->
+			def instance = grailsApplication.getClassForName(it.domain)
+			if(instance instanceof Object) {
+				def myinstnce = instance.findWhere((validationUserLookUpProperty): user)
+				if (myinstnce instanceof Object) {
+					String label = ''
+					String name = it.prop
+					if (it.labelDomain) {
+						label = uiPropertiesStrategy.getProperty(myinstnce, it.labelDomain)
+					} else {
+						label = message(code: it.labelMessage, defaul: it.domain + " " + it.prop)
+					}
+
+					outtxt += this.textFieldRow([value: validationItems[idx]?.valueTxt, errorMsg:validationItems[idx]?.errorMsg,size:25,labelCodeDefault: label, name: name, useBean: false])
+				}
+			}
+		}
+		out << outtxt
+	}
+
+
+
+
 	/**
 	 * @attr name             REQUIRED the HTML element name
 	 * @attr labelCodeDefault the default to display if there's no message for the i18n code
 	 */
 	def textFieldRow = { attrs ->
 		attrs = [:] + attrs
-
-		def bean = beanFromModel()
+		def useBean = attrs.remove('useBean')
+		if((useBean && useBean.size() > 0 && useBean instanceof String) || useBean instanceof Boolean ) {
+			useBean = Boolean.valueOf(useBean)
+		} else {
+			useBean = true
+		}
 		String labelCodeDefault = attrs.remove('labelCodeDefault')
-		String name = getRequiredAttribute(attrs, 'name', 'textFieldRow')
-
-		def value = uiPropertiesStrategy.getProperty(bean, name)
-
+		String name
+		def value
+		def bean = beanFromModel()
+		def errors = ""
+		if(useBean) {
+			name = getRequiredAttribute(attrs, 'name', 'textFieldRow')
+			value = uiPropertiesStrategy.getProperty(bean, name)
+		} else {
+			name = attrs.remove('name')
+			value = attrs.remove('value') ?: ''
+			errors = attrs.remove('errorMsg') ?: ''
+		}
 		def textFieldAttrs = [name: name, value: value] + attrs
 
 		String fieldName = name
@@ -785,9 +827,9 @@ class SecurityUiTagLib {
 				<td valign="top" class="name">
 					<label for="$name">${message(code: labelCode(name), default: labelCodeDefault)}</label>
 				</td>
-				<td valign="top" class="value ${hasErrors(bean: bean, field: fieldName, 'errors')}">
+				<td valign="top" class="value ${ useBean ? hasErrors(bean: bean, field: fieldName, 'errors') : errors.size() > 0 ? 'error' : ''}">
 					${textField(textFieldAttrs)}
-					${fieldErrors(bean, fieldName)}
+					${useBean ? fieldErrors(bean, fieldName) : "<span class='s2ui_error'>${errors}</span>"}
 				</td>
 			</tr>"""
 	}

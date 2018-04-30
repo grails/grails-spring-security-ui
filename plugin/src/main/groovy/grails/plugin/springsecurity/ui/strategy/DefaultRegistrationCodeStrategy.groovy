@@ -45,8 +45,8 @@ class DefaultRegistrationCodeStrategy implements RegistrationCodeStrategy {
 		springSecurityUiService.verifyRegistration(token)
 	}
 
-	def validateForgotPasswordExtraSecurity(ForgotPasswordCommand forgotPasswordCommand, user,domain, String forgotPasswordExraValidationProp, String validationUserLookUpProperty){
-		springSecurityUiService.validateForgotPasswordExtraSecurity(forgotPasswordCommand,user,domain,forgotPasswordExraValidationProp,validationUserLookUpProperty)
+	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExraValidation, String validationUserLookUpProperty){
+		springSecurityUiService.validateForgotPasswordExtraSecurity(params,user,forgotPasswordExraValidation,validationUserLookUpProperty)
 	}
 
 	def createUser(RegisterCommand command) {
