@@ -25,7 +25,6 @@ import groovy.text.SimpleTemplateEngine
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.security.authentication.dao.SaltSource
-import sun.java2d.cmm.Profile
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
