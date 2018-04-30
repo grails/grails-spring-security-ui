@@ -4,8 +4,8 @@
 	<s2ui:title messageCode='spring.security.ui.forgotPassword.title'/>
 </head>
 <body>
-<s2ui:formContainer type='forgotPassword' focus='username' width='50%'>
-	<s2ui:form beanName='forgotPasswordCommand'>
+<s2ui:formContainer type='forgotPassword' focus='username' width='50%' >
+	<s2ui:form beanName='forgotPasswordCommand' useToken="true">
 		<g:if test='${emailSent}'>
 		<br/>
 		<g:message code='spring.security.ui.forgotPassword.sent'/>

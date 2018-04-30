@@ -187,6 +187,49 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	@Transactional
+	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExraValidation,String validationUserLookUpProperty) {
+		Boolean isvalid = true
+		String instance
+		List<HashMap> rtnValidations = []
+		forgotPasswordExraValidation?.eachWithIndex{it,idx->
+			HashMap inst = forgotPasswordExraValidation.getAt(idx)
+				def domain = grailsApplication.getClassForName(inst.domain)
+				rtnValidations[idx] = [:]
+				if(domain instanceof Object) {
+					instance = this.getProperty(domain.findWhere((validationUserLookUpProperty): user),inst.prop)
+					rtnValidations[idx].valueTxt = params.get(inst.prop)
+					if (!instance || instance.size() == 0 || instance?.toLowerCase() != params.get(inst.prop)?.toLowerCase()) {
+						rtnValidations[idx].errorMsg = messageSource.getMessage('spring.security.ui.securityQuestions.extraValidationString.notequal',null,'Not Equal',LocaleContextHolder.getLocale())
+						isvalid = false
+					}
+				} else {
+					rtnValidations[idx].errorMsg = messageSource.getMessage('spring.security.ui.securityQuestions.extraValidationString.config',null,'Domain Not Found',LocaleContextHolder.getLocale())
+					isvalid = false
+				}
+				idx++
+			}
+
+		[isvalid,rtnValidations]
+	}
+
+	@Transactional
+	def verifyRegistration(String token) {
+		def conf = SpringSecurityUtils.securityConfig
+		RegistrationCode registrationCode = token ? RegistrationCode.findByToken(token) : null
+		def registerPostRegisterUrl = conf.ui.register.postRegisterUrl ?: ''
+		def successHandlerDefaultTargetUrl = conf.successHandler.defaultTargetUrl ?: '/'
+
+		if (!registrationCode) {
+			return [flashType:'error',flashmsg:'spring.security.ui.register.badCode',redirectmsg:successHandlerDefaultTargetUrl]
+		}
+		def user = this.finishRegistration(registrationCode)
+		if (!user || user.hasErrors()) {
+			return [flashType:'error',flashmsg:'spring.security.ui.register.badCode',redirectmsg:successHandlerDefaultTargetUrl]
+		}
+		[flashType:'message', flashmsg:'spring.security.ui.register.complete',redirectmsg:registerPostRegisterUrl ?: successHandlerDefaultTargetUrl]
+	}
+
+	@Transactional
 	def finishRegistration(RegistrationCode registrationCode) {
 
 		def user = findUserByUsername(registrationCode.username)
@@ -205,10 +248,20 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	@Transactional
+	RegistrationCode sendForgotPasswordMail(String username,  String emailAddress,  Boolean sendMail) {
+		sendForgotPasswordMail(username, emailAddress, null,sendMail)
+	}
+
+	@Transactional
 	RegistrationCode sendForgotPasswordMail(String username, String emailAddress, Closure emailBodyGenerator) {
+		sendForgotPasswordMail(username, emailAddress, emailBodyGenerator,true)
+	}
+
+	@Transactional
+	RegistrationCode sendForgotPasswordMail(String username, String emailAddress, Closure emailBodyGenerator, Boolean sendMail) {
 
 		RegistrationCode registrationCode = save(username: username, RegistrationCode, 'sendForgotPasswordMail', transactionStatus)
-		if (!registrationCode.hasErrors()) {
+		if (!registrationCode.hasErrors() && sendMail) {
 			uiMailStrategy.sendForgotPasswordMail(
 					to: emailAddress,
 					from: forgotPasswordEmailFrom,
