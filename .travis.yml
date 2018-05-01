@@ -11,12 +11,12 @@ cache:
   - "$HOME/.gradle/wrapper"
 before_cache:
 - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-#install: true
-#script: "./travis-build.sh"
-#env:
-#  global:
-#  - secure: GkNKI+lpc+wMS9Vrs53h1NOYW1eBZmBpRGZ+pKGPEZjuhKg6YYW8Ue51CDd8R9GHlpCPifLre6IqSFqbl30G841Vv/fnyXGf6V/8b8MQvsytsVmjAmEXYi79bZknMFwxYYfJc+8jpFhdh1EY7GqzJrEbhwPUhwmOBGh+s4fYFWI=
-#  - secure: c890C2poIYtHE/+bq2O+Jc4EUT3wS22SkWuFoAsmUVWHh7T3G/lZ1jeP8FpXmntDjYwJ7+R5SRH4MkK2XSd8zl9onnMYACxC/OoW6rCr392STkmVWRN23WlYegoJJeG1LH2Dstu2HUMidInjoDW/rhF83PaBiazyJUciZuVRb9I=
-#  - secure: DHBy4BV5bZ4/S6/G/yxf+b702Qd8jWN9J5XI1Y3UmwYN0c+n38nepTint44EF8BjoiPB0aip5KU9uQSiE+zeztc7pgZyhK2di5RJY4zp6V/fOsjX3iNbdN3fwQ+cJmVVU5uN32EBQ/ZfzaFBXeil5mzN41jKmTXnj0QMx9FmY7U=
-#  - secure: uQnPD+9VodxweK++hhkiMEtcoZJ1+KEpOeP1B4AYmEqBMnYtW1U18vKA7D8jtMns2AAbrHMmIceEGFtVjnFHfY+xs8sH6xAeTmXfi5KVECdyHRSqhoxT3idJxlCO+3sk9BJwJqzQZzlCho/474z0+Qp/JK6HoSH7EVxVxF58r8E=
-#  - secure: XtobV3slsL0deceDSca6iUz/4jZlvJ/jIhWk2CF9s/DB344tshsz0pnTPHN7zwvbImj3gypxruavG9hQlSxYkGjVq60WFkaPnhLUuGb69Y4876cKCZwCruKSkHRq4BGadDy4/m+utrsWPW8J38sEhCdqZLo0vllqzAeO+7rcDB0=
+install: true
+script: "./travis-build.sh"
+env:
+  global:
+  - secure: GkNKI+lpc+wMS9Vrs53h1NOYW1eBZmBpRGZ+pKGPEZjuhKg6YYW8Ue51CDd8R9GHlpCPifLre6IqSFqbl30G841Vv/fnyXGf6V/8b8MQvsytsVmjAmEXYi79bZknMFwxYYfJc+8jpFhdh1EY7GqzJrEbhwPUhwmOBGh+s4fYFWI=
+  - secure: c890C2poIYtHE/+bq2O+Jc4EUT3wS22SkWuFoAsmUVWHh7T3G/lZ1jeP8FpXmntDjYwJ7+R5SRH4MkK2XSd8zl9onnMYACxC/OoW6rCr392STkmVWRN23WlYegoJJeG1LH2Dstu2HUMidInjoDW/rhF83PaBiazyJUciZuVRb9I=
+  - secure: DHBy4BV5bZ4/S6/G/yxf+b702Qd8jWN9J5XI1Y3UmwYN0c+n38nepTint44EF8BjoiPB0aip5KU9uQSiE+zeztc7pgZyhK2di5RJY4zp6V/fOsjX3iNbdN3fwQ+cJmVVU5uN32EBQ/ZfzaFBXeil5mzN41jKmTXnj0QMx9FmY7U=
+  - secure: uQnPD+9VodxweK++hhkiMEtcoZJ1+KEpOeP1B4AYmEqBMnYtW1U18vKA7D8jtMns2AAbrHMmIceEGFtVjnFHfY+xs8sH6xAeTmXfi5KVECdyHRSqhoxT3idJxlCO+3sk9BJwJqzQZzlCho/474z0+Qp/JK6HoSH7EVxVxF58r8E=
+  - secure: XtobV3slsL0deceDSca6iUz/4jZlvJ/jIhWk2CF9s/DB344tshsz0pnTPHN7zwvbImj3gypxruavG9hQlSxYkGjVq60WFkaPnhLUuGb69Y4876cKCZwCruKSkHRq4BGadDy4/m+utrsWPW8J38sEhCdqZLo0vllqzAeO+7rcDB0=
