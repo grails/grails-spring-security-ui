@@ -79,8 +79,8 @@ bootRun {
 }
 
 webdriverBinaries {
-    chromedriver '2.32'
-    geckodriver '0.18.0'
+    chromedriver '2.38'
+    geckodriver '0.20.0'
 }
 
 assets {
@@ -90,7 +90,7 @@ assets {
 
 integrationTest {
     systemProperty "geb.build.reportsDir", reporting.file("${project.projectDir}/build/geb-reports")
-    systemProperty "geb.env", System.getProperty('geb.env')
+    systemProperty "geb.env", System.getProperty('geb.env') ?: 'chrome'
     systemProperty "webdriver.chrome.driver", System.getProperty('webdriver.chrome.driver')
     systemProperty "webdriver.gecko.driver", System.getProperty('webdriver.gecko.driver')
 }
