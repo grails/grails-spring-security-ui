@@ -194,16 +194,3 @@ grails:
                 authorityJoinClassName: test.UserRole
                 userDomainClassName: test.User
             useSwitchUserFilter: true
-            ui:
-                forgotPassword:
-                    forgotPasswordExraValidation:
-                             -
-                                 domain: test.Profile
-                                 labelDomain: myQuestion
-                                 prop: myAnswer
-                             -
-                                 domain: test.Profile
-#                                 labelDomain: myQuestion2
-                                 labelMessage: securityvalidations.labelMessage.label1
-                                 prop: myAnswer2
-                    requireForgotPassEmailValidation: false
