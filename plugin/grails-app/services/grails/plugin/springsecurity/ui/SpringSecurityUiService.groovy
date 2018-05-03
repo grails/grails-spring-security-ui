@@ -320,8 +320,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 			return
 		}
 
-		UserRole.removeAll user
-		addRoles user, roleNames
+		updateUserRoles user, roleNames, transactionStatus
 		removeUserFromCache user
 	}
 
@@ -342,6 +341,39 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		}
 		catch (e) {
 			uiErrorsStrategy.handleException e, user, null, this, 'addRoles', transactionStatus
+		}
+	}
+
+	protected void addUserRoles(user, Set rolesToAdd) {
+		if (!user || !rolesToAdd) {
+			return
+		}
+		rolesToAdd.each { role ->
+			UserRole.create(user, role)
+		}
+	}
+
+	protected void updateUserRoles(user, List<String> roleNames, TransactionStatus transactionStatus) {
+		String authorityNameField = uiPropertiesStrategy.paramNameToPropertyName('authority', 'role')
+
+		try {
+			String dynamicFinder = "findAllBy".concat(authorityNameField.capitalize()).concat("InList")
+			List selectedRoles = Role."${dynamicFinder}"(roleNames)
+			Set originalRoles = user.authorities
+			Set rolesToRemove = originalRoles - selectedRoles
+			Set rolesToAdd = selectedRoles - originalRoles
+
+			removeUserRoles(user, rolesToRemove)
+			addUserRoles(user, rolesToAdd)
+		}
+		catch (e) {
+			uiErrorsStrategy.handleException e, user, null, this, 'updateUserRoles', transactionStatus
+		}
+	}
+
+	protected Set removeUserRoles(user, Set rolesToRemove) {
+		return rolesToRemove.each { role ->
+			UserRole.remove(user, role)
 		}
 	}
 
