@@ -92,6 +92,11 @@ class RegisterSpec extends AbstractSecuritySpec {
 
 		given:
 		String un = 'test_user_abcdef' + System.currentTimeMillis()
+		when:
+		go 'register/resetPassword?t=123'
+
+		then:
+		assertHtmlContains 'Sorry, we have no record of that request, or it has expired'
 
 		when:
 		go 'register/resetPassword?t=123'
