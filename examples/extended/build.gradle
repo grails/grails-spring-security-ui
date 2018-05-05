@@ -91,7 +91,7 @@ assets {
 
 integrationTest {
     systemProperty "geb.build.reportsDir", reporting.file("${project.projectDir}/build/geb-reports")
-    systemProperty "geb.env", System.getProperty('geb.env') ?: 'chrome'
+    systemProperty "geb.env", System.getProperty('geb.env') ?: 'chromeHeadless'
     systemProperty "webdriver.chrome.driver", System.getProperty('webdriver.chrome.driver')
     systemProperty "webdriver.gecko.driver", System.getProperty('webdriver.gecko.driver')
 }

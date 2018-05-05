@@ -92,6 +92,11 @@ class RegisterSpec extends AbstractSecuritySpec {
 
 		given:
 		String un = 'test_user_abcdef' + System.currentTimeMillis()
+		when:
+		go 'register/resetPassword?t=123'
+
+		then:
+		assertHtmlContains 'Sorry, we have no record of that request, or it has expired'
 
 		when:
 		to RegisterPage
@@ -176,12 +181,7 @@ class RegisterSpec extends AbstractSecuritySpec {
 //		then:
 //		body.contains('Hi ' + un)
 //
-//		when:
-//		code = findCode(body, 'resetPassword')
-//		go 'register/resetPassword?t=123'
-
-//		then:
-//		assertHtmlContains 'Sorry, we have no record of that request, or it has expired'
+//
 
 //		when:
 //		go 'register/resetPassword?t=' + code
@@ -196,7 +196,6 @@ class RegisterSpec extends AbstractSecuritySpec {
 		assertContentContains 'Password is required'
 
 		when:
-//		go 'register/resetPassword?t=' + code
 		enterNewPassword('abcdefghijk','mnopqrstuwzy')
 
 		then:
@@ -204,14 +203,12 @@ class RegisterSpec extends AbstractSecuritySpec {
 		assertContentContains 'Passwords do not match'
 
 		when:
-//		go 'register/resetPassword?t=' + code
 		enterNewPassword('aaaaaaaa','aaaaaaaa')
 
 		then:
 		assertContentContains 'Password must have at least one letter, number, and special character: !@#$%^&'
 
 		when:
-//		go 'register/resetPassword?t=' + code
 		enterNewPassword('aaaaaa1#','aaaaaa1#')
 
 		then:
