@@ -92,6 +92,7 @@ class RegisterSpec extends AbstractSecuritySpec {
 
 		given:
 		String un = 'test_user_abcdef' + System.currentTimeMillis()
+
 		when:
 		go 'register/resetPassword?t=123'
 
