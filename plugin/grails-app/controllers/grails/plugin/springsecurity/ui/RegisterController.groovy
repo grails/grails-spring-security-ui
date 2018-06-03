@@ -188,14 +188,14 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 							if (!rtn[0]) {
 								sc.validations = rtn[1]
 								render(view: "securityQuestions", model: [securityQuestionsCommand: sc, user: user, forgotPasswordExtraValidation: forgotPasswordExtraValidation, validationUserLookUpProperty: validationUserLookUpProperty])
-							} else if (requireForgotPassEmailValidation) {
-								ForgotPasswordCommand fc = new ForgotPasswordCommand()
-								fc.username = sc.username
-								render(view: "forgotPassword", processForgotPasswordEmail(fc, user))
 							} else {
 								ForgotPasswordCommand fc = new ForgotPasswordCommand()
 								fc.username = sc.username
-								redirect uri: processForgotPasswordEmail(fc, user)
+								if (requireForgotPassEmailValidation) {
+									render(view: "forgotPassword", processForgotPasswordEmail(fc, user))
+								} else {
+									redirect uri: processForgotPasswordEmail(fc, user)
+								}
 							}
 						}.invalidToken {
 							flash.message = "Invalid Form Submission"

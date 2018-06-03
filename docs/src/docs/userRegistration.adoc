@@ -36,6 +36,16 @@ grails.plugin.springsecurity.ui.register.postRegisterUrl = '/welcome'
 
 If you don't specify a value then the `grails.plugin.springsecurity.successHandler.defaultTargetUrl` value will be used, which is `'/'` by default.
 
+You can customize if the user should get e-mail for validation before they can log in for the first time.  To turn off
+e-mail validation set the parameter `requireEmailValidation` to false, if not set it will default to true.  This
+can be set in `grails-app/conf/application.groovy` or `grails-app/conf/application.yml` under
+[source,groovy]
+----
+grails.plugin.springsecurity.ui.register.requireEmailValidation = false
+----
+
+*Please Note if you turn off e-mail validation in production it is strongly recommended to have additional user creation validation*
+
 You can customize the subject, body, and from address of the registration email by overriding the default values in `grails-app/conf/application.groovy`, for example:
 
 [source,groovy]
