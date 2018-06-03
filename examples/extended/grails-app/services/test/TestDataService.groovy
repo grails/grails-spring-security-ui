@@ -85,7 +85,11 @@ class TestDataService {
 			save new Profile(user:user,myAnswer:'1234',myQuestion: "Count to four",myAnswer2: '12345', myQuestion2: 'Count to Five')
 		}
 
-		def admin = save new User('admin', 'password', 'admin@test.com')
+		User admin = save new User('admin', 'password', 'admin@test.com')
+		admin.accountLocked = false
+		admin.enabled = true
+		save admin
+
 		['user', 'admin', 'run_as', 'switch_user'].each { grantRole admin, it }
 
 		def flags = [:]
@@ -161,7 +165,7 @@ class TestDataService {
 	}
 
 	protected save(instance) {
-		instance.save(failOnError: true)
+		instance.save(failOnError: true, flush: true)
 	}
 
 	private static final registrationCodeData = [

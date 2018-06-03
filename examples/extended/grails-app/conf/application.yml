@@ -207,3 +207,5 @@ grails:
                                  labelMessage: securityvalidations.labelMessage.label1
                                  prop: myAnswer2
                     requireForgotPassEmailValidation: false
+                register:
+                    requireEmailValidation: false
