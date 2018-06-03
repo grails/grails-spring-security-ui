@@ -187,12 +187,12 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	@Transactional
-	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExraValidation,String validationUserLookUpProperty) {
+	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExtraValidation,String validationUserLookUpProperty) {
 		Boolean isvalid = true
 		String instance
 		List<HashMap> rtnValidations = []
-		forgotPasswordExraValidation?.eachWithIndex{it,idx->
-			HashMap inst = forgotPasswordExraValidation.getAt(idx)
+		forgotPasswordExtraValidation?.eachWithIndex{it,idx->
+			HashMap inst = forgotPasswordExtraValidation.getAt(idx)
 				def domain = grailsApplication.getClassForName(inst.domain)
 				rtnValidations[idx] = [:]
 				if(domain instanceof Object) {

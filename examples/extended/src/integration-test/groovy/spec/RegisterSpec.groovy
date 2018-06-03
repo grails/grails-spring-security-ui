@@ -178,20 +178,6 @@ class RegisterSpec extends AbstractSecuritySpec {
 		question2 = '12345'
 		submit()
 
-//		then:
-//		'Password Reset' == email.getHeaderValue('Subject')
-//
-//		when:
-//		body = email.body
-//
-//		then:
-//		body.contains('Hi ' + un)
-//
-//
-
-//		when:
-//		go 'register/resetPassword?t=' + code
-
 		then:
 		at ResetPasswordPage
 

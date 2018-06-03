@@ -87,18 +87,17 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 		} else {
 			redirectVerifyRegistration(uiRegistrationCodeStrategy.verifyRegistration(registrationCode.token))
 		}
-
-
-
 	}
 
 	protected void redirectVerifyRegistration(def rtn) {
 		if (rtn?.flashmsg) {
-			if(rtn?.flashType == 'error')
+			if(rtn?.flashType == 'error') {
 				flash.error =  message(code: rtn?.flashmsg)
-			else
+			} else {
 				flash.message = message(code:rtn?.flashmsg)
+			}
 		}
+
 		//this should always be set but if not have a backup!
 		redirect uri: rtn?.redirectmsg ?: successHandlerDefaultTargetUrl
 	}
@@ -159,7 +158,7 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 				return [forgotPasswordCommand: forgotPasswordCommand]
 			}
 
-			if (forgotPasswordExraValidation && forgotPasswordExraValidation.size() > 0) {
+			if (forgotPasswordExtraValidation && forgotPasswordExtraValidation.size() > 0) {
 				redirect uri: generateLink('securityQuestions', [username: forgotPasswordCommand.username])
 			} else {
 				if (requireForgotPassEmailValidation) {
@@ -176,19 +175,19 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 
 
 	def securityQuestions(){
-		if (forgotPasswordExraValidation && forgotPasswordExraValidation.size() > 0) {
+		if (forgotPasswordExtraValidation && forgotPasswordExtraValidation.size() > 0) {
 				def user = findUserByUsername(params.username)
 				SecurityQuestionsCommand sc = new SecurityQuestionsCommand()
 				try {
 					sc.username = params.username
 					if (!request.post) {
-						render(view:"secuirtyQuestions", model: [securityQuestionsCommand:sc,user:user,forgotPasswordExraValidation:forgotPasswordExraValidation,validationUserLookUpProperty:validationUserLookUpProperty])
+						render(view:"securityQuestions", model: [securityQuestionsCommand:sc,user:user,forgotPasswordExtraValidation:forgotPasswordExtraValidation,validationUserLookUpProperty:validationUserLookUpProperty])
 					} else {
 						withForm {
-							def rtn = uiRegistrationCodeStrategy.validateForgotPasswordExtraSecurity(params, user, forgotPasswordExraValidation, validationUserLookUpProperty)
+							def rtn = uiRegistrationCodeStrategy.validateForgotPasswordExtraSecurity(params, user, forgotPasswordExtraValidation, validationUserLookUpProperty)
 							if (!rtn[0]) {
 								sc.validations = rtn[1]
-								render(view: "secuirtyQuestions", model: [securityQuestionsCommand: sc, user: user, forgotPasswordExraValidation: forgotPasswordExraValidation, validationUserLookUpProperty: validationUserLookUpProperty])
+								render(view: "securityQuestions", model: [securityQuestionsCommand: sc, user: user, forgotPasswordExtraValidation: forgotPasswordExtraValidation, validationUserLookUpProperty: validationUserLookUpProperty])
 							} else if (requireForgotPassEmailValidation) {
 								ForgotPasswordCommand fc = new ForgotPasswordCommand()
 								fc.username = sc.username
@@ -205,7 +204,7 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 					}
 				} catch (Exception e) {
 					log.error e
-					render(view: "secuirtyQuestions", model: [securityQuestionsCommand: sc,user: user, forgotPasswordExraValidation: forgotPasswordExraValidation, validationUserLookUpProperty: validationUserLookUpProperty])
+					render(view: "securityQuestions", model: [securityQuestionsCommand: sc,user: user, forgotPasswordExtraValidation: forgotPasswordExtraValidation, validationUserLookUpProperty: validationUserLookUpProperty])
 				}
 			} else {
 				redirect uri: generateLink('register')
@@ -310,7 +309,7 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 
 	protected String forgotPasswordEmailBody
 	protected Boolean requireForgotPassEmailValidation
-	protected List<HashMap> forgotPasswordExraValidation
+	protected List<HashMap> forgotPasswordExtraValidation
 	protected String registerEmailBody
 	protected String registerEmailFrom
 	protected String registerEmailSubject
@@ -331,7 +330,7 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 
 		forgotPasswordEmailBody = conf.ui.forgotPassword.emailBody ?: ''
 		requireForgotPassEmailValidation = conf.ui.forgotPassword.requireForgotPassEmailValidation instanceof groovy.util.ConfigObject ? true : Boolean.valueOf(conf.ui.forgotPassword.requireForgotPassEmailValidation)
-		forgotPasswordExraValidation = conf.ui.forgotPassword.forgotPasswordExraValidation  ?: []
+		forgotPasswordExtraValidation = conf.ui.forgotPassword.forgotPasswordExtraValidation  ?: []
 		registerEmailBody = conf.ui.register.emailBody ?: ''
 		registerEmailFrom = conf.ui.register.emailFrom ?: ''
 		validationUserLookUpProperty = conf.ui.forgotPassword.validationUserLookUpProperty ?: 'user'
