@@ -208,4 +208,4 @@ grails:
                                  prop: myAnswer2
                     requireForgotPassEmailValidation: false
                 register:
-                    requireEmailValidation: false
+                    requireEmailValidation: true
