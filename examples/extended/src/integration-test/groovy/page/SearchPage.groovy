@@ -28,4 +28,9 @@ abstract class SearchPage extends AbstractSecurityPage {
 		assertContentContains "Showing $start through $end out of ${total}."
 		true
 	}
+
+	boolean assertResultsFuzzy(int start, int end, int total, boolean fuzzyTotal) {
+		boolean rtn = assertFuzzyContentContains("Showing $start through $end out of ${total + 1}.","Showing $start through $end out of ${total}.","Showing $start through $end out of ${total - 1}.")
+		true
+	}
 }
