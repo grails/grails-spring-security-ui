@@ -344,12 +344,17 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		}
 	}
 
+	@Transactional
 	protected void addUserRoles(user, Set rolesToAdd) {
 		if (!user || !rolesToAdd) {
 			return
 		}
 		rolesToAdd.each { role ->
-			UserRole.create(user, role)
+			def instance = UserRole.newInstance()
+			instance.user = user
+			instance.role = user
+			instance.save(insert: true)
+			instance
 		}
 	}
 
@@ -371,10 +376,15 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		}
 	}
 
-	protected Set removeUserRoles(user, Set rolesToRemove) {
-		return rolesToRemove.each { role ->
-			UserRole.remove(user, role)
+	protected void removeUserRoles(user, Set rolesToRemove) {
+		rolesToRemove.each { role ->
+			removeUserRole(user, role)
 		}
+	}
+
+	@Transactional
+	Number removeUserRole(def u, def r) {
+		UserRole.where { user == u && role == r }.deleteAll()
 	}
 
 	protected void removeUserFromCache(user) {
