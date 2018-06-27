@@ -186,26 +186,30 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 			email: command.email, username: command.username, accountLocked: true, enabled: true, User, null)
 	}
 
+	/*Abstracted so this method can be used in other applications and if we determine to use another matching stragery later we can update as needed
+	 */
+	boolean doesAnswerMatch(String val1, String val2) {
+		springSecurityService.passwordEncoder.isPasswordValid(val1,val2, null)
+	}
+
 	@Transactional
-	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExtraValidation,String validationUserLookUpProperty) {
+	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExtraValidationDomainClassName,forgotPasswordExtraValidation,String validationUserLookUpProperty) {
 		Boolean isvalid = true
 		String instance
+        def domain =  grailsApplication.getClassForName(forgotPasswordExtraValidationDomainClassName)
+        if(!(domain instanceof Object)) {
+            return [false,[errorMsg:messageSource.getMessage('spring.security.ui.securityQuestions.extraValidationString.config',null,'Domain Not Found',LocaleContextHolder.getLocale())]]
+        }
 		List<HashMap> rtnValidations = []
 		forgotPasswordExtraValidation?.eachWithIndex{it,idx->
 			HashMap inst = forgotPasswordExtraValidation.getAt(idx)
-				def domain = grailsApplication.getClassForName(inst.domain)
 				rtnValidations[idx] = [:]
-				if(domain instanceof Object) {
 					instance = this.getProperty(domain.findWhere((validationUserLookUpProperty): user),inst.prop)
 					rtnValidations[idx].valueTxt = params.get(inst.prop)
-					if (!instance || instance.size() == 0 || instance?.toLowerCase() != params.get(inst.prop)?.toLowerCase()) {
+					if (!instance || instance.size() == 0 || ! this.doesAnswerMatch(instance,params.get(inst.prop)?.toLowerCase())  ) {
 						rtnValidations[idx].errorMsg = messageSource.getMessage('spring.security.ui.securityQuestions.extraValidationString.notequal',null,'Not Equal',LocaleContextHolder.getLocale())
 						isvalid = false
 					}
-				} else {
-					rtnValidations[idx].errorMsg = messageSource.getMessage('spring.security.ui.securityQuestions.extraValidationString.config',null,'Domain Not Found',LocaleContextHolder.getLocale())
-					isvalid = false
-				}
 				idx++
 			}
 
@@ -245,6 +249,11 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		}
 
 		user
+	}
+
+	@Transactional
+	RegistrationCode sendForgotPasswordMail(String username) {
+		sendForgotPasswordMail(username, null, null,false)
 	}
 
 	@Transactional

@@ -6,7 +6,7 @@ buildscript {
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:$assetPipelineVersion"
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipelineVersion}"
         classpath "gradle.plugin.com.energizedwork.webdriver-binaries:webdriver-binaries-gradle-plugin:1.4"
     }
 }
@@ -56,8 +56,6 @@ dependencies {
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:$assetPipelineVersion"
     testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-web-testing-support"
-    testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
-
     testCompile("org.grails.plugins:geb") {
         exclude group: 'org.gebish', module: 'geb-spock'
     }
@@ -69,17 +67,18 @@ dependencies {
     compile 'dumbster:dumbster:1.6', { transitive = false }
     compile "org.grails.plugins:mail:$mailVesion"
 
-    compile project(":spring-security-ui")
-}
 
-webdriverBinaries {
-    chromedriver '2.32'
-    geckodriver '0.18.0'
+    compile project(":spring-security-ui")
 }
 
 bootRun {
     jvmArgs('-Dspring.output.ansi.enabled=always')
     addResources = true
+}
+
+webdriverBinaries {
+    chromedriver '2.38'
+    geckodriver '0.20.0'
 }
 
 assets {
@@ -89,6 +88,8 @@ assets {
 
 integrationTest {
     systemProperty "geb.build.reportsDir", reporting.file("${project.projectDir}/build/geb-reports")
-    systemProperties System.properties
+    systemProperty "geb.env", System.getenv('geb.env') ?: (System.getProperty('webdriver.chrome.driver') ?: 'chromeHeadless')
+    systemProperty "webdriver.chrome.driver", System.getProperty('webdriver.chrome.driver')
+    systemProperty "webdriver.gecko.driver", System.getProperty('webdriver.gecko.driver')
 }
 apply from: "${rootProject.projectDir}/gradle/integrationTestVerbose.gradle"

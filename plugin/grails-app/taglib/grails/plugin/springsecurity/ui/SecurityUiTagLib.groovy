@@ -766,15 +766,15 @@ class SecurityUiTagLib {
 		def validationItems = attrs.remove('validations') ?: []
 		def user = attrs.remove('user')
 		def validationUserLookUpProperty = attrs.remove('validationUserLookUpProperty')
-		validations?.eachWithIndex{ it,idx ->
-			def instance = grailsApplication.getClassForName(it.domain)
-			if(instance instanceof Object) {
-				def myinstnce = instance.findWhere((validationUserLookUpProperty): user)
-				if (myinstnce instanceof Object) {
-					String label = ''
+		def instance = grailsApplication.getClassForName(attrs.remove('domainClassName'))
+		if(instance instanceof Object) {
+            def myInstance = instance.findWhere((validationUserLookUpProperty): user)
+            if (myInstance instanceof Object) {
+		        validations?.eachWithIndex{ it,idx ->
+                	String label = ''
 					String name = it.prop
 					if (it.labelDomain) {
-						label = uiPropertiesStrategy.getProperty(myinstnce, it.labelDomain)
+						label = uiPropertiesStrategy.getProperty(myInstance, it.labelDomain)
 					} else {
 						label = message(code: it.labelMessage, defaul: it.domain + " " + it.prop)
 					}

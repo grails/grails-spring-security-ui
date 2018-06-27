@@ -18,6 +18,6 @@ class SecurityQuestionsPage extends AbstractSecurityPage {
 
 	def answerQuestions() {
 		question1.value('1234')
-		question2.value('1234')
+		question2.value('12345')
 	}
 }

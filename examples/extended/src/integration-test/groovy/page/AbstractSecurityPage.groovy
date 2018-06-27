@@ -9,9 +9,10 @@ abstract class AbstractSecurityPage extends Page {
 	}
 
 	protected boolean assertContentContains(String expected) {
-		assert $().text().contains(expected)
+		assert $().text().contains(expected) || $().text().contains(expected)
 		true
 	}
+
 
 	protected boolean assertContentMatches(String regex) {
 		assert $().text() ==~ regex
