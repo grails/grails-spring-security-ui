@@ -3,6 +3,7 @@ package spec
 import com.dumbster.smtp.SimpleSmtpServer
 import com.dumbster.smtp.SmtpMessage
 import page.profile.ProfileEditPage
+import page.profile.ProfileListPage
 import page.register.ForgotPasswordPage
 import page.register.RegisterPage
 import page.register.SecurityQuestionsPage
@@ -99,12 +100,6 @@ class RegisterSpec extends AbstractSecuritySpec {
 		assertHtmlContains 'Sorry, we have no record of that request, or it has expired'
 
 		when:
-		go 'register/resetPassword?t=123'
-
-		then:
-		assertHtmlContains 'Sorry, we have no record of that request, or it has expired'
-
-		when:
 		to RegisterPage
 		username = un
 		email = un + '@abcdef.com'
@@ -112,29 +107,11 @@ class RegisterSpec extends AbstractSecuritySpec {
 		$('#password2') << 'aaaaaa1#'
 		submit()
 
-		then:
-		assertContentContains 'Your account registration email was sent - check your mail!'
-		assert 1 == server.receivedEmailSize
-
-		when:
-		def email = currentEmail
-
-		then:
-		'New Account' == email.getHeaderValue('Subject')
-
-		when:
-		String body = email.body
-
-		then:
-		body.contains 'Hi ' + un
-
-		when:
-		String code = findCode(body, 'verifyRegistration')
-		go 'register/verifyRegistration?t=' + code
 
 		then:
 		assertHtmlContains 'Your registration is complete'
 		assertContentContains 'Logged in as ' + un
+
 
 		when:
 		 to ProfileCreatePage
@@ -215,8 +192,13 @@ class RegisterSpec extends AbstractSecuritySpec {
 		assertContentContains 'Log in'
 
 		when:
-			go 'profile'
-			$("a", text: "User(username:"+un+")").parent().parent().children().children('a').first().click()
+			to ProfileListPage
+		then:
+		    at ProfileListPage
+
+		when:
+			$("a", text: "User(username:"+un+")").parent().parent().children().first().children('a').click()
+
 		then:
 		 at ProfileShowPage
 

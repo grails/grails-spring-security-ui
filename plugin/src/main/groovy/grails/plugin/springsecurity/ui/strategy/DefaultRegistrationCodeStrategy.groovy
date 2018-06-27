@@ -45,8 +45,8 @@ class DefaultRegistrationCodeStrategy implements RegistrationCodeStrategy {
 		springSecurityUiService.verifyRegistration(token)
 	}
 
-	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExtraValidation, String validationUserLookUpProperty){
-		springSecurityUiService.validateForgotPasswordExtraSecurity(params,user,forgotPasswordExtraValidation,validationUserLookUpProperty)
+	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExtraValidationDomainClassName, forgotPasswordExtraValidation, String validationUserLookUpProperty){
+		springSecurityUiService.validateForgotPasswordExtraSecurity(params,user,forgotPasswordExtraValidationDomainClassName,forgotPasswordExtraValidation,validationUserLookUpProperty)
 	}
 
 	def createUser(RegisterCommand command) {
@@ -57,8 +57,12 @@ class DefaultRegistrationCodeStrategy implements RegistrationCodeStrategy {
 		springSecurityUiService.finishRegistration registrationCode
 	}
 
+	RegistrationCode sendForgotPasswordMail(String username) {
+        springSecurityUiService.sendForgotPasswordMail(username)
+	}
+
 	RegistrationCode sendForgotPasswordMail(String username, String emailAddress, Closure emailBodyGenerator) {
-		this.sendForgotPasswordMail(username, emailAddress, emailBodyGenerator,true)
+        springSecurityUiService.sendForgotPasswordMail(username, emailAddress, emailBodyGenerator,true)
 	}
 
 	RegistrationCode sendForgotPasswordMail(String username,  String emailAddress,  Boolean sendMail) {

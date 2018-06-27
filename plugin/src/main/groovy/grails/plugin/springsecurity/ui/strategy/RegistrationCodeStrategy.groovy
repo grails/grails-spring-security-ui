@@ -36,7 +36,7 @@ interface RegistrationCodeStrategy {
 
 
 
-	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExtraValidation, String validationUserLookUpProperty)
+	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExtraValidationDomainClassName,forgotPasswordExtraValidation, String validationUserLookUpProperty)
 
 	/**
 	 * Called when the user clicks the link in the registration email. If the user is found, unlocks
@@ -56,6 +56,8 @@ interface RegistrationCodeStrategy {
 	 * @param emailBodyGenerator will be passed the RegistrationCode token to build the email link and body
 	 * @return the RegistrationCode, not null but may have validation errors
 	 */
+	RegistrationCode sendForgotPasswordMail(String username)
+
 	RegistrationCode sendForgotPasswordMail(String username, String emailAddress,
 	                                        Closure emailBodyGenerator)
 

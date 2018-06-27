@@ -31,7 +31,7 @@ class UserSpec extends AbstractSecuritySpec {
 
 		then:
 		at UserSearchPage
-		assertResultsFuzzy 1, 10, 22, true
+		assertResults 1, 10, 22
 	}
 
 	void testFindByUsername() {
