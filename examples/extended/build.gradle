@@ -81,6 +81,7 @@ bootRun {
 webdriverBinaries {
     chromedriver "${chromeDriverVersion}"
     geckodriver "${geckoDriverVersion}"
+
 }
 
 assets {
