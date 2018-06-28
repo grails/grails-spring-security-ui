@@ -56,6 +56,8 @@ dependencies {
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:$assetPipelineVersion"
     testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-web-testing-support"
+    testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
+
     testCompile("org.grails.plugins:geb") {
         exclude group: 'org.gebish', module: 'geb-spock'
     }
@@ -67,18 +69,17 @@ dependencies {
     compile 'dumbster:dumbster:1.6', { transitive = false }
     compile "org.grails.plugins:mail:$mailVesion"
 
-
     compile project(":spring-security-ui")
+}
+
+webdriverBinaries {
+    chromedriver '2.40'
+    geckodriver '0.21.0'
 }
 
 bootRun {
     jvmArgs('-Dspring.output.ansi.enabled=always')
     addResources = true
-}
-
-webdriverBinaries {
-    chromedriver '2.38'
-    geckodriver '0.20.0'
 }
 
 assets {
