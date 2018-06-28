@@ -26,6 +26,7 @@ import page.profile.ProfileShowPage
 	}
 	false
 })
+
 class RegisterSpec extends AbstractSecuritySpec {
 
 	private SimpleSmtpServer server
@@ -101,6 +102,11 @@ class RegisterSpec extends AbstractSecuritySpec {
 
 		when:
 		to RegisterPage
+
+        then:
+        at RegisterPage
+
+        when:
 		username = un
 		email = un + '@abcdef.com'
 		$('#password') << 'aaaaaa1#'
@@ -114,24 +120,24 @@ class RegisterSpec extends AbstractSecuritySpec {
 
 
 		when:
-		 to ProfileCreatePage
-		 create(un)
+		to ProfileCreatePage
+		create(un)
 
 		then:
-			assertHtmlContains 'created'
-			at ProfileShowPage
+		assertHtmlContains 'created'
+		at ProfileShowPage
 
 		when:
-			editProfileBtn.click()
+		editProfileBtn.click()
 
 		then:
-		  at ProfileEditPage
+		at ProfileEditPage
 
 		when:
-		  updateProfile(un)
+		updateProfile(un)
 
 		then:
-		 at ProfileShowPage
+		at ProfileShowPage
 		assertHtmlContains "updated"
 
 		when:
@@ -192,21 +198,21 @@ class RegisterSpec extends AbstractSecuritySpec {
 		assertContentContains 'Log in'
 
 		when:
-			to ProfileListPage
+		to ProfileListPage
 		then:
-		    at ProfileListPage
+		at ProfileListPage
 
 		when:
-			$("a", text: "User(username:"+un+")").parent().parent().children().first().children('a').click()
+		$("a", text: "User(username:"+un+")").parent().parent().children().first().children('a').click()
 
 		then:
-		 at ProfileShowPage
+		at ProfileShowPage
 
 		when:
-			deleteProfile()
+		deleteProfile()
 
 		then:
-			assertHtmlContains 'deleted'
+		assertHtmlContains 'deleted'
 
 		when:
 		go 'user/edit?username=' + un
