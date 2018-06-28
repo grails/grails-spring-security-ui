@@ -82,6 +82,7 @@ bootRun {
     addResources = true
 }
 
+
 assets {
     minifyJs = true
     minifyCss = true
