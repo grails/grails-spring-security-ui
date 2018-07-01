@@ -1,0 +1,35 @@
+package  ${packageName}
+
+import grails.events.annotation.gorm.Listener
+import grails.plugin.springsecurity.SpringSecurityService
+import groovy.transform.CompileStatic
+import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
+import org.grails.datastore.mapping.engine.event.PreInsertEvent
+import org.grails.datastore.mapping.engine.event.PreUpdateEvent
+
+@CompileStatic
+class ${saClassName}ListenerService {
+
+    SpringSecurityService springSecurityService
+
+    @Listener(${saClassName})
+    void onProfilePreInsert(PreInsertEvent event) {
+        <% for(int i=1; i <= numberOfQuestions.toInteger(); i++) { %>
+           event.entityAccess.setProperty('myAnswer${i}' , springSecurityService.encodePassword((event.entityAccess.getProperty('myAnswer${i}') as String).toLowerCase()))
+          <%  }
+        %>
+    }
+
+    @Listener(${saClassName})
+    void onProfilePreUpdate(PreUpdateEvent event) {
+        Profile prof = ((${saClassName}) event.entityObject)
+        <% for(int i=1; i <= numberOfQuestions.toInteger(); i++) {  %>
+        if ( prof.isDirty('myAnswer${i}') ) {
+            event.entityAccess.setProperty('myAnswer${i}' , springSecurityService.encodePassword((event.entityAccess.getProperty('myAnswer${i}') as String).toLowerCase()))
+        }
+        <%  } %>
+
+    }
+
+
+}
