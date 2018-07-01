@@ -9,9 +9,7 @@
         <input type="hidden" value="${securityQuestionsCommand?.username}" name="username" id="username" />
             <br/>
             <h3><g:message code='spring.security.ui.securityQuestions.description'/></h3>
-            <table>
-                <s2ui:cmdValidationFields domainClassName="${forgotPasswordExtraValidationDomainClassName}" validations="${securityQuestionsCommand.validations}" myfields="${forgotPasswordExtraValidation}"  user="${user}" validationUserLookUpProperty="${validationUserLookUpProperty}" />
-            </table>
+            <s2ui:cmdValidationFields domainClassName="${forgotPasswordExtraValidationDomainClassName}" validations="${securityQuestionsCommand.validations}" myfields="${forgotPasswordExtraValidation}"  user="${user}" validationUserLookUpProperty="${validationUserLookUpProperty}" />
             <s2ui:submitButton elementId='submit' messageCode='spring.security.ui.securityQuestions.submit'/>
     </s2ui:form>
 </s2ui:formContainer>

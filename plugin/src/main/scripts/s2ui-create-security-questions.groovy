@@ -65,6 +65,10 @@ render template('SecuirtyQuestions.groovy.template'),
 		file("grails-app/domain/${saModel.packageName}/${saModel.simpleName}.groovy"),
 		templateAttributes, false
 
+render template('SecuirtyQuestionsController.groovy.template'),
+		file("grails-app/controllers/${saModel.packageName}/${saModel.simpleName}Controller.groovy"),
+		templateAttributes, false
+
 file('grails-app/conf/application.groovy').withWriterAppend { BufferedWriter writer ->
 	writer.newLine()
 	writer.writeLine '// Added by the Spring Security UI plugin:'
@@ -82,3 +86,4 @@ file('grails-app/i18n/messages.properties').withWriterAppend { BufferedWriter wr
 	writer.writeLine "spring.security.ui.menu.${saModel.packageName}.${saModel.simpleName}.index=Security Questions"
 	writer.newLine()
 }
+println("Finished s2ui-create-security-questions!")
