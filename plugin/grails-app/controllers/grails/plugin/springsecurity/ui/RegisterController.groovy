@@ -203,7 +203,7 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 						}
 					}
 				} catch (Exception e) {
-					log.error e
+					flash.error = e.getMessage()
 					render(view: "securityQuestions", model: [securityQuestionsCommand: sc,user: user, forgotPasswordExtraValidation: forgotPasswordExtraValidation,forgotPasswordExtraValidationDomainClassName:forgotPasswordExtraValidationDomainClassName, validationUserLookUpProperty: validationUserLookUpProperty])
 				}
 			} else {

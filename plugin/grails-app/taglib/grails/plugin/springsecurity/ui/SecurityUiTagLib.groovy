@@ -781,9 +781,12 @@ class SecurityUiTagLib {
 
 					outtxt += this.textFieldRow([value: validationItems[idx]?.valueTxt, errorMsg:validationItems[idx]?.errorMsg,size:25,labelCodeDefault: label, name: name, useBean: false])
 				}
+				outtxt = '<table>' + outtxt + '</table>'
+			} else {
+				outtxt = '<div>' + message(code: 'spring.security.ui.securityQuestion.MissingQuestions') + '</div>'
 			}
 		}
-		out << outtxt
+		out <<  outtxt
 	}
 
 
