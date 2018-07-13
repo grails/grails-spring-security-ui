@@ -11,8 +11,8 @@ class Profile implements Serializable {
     private static final long serialVersionUID = 1
 
 
-    String myQuestion
-    String myAnswer
+    String myQuestion1
+    String myAnswer1
     String myQuestion2
     String myAnswer2
     User user
@@ -20,7 +20,7 @@ class Profile implements Serializable {
 
 
     static constraints = {
-        myAnswer nullable: false, blank: false
+        myAnswer1 nullable: false, blank: false
         user nullable: false, blank: false, unique: true
     }
 }

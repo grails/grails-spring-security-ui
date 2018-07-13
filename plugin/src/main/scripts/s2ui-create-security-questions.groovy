@@ -53,8 +53,13 @@ templateAttributes = [
 		saClassProperty: saModel.modelName,
 		numberOfQuestions: numberOfQuestions,
 		userPropName: userModel.modelName.toLowerCase(),
+		propertyName: saModel.simpleName.toLowerCase(),
 		userDomainName: (userModel.packageName.toLowerCase() == saModel.packageName  ?  "" : userModel.packageName.toLowerCase() + '.') + userModel.modelName.toLowerCase().capitalize()
 ]
+
+render template('SecurityQuestionsService.groovy.template'),
+		file("grails-app/services/${saModel.packageName}/${saModel.simpleName}Service.groovy"),
+		templateAttributes, false
 
 render template('SAListenerService.groovy.template'),
 		file("grails-app/services/${saModel.packageName}/${saModel.simpleName}ListenerService.groovy"),
@@ -66,6 +71,18 @@ render template('SecuirtyQuestions.groovy.template'),
 
 render template('SecuirtyQuestionsController.groovy.template'),
 		file("grails-app/controllers/${saModel.packageName}/${saModel.simpleName}Controller.groovy"),
+		templateAttributes, false
+
+render template('SecurityQuestionsEdit.gsp.template'),
+		file("grails-app/views/${saModel.simpleName.toLowerCase()}/edit.gsp"),
+		templateAttributes, false
+
+render template('SecurityQuestionsCreate.gsp.template'),
+		file("grails-app/views/${saModel.simpleName.toLowerCase()}/create.gsp"),
+		templateAttributes, false
+
+render template('SecurityQuestionsIndex.gsp.template'),
+		file("grails-app/views/${saModel.simpleName.toLowerCase()}/index.gsp"),
 		templateAttributes, false
 
 file('grails-app/conf/application.groovy').withWriterAppend { BufferedWriter writer ->

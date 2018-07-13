@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="layout" content="\${layoutUi}" />
+        <g:set var="entityName" value="\${message(code: '${propertyName}.label', default: '${saClassName}')}" />
+        <s2ui:title messageCode='default.create.label' entityNameMessageCode='${propertyName}.label' entityNameDefault='Security Questions'/>
+    </head>
+    <body>
+        <div class="nav" role="navigation">
+            <ul>
+                <li><a class="home" href="\${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                <li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+            </ul>
+        </div>
+        <div id="create-${propertyName}" class="body" role="main">
+            <h1><g:message code="default.create.label" args="[entityName]" /></h1>
+            <g:if test="\${flash.message}">
+            <div class="message" role="status">\${flash.message}</div>
+            </g:if>
+            <g:hasErrors bean="\${this.${propertyName}}">
+            <ul class="errors" role="alert">
+                <g:eachError bean="\${this.${propertyName}}" var="error">
+                <li <g:if test="\${error in org.springframework.validation.FieldError}">data-field-id="\${error.field}"</g:if>><g:message error="\${error}"/></li>
+                </g:eachError>
+            </ul>
+            </g:hasErrors>
+            <s2ui:formContainer type='save' beanType='${propertyName}' focus='myQuestion1'>
+            		<s2ui:form useToken="true">
+            			<div class="dialog">
+            				<br/>
+            				<table>
+            					<tbody>
+            					    <% for(int i=1; i <= numberOfQuestions.toInteger(); i++) {  %>
+            					            <s2ui:textFieldRow name='myQuestion${i}' size='50' labelCodeDefault='myQuestion${i}'/>
+            					             <s2ui:textFieldRow name='myAnswer${i}' size='50' labelCodeDefault='myAnswer${i}'/>
+                                         <%  } %>
+                   					<s2ui:selectRow name='${userPropName}.id' from='\${users}' labelCodeDefault='${userPropName}' optionValue='\${lookupProp}' />
+                                    <tr class="prop"><td valign="top"><s2ui:submitButton/></td></tr>
+                                </tbody>
+            				</table>
+            			</div>
+            		</s2ui:form>
+            	</s2ui:formContainer>
+        </div>
+    </body>
+</html>

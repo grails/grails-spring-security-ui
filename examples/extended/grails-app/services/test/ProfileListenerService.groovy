@@ -1,4 +1,4 @@
-package test
+package  test
 
 import grails.events.annotation.gorm.Listener
 import grails.plugin.springsecurity.SpringSecurityService
@@ -14,20 +14,26 @@ class ProfileListenerService {
 
     @Listener(Profile)
     void onProfilePreInsert(PreInsertEvent event) {
-        event.entityAccess.setProperty('myAnswer', springSecurityService.encodePassword((event.entityAccess.getProperty('myAnswer') as String).toLowerCase()))
-        event.entityAccess.setProperty('myAnswer2', springSecurityService.encodePassword((event.entityAccess.getProperty('myAnswer2') as String).toLowerCase()))
-
+        
+           event.entityAccess.setProperty('myAnswer1' , springSecurityService.encodePassword((event.entityAccess.getProperty('myAnswer1') as String).toLowerCase()))
+          
+           event.entityAccess.setProperty('myAnswer2' , springSecurityService.encodePassword((event.entityAccess.getProperty('myAnswer2') as String).toLowerCase()))
+          
     }
 
     @Listener(Profile)
     void onProfilePreUpdate(PreUpdateEvent event) {
         Profile prof = ((Profile) event.entityObject)
-        if ( prof.isDirty('myAnswer') ) {
-            event.entityAccess.setProperty('myAnswer', springSecurityService.encodePassword((event.entityAccess.getProperty('myAnswer') as String).toLowerCase()))
+        
+        if ( prof.isDirty('myAnswer1') ) {
+            event.entityAccess.setProperty('myAnswer1' , springSecurityService.encodePassword((event.entityAccess.getProperty('myAnswer1') as String).toLowerCase()))
         }
+        
         if ( prof.isDirty('myAnswer2') ) {
-            event.entityAccess.setProperty('myAnswer2', springSecurityService.encodePassword((event.entityAccess.getProperty('myAnswer2') as String).toLowerCase()))
+            event.entityAccess.setProperty('myAnswer2' , springSecurityService.encodePassword((event.entityAccess.getProperty('myAnswer2') as String).toLowerCase()))
         }
+        
+
     }
 
 

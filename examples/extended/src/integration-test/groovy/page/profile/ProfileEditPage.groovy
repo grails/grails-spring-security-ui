@@ -12,10 +12,10 @@ class ProfileEditPage extends AbstractSecurityPage {
 
 
 	static content = {
-		myQuestion { $('#myQuestion').module(TextInput) }
+		myQuestion { $('#myQuestion1').module(TextInput) }
 		myQuestion2 { $('#myQuestion2').module(TextInput) }
 		myAnswer2 { $('#myAnswer2').module(TextInput) }
-		myAnswer { $('#myAnswer').module(TextInput) }
+		myAnswer { $('#myAnswer1').module(TextInput) }
 		submit { $("input.save")}
 	}
 

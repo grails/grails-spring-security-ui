@@ -199,8 +199,8 @@ grails:
                     forgotPasswordExtraValidationDomainClassName:  test.Profile
                     forgotPasswordExtraValidation:
                              -
-                                 labelDomain: myQuestion
-                                 prop: myAnswer
+                                 labelDomain: myQuestion1
+                                 prop: myAnswer1
                              -
 #                                 labelDomain: myQuestion2
                                  labelMessage: securityvalidations.labelMessage.label1
