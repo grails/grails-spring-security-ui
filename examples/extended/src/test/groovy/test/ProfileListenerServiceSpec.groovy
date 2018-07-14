@@ -24,7 +24,7 @@ class ProfileListenerServiceSpec extends Specification implements ServiceUnitTes
     void "test my answer is encoded on insert"() {
         given:
         User u = new User(username: "adminTest",password: "pass",email: "test@user.com",accountLocked: false,accountExpired: false)
-        Profile prof = new Profile(myQuestion2: 'Practical Grails 3', myQuestion: 'Eric Helgeson', myAnswer2: "12345", myAnswer: "1234", user: u)
+        Profile prof = new Profile(myQuestion2: 'Practical Grails 3', myQuestion1: 'Eric Helgeson', myAnswer2: "12345", myAnswer1: "1234", user: u)
 
         when:
         service.springSecurityService = Stub(grails.plugin.springsecurity.SpringSecurityService) {
@@ -34,7 +34,7 @@ class ProfileListenerServiceSpec extends Specification implements ServiceUnitTes
         service.onProfilePreInsert(new PreInsertEvent(dataStore, prof))
 
         then:
-        prof.myAnswer == 'XXXX-5125'
+        prof.myAnswer1 == 'XXXX-5125'
         prof.myAnswer2 == 'XXXX-5125'
     }
 
@@ -42,7 +42,7 @@ class ProfileListenerServiceSpec extends Specification implements ServiceUnitTes
     void "test my answer is encoded on update"() {
         given:
         User u = new User(username: "adminTest",password: "pass",email: "test@user.com",accountLocked: false,accountExpired: false)
-        Profile prof = new Profile(myQuestion2: 'Practical Grails 3', myQuestion: 'Eric Helgeson', myAnswer2: "12345", myAnswer: "1234", user: u)
+        Profile prof = new Profile(myQuestion2: 'Practical Grails 3', myQuestion1: 'Eric Helgeson', myAnswer2: "12345", myAnswer1: "1234", user: u)
 
         when:
 
@@ -60,7 +60,7 @@ class ProfileListenerServiceSpec extends Specification implements ServiceUnitTes
 
         then:
         prof.myAnswer2 == '1232321344XXXX-5125'
-        prof.myAnswer == '1234XXXX-5125'
+        prof.myAnswer1 == '1234XXXX-5125'
 
     }
 }

@@ -26,7 +26,6 @@ grails.plugin.springsecurity.filterChain.chainMap = [
 	[pattern: '/**',             filters: 'JOINED_FILTERS']
 ]
 
-
 // Added by the Spring Security UI plugin:
 grails.plugin.springsecurity.ui.forgotPassword.forgotPasswordExtraValidationDomainClassName = 'test.Profile'
 grails.plugin.springsecurity.ui.forgotPassword.forgotPasswordExtraValidation = [

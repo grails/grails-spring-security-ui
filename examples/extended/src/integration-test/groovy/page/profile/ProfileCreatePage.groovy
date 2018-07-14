@@ -23,7 +23,7 @@ class ProfileCreatePage extends AbstractSecurityPage {
 
 	void create(String userName) {
 		def userSelect = $(name: "user.id").module(Select)
-		userSelect.selected = "User(username:"+userName+")"
+		userSelect.selected = userName
 		myQuestion = "Count to 8"
 		myQuestion2 = "Count to 4"
 		myAnswer2  = "1234"

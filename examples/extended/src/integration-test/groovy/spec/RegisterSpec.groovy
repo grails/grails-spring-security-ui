@@ -12,7 +12,6 @@ import page.user.UserEditPage
 import page.user.UserSearchPage
 import spock.lang.IgnoreIf
 import page.register.ResetPasswordPage
-import page.profile.ProfileShowPage
 
 @IgnoreIf({
 	if (!System.getProperty('geb.env')) {
@@ -124,20 +123,20 @@ class RegisterSpec extends AbstractSecuritySpec {
 		create(un)
 
 		then:
+		at ProfileListPage
 		assertHtmlContains 'created'
-		at ProfileShowPage
 
-		when:
-		editProfileBtn.click()
+        when:
+        $("a", text: "User(username:"+un+")").parent().parent().children().first().children('a').click()
+
+        then:
+        at ProfileEditPage
+
+        when:
+        updateProfile(un)
 
 		then:
-		at ProfileEditPage
-
-		when:
-		updateProfile(un)
-
-		then:
-		at ProfileShowPage
+		at ProfileListPage
 		assertHtmlContains "updated"
 
 		when:
@@ -199,6 +198,7 @@ class RegisterSpec extends AbstractSecuritySpec {
 
 		when:
 		to ProfileListPage
+
 		then:
 		at ProfileListPage
 
@@ -206,7 +206,7 @@ class RegisterSpec extends AbstractSecuritySpec {
 		$("a", text: "User(username:"+un+")").parent().parent().children().first().children('a').click()
 
 		then:
-		at ProfileShowPage
+		at ProfileEditPage
 
 		when:
 		deleteProfile()

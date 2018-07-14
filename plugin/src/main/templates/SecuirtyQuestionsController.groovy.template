@@ -7,116 +7,122 @@ class ${saClassName}Controller extends grails.plugin.springsecurity.ui.AbstractS
 
      ${saClassName}Service ${saClassName.toLowerCase()}Service
     
-        static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+     static defaultAction = 'index'
 
-        def search() {
+     def search() { redirect action: "index", method: "GET" }
 
-            }
-
-            protected Class<?> getClazz() { ${saClassName} }
-            protected String getClassLabelCode() { '${propertyName}.label' }
-
-            protected Map model(${propertyName}, String action) {
-
+    protected Class<?> getClazz() { ${saClassName} }
+    protected String getClassLabelCode() { '${propertyName}.label' }
+    protected Map model(${propertyName}, String action) {
                     [ ${propertyName}: ${propertyName}]
-
-            }
+    }
     
-        def index(Integer max) {
-            params.max = Math.min(max ?: 10, 100)
-            def model = [:]
-            model.results = ${saClassName.toLowerCase()}Service.list(params)
-            model.totalCount = ${saClassName.toLowerCase()}Service.count()
-            addQueryParamsToModelForPaging(model,
-              <% for(int i=1; i <= numberOfQuestions.toInteger(); i++) {  %>
-               'myQuestion${i}','myAnswer${i}',
-               <%  } %>
-            'id', '${userPropName}.id'
-            )
-            render view: 'index', model: model
-        }
+    def index(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        params.offset = Math.max(params.offset ? params.int('offset') : 0, 0)
+        def model = [:]
+        model.results = ${saClassName.toLowerCase()}Service.list(params)
+        model.totalCount = ${saClassName.toLowerCase()}Service.count()
+        addQueryParamsToModelForPaging(model,
+          <% for(int i=1; i <= numberOfQuestions.toInteger(); i++) {  %>'myQuestion${i}','myAnswer${i}',<%  } %>
+        'id', '${userPropName}.id'
+        )
+        render view: 'index', model: model
+    }
     
-        def show(Long id) {
-            respond ${saClassName.toLowerCase()}Service.get(id)
-        }
+    def show(Long id) {
+        redirect action: 'edit', id: id
+    }
     
-        def create() {
-            respond new ${saClassName}(params), model : ['users': ${userPropName.capitalize()}.list(),'lookupProp':SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName]
-        }
+    def create() {
+        respond new ${saClassName}(params), model : ['users': ${userPropName.capitalize()}.list(),'lookupProp':SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName]
+    }
     
-        def save(${saClassName} ${saClassName.toLowerCase()}) {
+    def save(${saClassName} ${saClassName.toLowerCase()}) {
+        withForm {
             if (${saClassName.toLowerCase()} == null) {
                 notFound()
                 return
             }
-    
+
             try {
                 ${saClassName.toLowerCase()}Service.save(${saClassName.toLowerCase()})
             } catch (ValidationException e) {
                 respond ${saClassName.toLowerCase()}.errors, view:'create', model : ['users': ${userPropName.capitalize()}.list(),'lookupProp':SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName]
                 return
             }
-    
+
             request.withFormat {
                 form multipartForm {
-                    flash.message = message(code: 'default.created.message', args: [message(code: '${saClassName.toLowerCase()}.label', default: 'Security Questions'), ${saClassName.toLowerCase()}.id])
-                    redirect ${saClassName.toLowerCase()}
+                    flashCreated(${saClassName.toLowerCase()}.id)
+                    redirect action:"index", method:"GET"
                 }
                 '*' { respond ${saClassName.toLowerCase()}, [status: CREATED] }
             }
+        }.invalidToken {
+            doSaveWithInvalidTokenSpring Security Management Console()
         }
+    }
     
-        def edit(Long id) {
-            respond ${saClassName.toLowerCase()}Service.get(id)
-        }
+    def edit(Long id) {
+        respond ${saClassName.toLowerCase()}Service.get(id), model : ['users': ${userPropName.capitalize()}.list(),'lookupProp':SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName]
+    }
     
-        def update(${saClassName} ${saClassName.toLowerCase()}) {
+    def update(${saClassName} ${saClassName.toLowerCase()}) {
+        withForm {
             if (${saClassName.toLowerCase()} == null) {
                 notFound()
                 return
             }
-    
+
             try {
                 ${saClassName.toLowerCase()}Service.save(${saClassName.toLowerCase()})
             } catch (ValidationException e) {
                 respond ${saClassName.toLowerCase()}.errors, view:'edit'
                 return
             }
-    
+
             request.withFormat {
                 form multipartForm {
-                    flash.message = message(code: 'default.updated.message', args: [message(code: '${saClassName.toLowerCase()}.label', default: 'Security Questions'), ${saClassName.toLowerCase()}.id])
-                    redirect ${saClassName.toLowerCase()}
+                   flashUpdated()
+                   redirect action:"index", method:"GET"
                 }
                 '*'{ respond ${saClassName.toLowerCase()}, [status: OK] }
             }
+        }.invalidToken {
+             doUpdateWithInvalidToken()
         }
+    }
     
-        def delete(Long id) {
+    def delete(Long id) {
+        withForm {
             if (id == null) {
                 notFound()
                 return
             }
-    
+
             ${saClassName.toLowerCase()}Service.delete(id)
-    
+
             request.withFormat {
                 form multipartForm {
-                    flash.message = message(code: 'default.deleted.message', args: [message(code: '${saClassName.toLowerCase()}.label', default: '${saClassName}'), id])
+                    flashDeleted()
                     redirect action:"index", method:"GET"
                 }
                 '*'{ render status: NO_CONTENT }
             }
+        }.invalidToken {
+            doDeleteWithInvalidToken()
         }
+    }
     
-        protected void notFound() {
-            request.withFormat {
-                form multipartForm {
-                    flash.message = message(code: 'default.not.found.message', args: [message(code: '${saClassName.toLowerCase()}.label', default: '${saClassName}'), params.id])
-                    redirect action: "index", method: "GET"
-                }
-                '*'{ render status: NOT_FOUND }
+    protected void notFound() {
+        request.withFormat {
+            form multipartForm {
+                flashNotFound()
+                redirect action: "index", method: "GET"
             }
+            '*'{ render status: NOT_FOUND }
         }
-
+    }
 }

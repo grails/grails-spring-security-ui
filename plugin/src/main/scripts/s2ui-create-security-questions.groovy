@@ -99,7 +99,7 @@ file('grails-app/conf/application.groovy').withWriterAppend { BufferedWriter wri
 
 file('grails-app/i18n/messages.properties').withWriterAppend { BufferedWriter writer ->
 	writer.newLine()
-	writer.writeLine "spring.security.ui.menu.${saModel.packageName}.${saModel.simpleName}.index=Security Questions"
+	writer.writeLine "spring.security.ui.menu.${saModel.packageName}.${saModel.simpleName}=${saModel.simpleName} Questions"
 	writer.newLine()
 }
 println("Finished s2ui-create-security-questions!")
