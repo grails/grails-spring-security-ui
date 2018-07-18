@@ -40,7 +40,7 @@ class ExtendedMenuSpec extends AbstractSecuritySpec {
 		html.contains 'Logout Handlers'
 		html.contains 'Voters'
 		html.contains 'Authentication Providers'
-
+		html.contains 'Profile Questions'
 		html.contains 'Persistent Logins'
 
 		html.contains 'ACL'

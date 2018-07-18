@@ -13,6 +13,9 @@ Navigate to `/register/`:
 
 image::register_start.png[]
 
+By default e-mail validation for user creation is turned on.  If you wish to turn it off see the 'E-Mail Validation Parameter' section below.
+If this is turned off then no e-mail is sent to the user and they are automatically redirected to the link that would have been sent in the e-mail.
+
 After filling out valid values an email will be sent and you'll see a success screen:
 
 image::register_sent.png[]
@@ -29,6 +32,8 @@ image::register_final.png[]
 
 The post-registration destination url is configurable in `grails-app/conf/application.groovy` using the `postRegisterUrl` attribute:
 
+In addition, each new user will be granted `ROLE_USER` after finalizing the registration. If you want to change the default role, add more, or grant no roles at all (for example if you want an admin to approve new users and explicitly enable new users) then you can customize that with the `defaultRoleNames` attribute (which is a List of Strings):
+
 [source,groovy]
 ----
 grails.plugin.springsecurity.ui.register.postRegisterUrl = '/welcome'
@@ -36,6 +41,7 @@ grails.plugin.springsecurity.ui.register.postRegisterUrl = '/welcome'
 
 If you don't specify a value then the `grails.plugin.springsecurity.successHandler.defaultTargetUrl` value will be used, which is `'/'` by default.
 
+== E-Mail Validation Parameter
 You can customize if the user should get e-mail for validation before they can log in for the first time.  To turn off
 e-mail validation set the parameter `requireEmailValidation` to false, if not set it will default to true.  This
 can be set in `grails-app/conf/application.groovy` or `grails-app/conf/application.yml` under
@@ -45,6 +51,11 @@ grails.plugin.springsecurity.ui.register.requireEmailValidation = false
 ----
 
 *Please Note if you turn off e-mail validation in production it is strongly recommended to have additional user creation validation*
+
+
+=== Mail configuration
+
+By default the plugin uses the http://grails.org/plugin/mail[Mail] plugin to send emails, but only if it installed. This is configurable by registering your own `MailStrategy` implementation - see [the section on configuration|guide:customization] for more information. The plugin assumes that the Mail plugin and an SMTP server are already configured.
 
 You can customize the subject, body, and from address of the registration email by overriding the default values in `grails-app/conf/application.groovy`, for example:
 
@@ -57,8 +68,6 @@ grails.plugin.springsecurity.ui.register.emailSubject = '...'
 
 The `emailBody` property should be a GString and will have the User domain class instance in scope in the `user` variable, and the generated url to click to finalize the signup in the `url` variable.
 
-In addition, each new user will be granted `ROLE_USER` after finalizing the registration. If you want to change the default role, add more, or grant no roles at all (for example if you want an admin to approve new users and explicitly enable new users) then you can customize that with the `defaultRoleNames` attribute (which is a List of Strings):
-
 [source,groovy]
 ----
 grails.plugin.springsecurity.ui.register.defaultRoleNames = [] // no roles
@@ -70,10 +79,6 @@ or
 ----
 grails.plugin.springsecurity.ui.register.defaultRoleNames = ['ROLE_CUSTOMER']
 ----
-
-=== Mail configuration
-
-By default the plugin uses the http://grails.org/plugin/mail[Mail] plugin to send emails, but only if it installed. This is configurable by registering your own `MailStrategy` implementation - see [the section on configuration|guide:customization] for more information. The plugin assumes that the Mail plugin and an SMTP server are already configured.
 
 === Notes
 
