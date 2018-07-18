@@ -18,25 +18,25 @@ import grails.util.GrailsNameUtils
 import groovy.transform.Field
 
 @Field String usageMessage = '''
-grails s2ui-create-security-questions <domain-class-package> <security-qa-class-name> <user-domain-class-name> [number-of-questions]
+grails s2ui-create-challenge-questions <domain-class-package> <challenge-qa-class-name> <user-domain-class-name> [number-of-questions]
 
 domain-class-package is required and is the package where domainName will live 
-security-qa-class-name  is required and is the Name of the domain class used to store this information
+challenge-qa-class-name  is required and is the Name of the domain class used to store this information
 user-domain-class-name is required and is the package and name of the User class.  In most circumstance I would put this in the same package but it will work if they are different. 
 number-of-questions is optional but if not given will default to 2. 
 
-Example: s2ui-create-security-questions com.mycompany Profile com.mycompany.User  4
+Example: s2ui-create-challenge-questions com.mycompany Profile com.mycompany.User  4
 '''
 
 
 @Field Map templateAttributes
 
-description 'Creates Domian Objects, Service Listener, and updates the YML file so it can be used', {
+description 'Creates Domian Objects, Service Listener, Controller, I18N and updates the application.groovy file so it can be used', {
 	usage usageMessage
 	argument name: 'Domain class package',     description: 'The package to use for the domain classes'
-	argument name: 'Security QA class name',   description: 'The name of security questions and answers class'
+	argument name: 'Challenge QA class name',   description: 'The name of challenge questions and answers class'
 	argument name: 'User class name',	       description: 'The name of the User/Person class'
-	argument name: 'Number Of Questions', 	   description: 'The number of security questions generated', required: false
+	argument name: 'Number Of Questions', 	   description: 'The number of challenge questions generated', required: false
 }
 
 
@@ -57,31 +57,31 @@ templateAttributes = [
 		userDomainName: (userModel.packageName.toLowerCase() == saModel.packageName  ?  "" : userModel.packageName.toLowerCase() + '.') + userModel.modelName.toLowerCase().capitalize()
 ]
 
-render template('SecurityQuestionsService.groovy.template'),
+render template('ChallengeQuestionsService.groovy.template'),
 		file("grails-app/services/${saModel.packageName}/${saModel.simpleName}Service.groovy"),
 		templateAttributes, false
 
-render template('SAListenerService.groovy.template'),
+render template('ChallengeQuestionsListenerService.groovy.template'),
 		file("grails-app/services/${saModel.packageName}/${saModel.simpleName}ListenerService.groovy"),
 		templateAttributes, false
 
-render template('SecuirtyQuestions.groovy.template'),
+render template('ChallengeQuestions.groovy.template'),
 		file("grails-app/domain/${saModel.packageName}/${saModel.simpleName}.groovy"),
 		templateAttributes, false
 
-render template('SecuirtyQuestionsController.groovy.template'),
+render template('ChallengeQuestionsController.groovy.template'),
 		file("grails-app/controllers/${saModel.packageName}/${saModel.simpleName}Controller.groovy"),
 		templateAttributes, false
 
-render template('SecurityQuestionsEdit.gsp.template'),
+render template('ChallengeQuestionsEdit.gsp.template'),
 		file("grails-app/views/${saModel.simpleName.toLowerCase()}/edit.gsp"),
 		templateAttributes, false
 
-render template('SecurityQuestionsCreate.gsp.template'),
+render template('ChallengeQuestionsCreate.gsp.template'),
 		file("grails-app/views/${saModel.simpleName.toLowerCase()}/create.gsp"),
 		templateAttributes, false
 
-render template('SecurityQuestionsIndex.gsp.template'),
+render template('ChallengeQuestionsIndex.gsp.template'),
 		file("grails-app/views/${saModel.simpleName.toLowerCase()}/index.gsp"),
 		templateAttributes, false
 
@@ -102,4 +102,4 @@ file('grails-app/i18n/messages.properties').withWriterAppend { BufferedWriter wr
 	writer.writeLine "spring.security.ui.menu.${saModel.packageName}.${saModel.simpleName}=${saModel.simpleName} Questions"
 	writer.newLine()
 }
-println("Finished s2ui-create-security-questions!")
+println("Finished s2ui-create-challenge-questions!")
