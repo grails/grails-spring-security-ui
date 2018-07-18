@@ -14,17 +14,17 @@ class ${saClassName} implements Serializable {
     String myQuestion${i}
     String myAnswer${i}
      <%  } %>
-    User user
+    ${userDomainName} ${userPropName}
 
      static constraints = {
          <% for(int i=1; i <= numberOfQuestions.toInteger(); i++) {  %>
              myQuestion${i} nullable: true, blank: false
              myAnswer${i} nullable: false, blank: false
          <%  } %>
-            user nullable: false, blank: false, unique: true
+            ${userPropName} nullable: false, blank: false, unique: true
         }
 
-    static belongsTo = [ user: User]
+    static belongsTo = [ ${userPropName}: ${userDomainName}]
 
 
 }

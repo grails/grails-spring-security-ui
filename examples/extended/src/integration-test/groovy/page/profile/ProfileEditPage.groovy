@@ -12,16 +12,16 @@ class ProfileEditPage extends AbstractSecurityPage {
 
 
 	static content = {
-		myQuestion { $('#myQuestion').module(TextInput) }
+		myQuestion { $('#myQuestion1').module(TextInput) }
 		myQuestion2 { $('#myQuestion2').module(TextInput) }
 		myAnswer2 { $('#myAnswer2').module(TextInput) }
-		myAnswer { $('#myAnswer').module(TextInput) }
-		submit { $("input.save")}
+		myAnswer { $('#myAnswer1').module(TextInput) }
+		submit { $("#update")}
 	}
 
 	void updateProfile(String userName) {
 		def userSelect = $(name: "user.id").module(Select)
-		userSelect.selected  = "User(username:"+userName+")"
+		userSelect.selected  = userName
 		myQuestion = "Count to 4"
 		myQuestion2 = "Count to 5"
 		myAnswer2  = "12345"
@@ -30,5 +30,11 @@ class ProfileEditPage extends AbstractSecurityPage {
 		submit()
 	}
 
-
+	void deleteProfile() {
+		$("#deleteButton").click()
+		waitFor {
+			$("span", text:"Are you sure?")
+		}
+		$("button", text:"Delete").click()
+	}
 }

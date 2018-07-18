@@ -14,16 +14,16 @@ class ProfileCreatePage extends AbstractSecurityPage {
 
 
 	static content = {
-		myQuestion { $('#myQuestion').module(TextInput) }
+		myQuestion { $('#myQuestion1').module(TextInput) }
 		myQuestion2 { $('#myQuestion2').module(TextInput) }
 		myAnswer2 { $('#myAnswer2').module(TextInput) }
-		myAnswer { $('#myAnswer').module(TextInput) }
+		myAnswer { $('#myAnswer1').module(TextInput) }
 		submit { $("#create")}
 	}
 
 	void create(String userName) {
 		def userSelect = $(name: "user.id").module(Select)
-		userSelect.selected = "User(username:"+userName+")"
+		userSelect.selected = userName
 		myQuestion = "Count to 8"
 		myQuestion2 = "Count to 4"
 		myAnswer2  = "1234"

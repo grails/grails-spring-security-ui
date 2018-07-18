@@ -28,7 +28,7 @@
 			</li>
 			</g:if>
 			<g:if test='${securityConfig.ui.forgotPassword?.forgotPasswordExtraValidation?.size() > 0 }'>
-				<s2ui:menu controller='${securityConfig.ui.forgotPassword.forgotPasswordExtraValidationDomainClassName}' itemAction='index' />
+				<s2ui:menu controller='${securityConfig.ui.forgotPassword.forgotPasswordExtraValidationDomainClassName}' showList="true" noSearch="true" />
 			</g:if>
 			<li><a class="accessible"><g:message code='spring.security.ui.menu.securityInfo'/></a>
 				<ul>

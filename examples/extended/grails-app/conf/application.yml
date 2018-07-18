@@ -196,15 +196,6 @@ grails:
             useSwitchUserFilter: true
             ui:
                 forgotPassword:
-                    forgotPasswordExtraValidationDomainClassName:  test.Profile
-                    forgotPasswordExtraValidation:
-                             -
-                                 labelDomain: myQuestion
-                                 prop: myAnswer
-                             -
-#                                 labelDomain: myQuestion2
-                                 labelMessage: securityvalidations.labelMessage.label1
-                                 prop: myAnswer2
                     requireForgotPassEmailValidation: false
                 register:
                     requireEmailValidation: false

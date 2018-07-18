@@ -407,6 +407,8 @@ class SecurityUiTagLib {
 		}
 
 		boolean searchOnly = attrs.remove('searchOnly')
+		boolean showList = attrs.remove('showList')
+		boolean noSearch = attrs.remove('noSearch')
 		boolean submenu = attrs.remove('submenu')
 
 		def lines = []
@@ -418,8 +420,12 @@ class SecurityUiTagLib {
 			lines << """<li><a class="accessible">$caption</a>"""
 		}
 		lines << indent + '\t<ul>'
-
-		lines << """$indent\t\t<li><a href="${createLink('search', controller)}">${message(code:'spring.security.ui.search')}</a></li>"""
+		if(!noSearch) {
+			lines << """$indent\t\t<li><a href="${createLink('search', controller)}">${message(code: 'spring.security.ui.search')}</a></li>"""
+		}
+		if(showList) {
+			lines << """$indent\t\t<li><a href="${createLink('index', controller)}">${message(code: 'spring.security.ui.list')}</a></li>"""
+		}
 		if (!searchOnly) {
 			lines << """$indent\t\t<li><a href="${createLink('create', controller)}">${message(code:'spring.security.ui.create')}</a></li>"""
 		}
