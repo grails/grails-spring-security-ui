@@ -18,7 +18,7 @@ import spock.lang.Issue
     }
     false
 })
-class UserSimpleSpec extends AbstractSecuritySpec {
+class UserSpec extends AbstractSecuritySpec {
 
     void testFindAll() {
         when:
