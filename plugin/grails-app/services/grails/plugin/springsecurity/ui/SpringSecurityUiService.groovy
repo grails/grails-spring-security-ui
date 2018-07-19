@@ -352,7 +352,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		rolesToAdd.each { role ->
 			def instance = UserRole.newInstance()
 			instance.user = user
-			instance.role = user
+			instance.role = role
 			instance.save(insert: true)
 			instance
 		}
