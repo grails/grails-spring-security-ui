@@ -1,6 +1,7 @@
 package module
 
 import geb.Module
+import geb.navigator.Navigator
 
 /**
  * Module representing the Roles tab which is displayed on the User edit page
@@ -21,10 +22,24 @@ class RolesTab extends Module {
     }
 
     int totalEnabledRoles() {
-        return $("input", type: "checkbox", id: startsWith("ROLE_"), checked: "checked").size().toInteger()
+        return findAllEnabledRoles().size().toInteger()
+    }
+
+    Navigator findAllEnabledRoles() {
+        return $("input", type: "checkbox", id: startsWith("ROLE_"), checked: "checked")
     }
 
     void enableRole(String roleName) {
         $("input", type: "checkbox", id: roleName).value(true)
     }
+
+    boolean hasEnabledRole(String roleName) {
+        return hasEnabledRoles([roleName])
+    }
+
+    boolean hasEnabledRoles(List<String> roleNames) {
+        return findAllEnabledRoles().collect { it.attr('id') }.containsAll(roleNames)
+    }
+
+
 }

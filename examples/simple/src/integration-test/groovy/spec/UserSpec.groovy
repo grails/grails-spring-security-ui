@@ -192,6 +192,7 @@ class UserSpec extends AbstractSecuritySpec {
         then: "12 roles are listed and 1 is enabled"
         assert rolesTab.totalRoles() == 12
         assert rolesTab.totalEnabledRoles() == 1
+        assert rolesTab.hasEnabledRole('ROLE_USER')
 
         when: "ROLE_ADMIN is enabled and the changes are saved"
         rolesTab.enableRole "ROLE_ADMIN"
@@ -200,6 +201,7 @@ class UserSpec extends AbstractSecuritySpec {
 
         then: "12 roles are listed and 2 are enabled"
         assert rolesTab.totalEnabledRoles() == 2
+        assert rolesTab.hasEnabledRoles(['ROLE_USER', 'ROLE_ADMIN'])
         assert rolesTab.totalRoles() == 12
     }
 }
