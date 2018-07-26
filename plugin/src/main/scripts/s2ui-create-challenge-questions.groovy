@@ -45,7 +45,7 @@ String domainName =args[1]
 Model saModel = model(domainPackage + '.' + domainName)
 Integer numberOfQuestions = args.size() > 3 ? args[3].toInteger() : 2
 Model userModel = model(args[2])
-
+File grailsApp = file('grails-app')
 
 templateAttributes = [
 		packageName: saModel.packageName,
@@ -57,32 +57,45 @@ templateAttributes = [
 		userDomainName: (userModel.packageName.toLowerCase() == saModel.packageName  ?  "" : userModel.packageName.toLowerCase() + '.') + userModel.modelName.toLowerCase().capitalize()
 ]
 
+String directoryName = saModel.packageName.replaceAll('\\.', '/')
+File serviceDestinationDirectory = new File(new File(grailsApp, 'services'), directoryName)
+serviceDestinationDirectory.mkdirs()
+
 render template('ChallengeQuestionsService.groovy.template'),
-		file("grails-app/services/${saModel.packageName}/${saModel.simpleName}Service.groovy"),
+		new File(serviceDestinationDirectory, "${saModel.simpleName}Service.groovy"),
 		templateAttributes, false
 
 render template('ChallengeQuestionsListenerService.groovy.template'),
-		file("grails-app/services/${saModel.packageName}/${saModel.simpleName}ListenerService.groovy"),
+		new File(serviceDestinationDirectory, "${saModel.simpleName}ListenerService.groovy"),
 		templateAttributes, false
+
+File domainDestinationDirectory = new File(new File(grailsApp, 'domain'), directoryName)
+domainDestinationDirectory.mkdirs()
 
 render template('ChallengeQuestions.groovy.template'),
-		file("grails-app/domain/${saModel.packageName}/${saModel.simpleName}.groovy"),
+		new File(domainDestinationDirectory, "${saModel.simpleName}.groovy"),
 		templateAttributes, false
+
+File controllerDirectory = new File(new File(grailsApp, 'controllers'), directoryName)
+controllerDirectory.mkdirs()
 
 render template('ChallengeQuestionsController.groovy.template'),
-		file("grails-app/controllers/${saModel.packageName}/${saModel.simpleName}Controller.groovy"),
+		new File(controllerDirectory, "${saModel.simpleName}Controller.groovy"),
 		templateAttributes, false
 
+File viewDirectory = new File(new File(grailsApp,'views'), saModel.simpleName.toLowerCase())
+viewDirectory.mkdirs()
+
 render template('ChallengeQuestionsEdit.gsp.template'),
-		file("grails-app/views/${saModel.simpleName.toLowerCase()}/edit.gsp"),
+		new File(viewDirectory, 'edit.gsp'),
 		templateAttributes, false
 
 render template('ChallengeQuestionsCreate.gsp.template'),
-		file("grails-app/views/${saModel.simpleName.toLowerCase()}/create.gsp"),
+		new File(viewDirectory, 'create.gsp'),
 		templateAttributes, false
 
 render template('ChallengeQuestionsIndex.gsp.template'),
-		file("grails-app/views/${saModel.simpleName.toLowerCase()}/index.gsp"),
+		new File(viewDirectory,'index.gsp'),
 		templateAttributes, false
 
 file('grails-app/conf/application.groovy').withWriterAppend { BufferedWriter writer ->

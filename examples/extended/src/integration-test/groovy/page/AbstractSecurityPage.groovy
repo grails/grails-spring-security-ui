@@ -9,7 +9,7 @@ abstract class AbstractSecurityPage extends Page {
 	}
 
 	protected boolean assertContentContains(String expected) {
-		assert $().text().contains(expected) || $().text().contains(expected)
+		assert $().text().contains(expected)
 		true
 	}
 

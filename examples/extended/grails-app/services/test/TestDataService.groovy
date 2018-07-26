@@ -165,7 +165,7 @@ class TestDataService {
 	}
 
 	protected save(instance) {
-		instance.save(failOnError: true, flush: true)
+		instance.save(failOnError: true)
 	}
 
 	private static final registrationCodeData = [

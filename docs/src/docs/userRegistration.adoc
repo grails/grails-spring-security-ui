@@ -32,6 +32,8 @@ image::register_final.png[]
 
 The post-registration destination url is configurable in `grails-app/conf/application.groovy` using the `postRegisterUrl` attribute:
 
+If you don't specify a value then the `grails.plugin.springsecurity.successHandler.defaultTargetUrl` value will be used, which is `'/'` by default.
+
 In addition, each new user will be granted `ROLE_USER` after finalizing the registration. If you want to change the default role, add more, or grant no roles at all (for example if you want an admin to approve new users and explicitly enable new users) then you can customize that with the `defaultRoleNames` attribute (which is a List of Strings):
 
 [source,groovy]
@@ -39,7 +41,6 @@ In addition, each new user will be granted `ROLE_USER` after finalizing the regi
 grails.plugin.springsecurity.ui.register.postRegisterUrl = '/welcome'
 ----
 
-If you don't specify a value then the `grails.plugin.springsecurity.successHandler.defaultTargetUrl` value will be used, which is `'/'` by default.
 
 == E-Mail Validation Parameter
 You can customize if the user should get e-mail for validation before they can log in for the first time.  To turn off
@@ -55,7 +56,7 @@ grails.plugin.springsecurity.ui.register.requireEmailValidation = false
 
 === Mail configuration
 
-By default the plugin uses the http://grails.org/plugin/mail[Mail] plugin to send emails, but only if it installed. This is configurable by registering your own `MailStrategy` implementation - see [the section on configuration|guide:customization] for more information. The plugin assumes that the Mail plugin and an SMTP server are already configured.
+By default the plugin uses the http://grails.org/plugin/mail[Mail] plugin to send emails, but only if it is installed. This is configurable by registering your own `MailStrategy` implementation - see the section on <<Configuration>> for more information. The plugin assumes that the Mail plugin and an SMTP server are already configured.
 
 You can customize the subject, body, and from address of the registration email by overriding the default values in `grails-app/conf/application.groovy`, for example:
 

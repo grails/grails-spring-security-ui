@@ -31,3 +31,12 @@ grails.plugin.springsecurity.ui.forgotPassword.forgotPasswordExtraValidation = [
 	[labelDomain: 'myQuestion1', prop:'myAnswer1'],
 	[labelDomain: 'myQuestion2', prop:'myAnswer2'],
 ]
+// Added by the Spring Security UI plugin:
+grails.plugin.springsecurity.ui.forgotPassword.forgotPasswordExtraValidationDomainClassName = 'com.mycompany.Profile'
+grails.plugin.springsecurity.ui.forgotPassword.forgotPasswordExtraValidation = [
+	[labelDomain: 'myQuestion1', prop:'myAnswer1'],
+	[labelDomain: 'myQuestion2', prop:'myAnswer2'],
+	[labelDomain: 'myQuestion3', prop:'myAnswer3'],
+	[labelDomain: 'myQuestion4', prop:'myAnswer4'],
+]
+

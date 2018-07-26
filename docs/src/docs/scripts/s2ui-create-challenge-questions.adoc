@@ -30,7 +30,7 @@ This script will create three views.  Each of the three views (List/index, edit,
 
 This script will add lines into your application.groovy file in order to ensure the questions and answers are properly configured.
 
-This script will one line into i18n this will be the menu item in the nav bar for spring security.
+This script will insert one line into messages.properties. This will be the menu item in the nav bar for spring security.
 ----
 spring.security.ui.menu.<domain-class-package>.<challenge-qa-class-name>=<challenge-qa-class-name> Questions"
 ----

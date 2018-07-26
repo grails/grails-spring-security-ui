@@ -13,14 +13,6 @@ class ProfileServiceSpec extends Specification {
     SessionFactory sessionFactory
 
     private Long setupData() {
-        // TODO: Populate valid domain instances and return a valid ID
-        ///new Profile(...).save(flush: true, failOnError: true)
-        //new Profile(...).save(flush: true, failOnError: true)
-        //Profile profile = new Profile(...).save(flush: true, failOnError: true)
-        //new Profile(...).save(flush: true, failOnError: true)
-        //new Profile(...).save(flush: true, failOnError: true)
-
-        //profile.id
     }
 
     void "test get"() {
