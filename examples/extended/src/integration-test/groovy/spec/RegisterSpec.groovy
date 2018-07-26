@@ -102,10 +102,10 @@ class RegisterSpec extends AbstractSecuritySpec {
 		when:
 		to RegisterPage
 
-        then:
-        at RegisterPage
+		then:
+		at RegisterPage
 
-        when:
+		when:
 		username = un
 		email = un + '@abcdef.com'
 		$('#password') << 'aaaaaa1#'
@@ -126,14 +126,14 @@ class RegisterSpec extends AbstractSecuritySpec {
 		at ProfileListPage
 		assertHtmlContains 'created'
 
-        when:
-        $("a", text: "User(username:"+un+")").parent().parent().children().first().children('a').click()
+		when:
+		$("a", text: "User(username:"+un+")").parent().parent().children().first().children('a').click()
 
-        then:
-        at ProfileEditPage
+		then:
+		at ProfileEditPage
 
-        when:
-        updateProfile(un)
+		when:
+		updateProfile(un)
 
 		then:
 		at ProfileListPage
