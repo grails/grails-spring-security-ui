@@ -25,7 +25,7 @@ challenge-qa-class-name  is required and is the Name of the domain class used to
 user-domain-class-name is required and is the package and name of the User class.  In most circumstance I would put this in the same package but it will work if they are different. 
 number-of-questions is optional but if not given will default to 2. 
 
-Example: s2ui-create-challenge-questions com.mycompany Profile com.mycompany.User  4
+Example: s2ui-create-challenge-questions com.mycompany ChallengeQuestion com.mycompany.User  2
 '''
 
 
@@ -47,13 +47,21 @@ Integer numberOfQuestions = args.size() > 3 ? args[3].toInteger() : 2
 Model userModel = model(args[2])
 File grailsApp = file('grails-app')
 
+def chsa = saModel.simpleName.toCharArray()
+chsa[0] = Character.toLowerCase(chsa[0])
+
+def chup = userModel.modelName.toCharArray()
+chup[0] = Character.toLowerCase(chup[0])
+
+String camelCaseSaNamevar =  new String(chsa)
+
 templateAttributes = [
 		packageName: saModel.packageName,
 		saClassName: saModel.simpleName,
+		camelCaseSaName:  camelCaseSaNamevar,
 		saClassProperty: saModel.modelName,
 		numberOfQuestions: numberOfQuestions,
-		userPropName: userModel.modelName.toLowerCase(),
-		propertyName: saModel.simpleName.toLowerCase(),
+		userPropName: new String(chup),
 		userDomainName: (userModel.packageName.toLowerCase() == saModel.packageName  ?  "" : userModel.packageName.toLowerCase() + '.') + userModel.modelName.toLowerCase().capitalize()
 ]
 
@@ -83,7 +91,7 @@ render template('ChallengeQuestionsController.groovy.template'),
 		new File(controllerDirectory, "${saModel.simpleName}Controller.groovy"),
 		templateAttributes, false
 
-File viewDirectory = new File(new File(grailsApp,'views'), saModel.simpleName.toLowerCase())
+File viewDirectory = new File(new File(grailsApp,'views'), camelCaseSaNamevar)
 viewDirectory.mkdirs()
 
 render template('ChallengeQuestionsEdit.gsp.template'),
@@ -112,7 +120,7 @@ file('grails-app/conf/application.groovy').withWriterAppend { BufferedWriter wri
 
 file('grails-app/i18n/messages.properties').withWriterAppend { BufferedWriter writer ->
 	writer.newLine()
-	writer.writeLine "spring.security.ui.menu.${saModel.packageName}.${saModel.simpleName}=${saModel.simpleName} Questions"
+	writer.writeLine "spring.security.ui.menu.${saModel.simpleName}=${saModel.simpleName} Questions"
 	writer.newLine()
 }
 println("Finished s2ui-create-challenge-questions!")

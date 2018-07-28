@@ -2,18 +2,18 @@
 <html>
     <head>
         <meta name="layout" content="\${layoutUi}" />
-        <s2ui:title messageCode='default.create.label' entityNameMessageCode='${propertyName}.label' entityNameDefault='${saClassName}'/>
+        <s2ui:title messageCode='default.create.label' entityNameMessageCode='${camelCaseSaName}.label' entityNameDefault='${saClassName}'/>
     </head>
     <body>
-         <div id="create-${propertyName}" class="body" role="main">
-            <g:hasErrors bean="\${this.${propertyName}}">
+         <div id="create-${camelCaseSaName}" class="body" role="main">
+            <g:hasErrors bean="\${this.${camelCaseSaName}}">
             <ul class="errors" role="alert">
-                <g:eachError bean="\${this.${propertyName}}" var="error">
+                <g:eachError bean="\${this.${camelCaseSaName}}" var="error">
                 <li <g:if test="\${error in org.springframework.validation.FieldError}">data-field-id="\${error.field}"</g:if>><g:message error="\${error}"/></li>
                 </g:eachError>
             </ul>
             </g:hasErrors>
-            <s2ui:formContainer type='save' beanType='${propertyName}' focus='myQuestion1'>
+            <s2ui:formContainer type='save' beanType='${camelCaseSaName}' focus='myQuestion1'>
             		<s2ui:form useToken="true">
             			<div class="dialog">
             				<br/>
