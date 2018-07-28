@@ -3,6 +3,7 @@ include 'docs'
 
 include 'examples/simple'
 include 'examples/extended'
+include 'examples/extended_test'
 
 rootProject.name = 'grails-spring-security-ui'
 

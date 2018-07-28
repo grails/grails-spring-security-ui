@@ -16,7 +16,7 @@ grails s2ui-create-challenge-questions <domain-class-package> <challenge-qa-clas
 - number-of-questions is optional but if not given will default to 2.
 
 ----
-Example: s2ui-create-challenge-questions com.mycompany Profile com.mycompany.User  4
+Example: s2ui-create-challenge-questions com.mycompany Profile User  4
 ----
 
 This script will create one Domain Class.  This will contain a link to the user and also contain one entry for each questions and answer.
