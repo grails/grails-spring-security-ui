@@ -2,10 +2,10 @@
 <html>
     <head>
         <meta name="layout" content="\${layoutUi}" />
-        <s2ui:title messageCode='default.list.label' entityNameMessageCode='${propertyName}.label' entityNameDefault='${saClassName}'/>
+        <s2ui:title messageCode='default.list.label' entityNameMessageCode='${camelCaseSaName}.label' entityNameDefault='${saClassName}'/>
     </head>
     <body>
-        <div id="list-${propertyName}" class="body" role="main">
+        <div id="list-${camelCaseSaName}" class="body" role="main">
            <div class="list">
            		<table>
            			<thead>

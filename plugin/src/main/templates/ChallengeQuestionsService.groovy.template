@@ -13,6 +13,6 @@ interface ${saClassName}Service {
 
     void delete(Serializable id)
 
-    ${saClassName} save(${saClassName} ${saClassName.toLowerCase()})
+    ${saClassName} save(${saClassName} ${camelCaseSaName})
 
 }
