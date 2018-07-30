@@ -44,7 +44,7 @@ String domainPackage = args[0].toLowerCase()
 String domainName =args[1]
 Model saModel = model(domainPackage + '.' + domainName)
 Integer numberOfQuestions = args.size() > 3 ? args[3].toInteger() : 2
-Model userModel = model(args[2])
+Model userModel = args[2].indexOf('.') > -1 ? model(args[2]) : model(domainPackage + '.' + args[2])
 File grailsApp = file('grails-app')
 
 def chsa = saModel.simpleName.toCharArray()
