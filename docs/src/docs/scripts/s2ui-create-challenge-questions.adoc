@@ -10,16 +10,16 @@ The general format is:
 grails s2ui-create-challenge-questions <domain-class-package> <challenge-qa-class-name> <user-domain-class-name> [number-of-questions]
 ----
 
-- domain-class-package is required and is the package where domainName will live
+- domain-class-package is required and is the package where the Domain, Controller, and Services will be created.  It is recommend to use the same class where your 'User' class is created.
 - challenge-qa-class-name  is required and is the Name of the domain class used to store this information
-- user-domain-class-name is required and is the package and name of the User class.  In most circumstance I would put this in the same package but it will work if they are different.
+- user-domain-class-name is required and is the package and name of the User class.  It is recommend to ensure the first parameter is the same package as the User class.
 - number-of-questions is optional but if not given will default to 2.
 
 ----
 Example: s2ui-create-challenge-questions com.mycompany Profile com.mycompany.User  4
 ----
 
-This script will create one Domain Class.  This will contain a link to the user and also contain one entry for each questions and answer.
+This script will create one Domain Class.  This will contain a link to the user and also contain one entry for each questions and answer.  If you pass in either no package or the same package as the what is used for the Challenge Question domain it will not put a package in front of the User class. However, if you pass in a different package then it will add the package in front of the user class.
 
 This script will create one controller which contains all the logic for handling the actions needed to provide a user interface to manage different users challenge questions and answers.
 
