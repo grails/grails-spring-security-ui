@@ -2,3 +2,4 @@
 == Scripts
 
 include::scripts/s2ui-override.adoc[]
+include::scripts/s2ui-create-challenge-questions.adoc[]

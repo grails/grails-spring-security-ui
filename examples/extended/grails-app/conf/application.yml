@@ -194,3 +194,8 @@ grails:
                 authorityJoinClassName: test.UserRole
                 userDomainClassName: test.User
             useSwitchUserFilter: true
+            ui:
+                forgotPassword:
+                    requireForgotPassEmailValidation: false
+                register:
+                    requireEmailValidation: false

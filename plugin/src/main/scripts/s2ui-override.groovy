@@ -131,6 +131,7 @@ switch ( directoryName ) {
 		copy template('views/register/resetPassword.gsp'), new File(viewsDir, 'register')
 		copy template('views/register/_forgotPasswordMail.gsp'), new File(viewsDir, 'register')
 		copy template('views/register/_verifyRegistrationMail.gsp'), new File(viewsDir, 'register')
+		copy template('views/register/securityQuestions.gsp'), new File(viewsDir, 'register')
 		break
 	case 'registrationCode':
 		copy template('views/registrationCode/search.gsp'), new File(viewsDir, 'registrationCode')
