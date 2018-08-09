@@ -53,6 +53,7 @@ dependencies {
     runtime "org.glassfish.web:el-impl:2.1.2-b03"
     runtime "com.h2database:h2"
     runtime "org.apache.tomcat:tomcat-jdbc"
+    testCompile "org.grails:grails-test-mixins:3.3.0"
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:$assetPipelineVersion"
     testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-web-testing-support"
@@ -73,15 +74,16 @@ dependencies {
     compile project(":spring-security-ui")
 }
 
+webdriverBinaries {
+    chromedriver '2.40'
+    geckodriver '0.21.0'
+}
+
 bootRun {
     jvmArgs('-Dspring.output.ansi.enabled=always')
     addResources = true
 }
 
-webdriverBinaries {
-    chromedriver '2.40'
-    geckodriver '0.21.0'
-}
 
 assets {
     minifyJs = true
@@ -90,7 +92,7 @@ assets {
 
 integrationTest {
     systemProperty "geb.build.reportsDir", reporting.file("${project.projectDir}/build/geb-reports")
-    systemProperty "geb.env", System.getProperty('geb.env')
+    systemProperty "geb.env", System.getenv('geb.env') ?: (System.getProperty('webdriver.chrome.driver') ?: 'chromeHeadless')
     systemProperty "webdriver.chrome.driver", System.getProperty('webdriver.chrome.driver')
     systemProperty "webdriver.gecko.driver", System.getProperty('webdriver.gecko.driver')
 }

@@ -6,7 +6,7 @@ buildscript {
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:$assetPipelineVersion"
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipelineVersion}"
         classpath "gradle.plugin.com.energizedwork.webdriver-binaries:webdriver-binaries-gradle-plugin:1.4"
     }
 }
@@ -82,6 +82,7 @@ bootRun {
     addResources = true
 }
 
+
 assets {
     minifyJs = true
     minifyCss = true
@@ -89,6 +90,8 @@ assets {
 
 integrationTest {
     systemProperty "geb.build.reportsDir", reporting.file("${project.projectDir}/build/geb-reports")
-    systemProperties System.properties
+    systemProperty "geb.env", System.getenv('geb.env') ?: (System.getProperty('webdriver.chrome.driver') ?: 'chromeHeadless')
+    systemProperty "webdriver.chrome.driver", System.getProperty('webdriver.chrome.driver')
+    systemProperty "webdriver.gecko.driver", System.getProperty('webdriver.gecko.driver')
 }
 apply from: "${rootProject.projectDir}/gradle/integrationTestVerbose.gradle"

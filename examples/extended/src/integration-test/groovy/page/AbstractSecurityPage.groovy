@@ -13,6 +13,7 @@ abstract class AbstractSecurityPage extends Page {
 		true
 	}
 
+
 	protected boolean assertContentMatches(String regex) {
 		assert $().text() ==~ regex
 		true

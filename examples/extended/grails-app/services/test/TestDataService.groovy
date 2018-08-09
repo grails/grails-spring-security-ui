@@ -82,9 +82,14 @@ class TestDataService {
 		(1..3).each {
 			def user = save new User("user$it", "password", "user$it@test.com")
 			grantRole user, 'user'
+			save new Profile(user:user,myAnswer1:'1234',myQuestion1: "Count to four",myAnswer2: '12345', myQuestion2: 'Count to Five')
 		}
 
-		def admin = save new User('admin', 'password', 'admin@test.com')
+		User admin = save new User('admin', 'password', 'admin@test.com')
+		admin.accountLocked = false
+		admin.enabled = true
+		save admin
+
 		['user', 'admin', 'run_as', 'switch_user'].each { grantRole admin, it }
 
 		def flags = [:]
@@ -103,6 +108,8 @@ class TestDataService {
 
 		flags = [enabled: false]
 		create 'billy9494'
+
+		save new Profile(user:admin,myAnswer1:'1234',myQuestion1: "Count to four",myAnswer2: '12345', myQuestion2: 'Count to Five')
 	}
 
 	protected void createAcls() {
