@@ -97,7 +97,7 @@ class UserController extends AbstractS2UiDomainController {
 
 	@CompileStatic
 	protected Map buildRoleMap(Set userRoleNames, List sortedRoles) {
-		if (!userRoleNames) {
+		if (!sortedRoles) {
 			return [:]
 		}
 		Map granted = [:]
