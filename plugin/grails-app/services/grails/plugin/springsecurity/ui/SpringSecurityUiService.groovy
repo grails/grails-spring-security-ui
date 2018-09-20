@@ -382,8 +382,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 			return
 		}
 
-		UserRole.removeAll user
-		addRoles user, roleNames
+		updateUserRoles user, roleNames, transactionStatus
 		removeUserFromCache user
 	}
 
@@ -405,6 +404,49 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		catch (e) {
 			uiErrorsStrategy.handleException e, user, null, this, 'addRoles', transactionStatus
 		}
+	}
+
+	@Transactional
+	protected void addUserRoles(user, Set rolesToAdd) {
+		if (!user || !rolesToAdd) {
+			return
+		}
+		rolesToAdd.each { role ->
+			def instance = UserRole.newInstance()
+			instance.user = user
+			instance.role = role
+			instance.save(insert: true)
+			instance
+		}
+	}
+
+	protected void updateUserRoles(user, List<String> roleNames, TransactionStatus transactionStatus) {
+		String authorityNameField = uiPropertiesStrategy.paramNameToPropertyName('authority', 'role')
+
+		try {
+			String dynamicFinder = "findAllBy".concat(authorityNameField.capitalize()).concat("InList")
+			List selectedRoles = Role."${dynamicFinder}"(roleNames)
+			Set originalRoles = user.authorities
+			Set rolesToRemove = originalRoles - selectedRoles
+			Set rolesToAdd = selectedRoles - originalRoles
+
+			removeUserRoles(user, rolesToRemove)
+			addUserRoles(user, rolesToAdd)
+		}
+		catch (e) {
+			uiErrorsStrategy.handleException e, user, null, this, 'updateUserRoles', transactionStatus
+		}
+	}
+
+	protected void removeUserRoles(user, Set rolesToRemove) {
+		rolesToRemove.each { role ->
+			removeUserRole(user, role)
+		}
+	}
+
+	@Transactional
+	Number removeUserRole(def u, def r) {
+		UserRole.where { user == u && role == r }.deleteAll()
 	}
 
 	protected void removeUserFromCache(user) {
