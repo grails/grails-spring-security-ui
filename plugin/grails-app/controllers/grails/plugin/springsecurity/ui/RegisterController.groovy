@@ -79,9 +79,27 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 			return [registerCommand: registerCommand]
 		}
 
-		sendVerifyRegistrationMail registrationCode, user, registerCommand.email
 
-		[emailSent: true, registerCommand: registerCommand]
+
+		if( requireEmailValidation  ) {
+			sendVerifyRegistrationMail registrationCode, user, registerCommand.email
+			[emailSent: true, registerCommand: registerCommand]
+		} else {
+			redirectVerifyRegistration(uiRegistrationCodeStrategy.verifyRegistration(registrationCode.token))
+		}
+	}
+
+	protected void redirectVerifyRegistration(def rtn) {
+		if (rtn?.flashmsg) {
+			if(rtn?.flashType == 'error') {
+				flash.error =  message(code: rtn?.flashmsg)
+			} else {
+				flash.message = message(code:rtn?.flashmsg)
+			}
+		}
+
+		//this should always be set but if not have a backup!
+		redirect uri: rtn?.redirectmsg ?: successHandlerDefaultTargetUrl
 	}
 
     protected void sendVerifyRegistrationMail(RegistrationCode registrationCode, user, String email) {
@@ -118,78 +136,116 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 	}
 
 	def verifyRegistration() {
-
-		String token = params.t
-
-		RegistrationCode registrationCode = token ? RegistrationCode.findByToken(token) : null
-		if (!registrationCode) {
-			flash.error = message(code: 'spring.security.ui.register.badCode')
-			redirect uri: successHandlerDefaultTargetUrl
-			return
-		}
-
-		def user = uiRegistrationCodeStrategy.finishRegistration(registrationCode)
-
-		if (!user) {
-			flash.error = message(code: 'spring.security.ui.register.badCode')
-			redirect uri: successHandlerDefaultTargetUrl
-			return
-		}
-
-		if (user.hasErrors()) {
-			// expected to be handled already by ErrorsStrategy.handleValidationErrors
-			return
-		}
-
-		flash.message = message(code: 'spring.security.ui.register.complete')
-		redirect uri: registerPostRegisterUrl ?: successHandlerDefaultTargetUrl
+		redirectVerifyRegistration(uiRegistrationCodeStrategy.verifyRegistration(params.t))
 	}
 
 	def forgotPassword(ForgotPasswordCommand forgotPasswordCommand) {
 
-		if (!request.post) {
-			return [forgotPasswordCommand: new ForgotPasswordCommand()]
-		}
+			if (!request.post) {
+				ForgotPasswordCommand fpc = new ForgotPasswordCommand()
+				return [forgotPasswordCommand: fpc]
+			}
+		withForm {
+			if (forgotPasswordCommand.hasErrors()) {
 
-		if (forgotPasswordCommand.hasErrors()) {
-			return [forgotPasswordCommand: forgotPasswordCommand]
-		}
-
-		def user = findUserByUsername(forgotPasswordCommand.username)
-		if (!user) {
-			forgotPasswordCommand.errors.rejectValue 'username', 'spring.security.ui.forgotPassword.user.notFound'
-			return [forgotPasswordCommand: forgotPasswordCommand]
-		}
-
-		String email = uiPropertiesStrategy.getProperty(user, 'email')
-		if (!email) {
-			forgotPasswordCommand.errors.rejectValue 'username', 'spring.security.ui.forgotPassword.noEmail'
-			return [forgotPasswordCommand: forgotPasswordCommand]
-		}
-
-		uiRegistrationCodeStrategy.sendForgotPasswordMail(
-				forgotPasswordCommand.username, email) { String registrationCodeToken ->
-
-			String url = generateLink('resetPassword', [t: registrationCodeToken])
-			String body = forgotPasswordEmailBody
-
-			if (!body) {
-				body = renderEmail(
-						FORGOT_PASSWORD_TEMPLATE, EMAIL_LAYOUT,
-						[
-								url     : url,
-								username: user.username
-						]
-				)
-			} else if (body.contains('$')) {
-				body = evaluate(body, [user: user, url: url])
+				return [forgotPasswordCommand: forgotPasswordCommand]
 			}
 
-			body
+			def user = findUserByUsername(forgotPasswordCommand.username)
+			if (!user) {
+				forgotPasswordCommand.errors.rejectValue 'username', 'spring.security.ui.forgotPassword.user.notFound'
+
+				return [forgotPasswordCommand: forgotPasswordCommand]
+			}
+
+			if (forgotPasswordExtraValidation && forgotPasswordExtraValidation.size() > 0 && forgotPasswordExtraValidationDomainClassName ) {
+				redirect uri: generateLink('securityQuestions', [username: forgotPasswordCommand.username])
+			} else {
+				if (requireForgotPassEmailValidation) {
+					processForgotPasswordEmail(forgotPasswordCommand, user)
+				} else {
+					redirect uri: processForgotPasswordEmail(forgotPasswordCommand, user)
+				}
+			}
+		}.invalidToken {
+			flash.message = "Invalid Form Submission"
+			redirect(controller: "login", action: "auth")
+		}
+	}
+
+
+	def securityQuestions(){
+		if (forgotPasswordExtraValidation && forgotPasswordExtraValidation.size() > 0) {
+				def user = findUserByUsername(params.username)
+				SecurityQuestionsCommand sc = new SecurityQuestionsCommand()
+				try {
+					sc.username = params.username
+					if (!request.post) {
+						render(view:"securityQuestions", model: [securityQuestionsCommand:sc,user:user,forgotPasswordExtraValidation:forgotPasswordExtraValidation,forgotPasswordExtraValidationDomainClassName:forgotPasswordExtraValidationDomainClassName,validationUserLookUpProperty:validationUserLookUpProperty])
+					} else {
+						withForm {
+							def rtn = uiRegistrationCodeStrategy.validateForgotPasswordExtraSecurity(params, user,forgotPasswordExtraValidationDomainClassName, forgotPasswordExtraValidation, validationUserLookUpProperty)
+							if (!rtn[0]) {
+								sc.validations = rtn[1]
+								render(view: "securityQuestions", model: [securityQuestionsCommand: sc, user: user, forgotPasswordExtraValidation: forgotPasswordExtraValidation,forgotPasswordExtraValidationDomainClassName:forgotPasswordExtraValidationDomainClassName, validationUserLookUpProperty: validationUserLookUpProperty])
+							} else {
+								ForgotPasswordCommand fc = new ForgotPasswordCommand()
+								fc.username = sc.username
+								if (requireForgotPassEmailValidation) {
+									render(view: "forgotPassword", processForgotPasswordEmail(fc, user))
+								} else {
+									redirect uri: processForgotPasswordEmail(fc, user)
+								}
+							}
+						}.invalidToken {
+							flash.message = "Invalid Form Submission"
+							redirect(controller: "login", action: "auth")
+						}
+					}
+				} catch (Exception e) {
+					flash.error = e.getMessage()
+					render(view: "securityQuestions", model: [securityQuestionsCommand: sc,user: user, forgotPasswordExtraValidation: forgotPasswordExtraValidation,forgotPasswordExtraValidationDomainClassName:forgotPasswordExtraValidationDomainClassName, validationUserLookUpProperty: validationUserLookUpProperty])
+				}
+			} else {
+				redirect uri: generateLink('register')
+			}
 		}
 
-		[emailSent: true, forgotPasswordCommand: forgotPasswordCommand]
+
+	protected def processForgotPasswordEmail(forgotPasswordCommand,user){
+
+		if(requireForgotPassEmailValidation) {
+            String email = uiPropertiesStrategy.getProperty(user, 'email')
+			if (!email) {
+				forgotPasswordCommand.errors.rejectValue 'username', 'spring.security.ui.forgotPassword.noEmail'
+				return [forgotPasswordCommand: forgotPasswordCommand]
+			}
+			uiRegistrationCodeStrategy.sendForgotPasswordMail(
+					forgotPasswordCommand.username, email) { String registrationCodeToken ->
+
+				String url = generateLink('resetPassword', [t: registrationCodeToken])
+				String body = forgotPasswordEmailBody
+
+				if (!body) {
+					body = renderEmail(
+							FORGOT_PASSWORD_TEMPLATE, EMAIL_LAYOUT,
+							[
+									url     : url,
+									username: user.username
+							]
+					)
+				} else if (body.contains('$')) {
+					body = evaluate(body, [user: user, url: url])
+				}
+
+				body
+			}
+			[emailSent: true, forgotPasswordCommand: forgotPasswordCommand]
+		} else {
+			return generateLink('resetPassword', [t: uiRegistrationCodeStrategy.sendForgotPasswordMail(forgotPasswordCommand.username)?.token ])
+		}
 	}
+
 
 	private String renderEmail(String viewPath, String layoutPath, Map model) {
 		String content = groovyPageRenderer.render(view: viewPath, model: model)
@@ -253,14 +309,18 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 	}
 
 	protected String forgotPasswordEmailBody
+	protected Boolean requireForgotPassEmailValidation
+	protected List<HashMap> forgotPasswordExtraValidation
+    protected String forgotPasswordExtraValidationDomainClassName
 	protected String registerEmailBody
 	protected String registerEmailFrom
 	protected String registerEmailSubject
 	protected String registerPostRegisterUrl
 	protected String registerPostResetUrl
 	protected String successHandlerDefaultTargetUrl
-
+	protected Boolean requireEmailValidation
 	protected static int passwordMaxLength
+	protected String validationUserLookUpProperty
 	protected static int passwordMinLength
 	protected static String passwordValidationRegex
 
@@ -271,13 +331,17 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 		RegisterCommand.usernamePropertyName = usernamePropertyName
 
 		forgotPasswordEmailBody = conf.ui.forgotPassword.emailBody ?: ''
+		requireForgotPassEmailValidation = conf.ui.forgotPassword.requireForgotPassEmailValidation instanceof groovy.util.ConfigObject ? true : Boolean.valueOf(conf.ui.forgotPassword.requireForgotPassEmailValidation)
+		forgotPasswordExtraValidation = conf.ui.forgotPassword.forgotPasswordExtraValidation  ?: []
+        forgotPasswordExtraValidationDomainClassName = (conf.ui.forgotPassword.forgotPasswordExtraValidationDomainClassName ?: '').toString().trim()
 		registerEmailBody = conf.ui.register.emailBody ?: ''
 		registerEmailFrom = conf.ui.register.emailFrom ?: ''
+		validationUserLookUpProperty = conf.ui.forgotPassword.validationUserLookUpProperty ?: 'user'
 		registerEmailSubject = conf.ui.register.emailSubject ?: messageSource ? messageSource.getMessage('spring.security.ui.register.email.subject', [].toArray(), 'New Account', LocaleContextHolder.locale) : '' ?: ''
 		registerPostRegisterUrl = conf.ui.register.postRegisterUrl ?: ''
 		registerPostResetUrl = conf.ui.forgotPassword.postResetUrl ?: ''
 		successHandlerDefaultTargetUrl = conf.successHandler.defaultTargetUrl ?: '/'
-
+		requireEmailValidation = conf.ui.register.requireEmailValidation instanceof groovy.util.ConfigObject ? true : Boolean.valueOf(conf.ui.register.requireEmailValidation)
 		passwordMaxLength = conf.ui.password.maxLength instanceof Number ? conf.ui.password.maxLength : 64
 		passwordMinLength = conf.ui.password.minLength instanceof Number ? conf.ui.password.minLength : 8
 		passwordValidationRegex = conf.ui.password.validationRegex ?: '^.*(?=.*\\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&]).*$'
@@ -312,47 +376,5 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 		if (command.password != command.password2) {
 			return 'command.password2.error.mismatch'
 		}
-	}
-}
-
-class ForgotPasswordCommand implements CommandObject {
-	String username
-}
-
-class RegisterCommand implements CommandObject {
-
-	protected static Class<?> User
-	protected static String usernamePropertyName
-
-	String username
-	String email
-	String password
-	String password2
-
-	static constraints = {
-		username validator: { value, command ->
-			if (!value) {
-				return
-			}
-
-			if (User.findWhere((usernamePropertyName): value)) {
-				return 'registerCommand.username.unique'
-			}
-		}
-		email email: true
-		password validator: RegisterController.passwordValidator
-		password2 nullable: true, validator: RegisterController.password2Validator
-	}
-}
-
-class ResetPasswordCommand implements CommandObject {
-
-	String username
-	String password
-	String password2
-
-	static constraints = {
-		password validator: RegisterController.passwordValidator
-		password2 nullable: true, validator: RegisterController.password2Validator
 	}
 }

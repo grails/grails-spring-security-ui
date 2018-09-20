@@ -90,6 +90,11 @@ class RegisterSpec extends AbstractSecuritySpec {
 
 		when:
 		to RegisterPage
+
+		then:
+		at RegisterPage
+
+		when:
 		username = un
 		email = un + '@abcdef.com'
 		$('#password') << 'aaaaaa1#'

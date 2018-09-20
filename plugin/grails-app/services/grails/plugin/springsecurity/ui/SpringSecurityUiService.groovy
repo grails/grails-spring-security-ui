@@ -186,6 +186,53 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 			email: command.email, username: command.username, accountLocked: true, enabled: true, User, null)
 	}
 
+	/*Abstracted so this method can be used in other applications and if we determine to use another matching stragery later we can update as needed
+	 */
+	boolean doesAnswerMatch(String val1, String val2) {
+		springSecurityService.passwordEncoder.isPasswordValid(val1,val2, null)
+	}
+
+	@Transactional
+	def validateForgotPasswordExtraSecurity(params,user,forgotPasswordExtraValidationDomainClassName,forgotPasswordExtraValidation,String validationUserLookUpProperty) {
+		Boolean isvalid = true
+		String instance
+        def domain =  grailsApplication.getClassForName(forgotPasswordExtraValidationDomainClassName)
+        if(!(domain instanceof Object)) {
+            return [false,[errorMsg:messageSource.getMessage('spring.security.ui.securityQuestions.extraValidationString.config',null,'Domain Not Found',LocaleContextHolder.getLocale())]]
+        }
+		List<HashMap> rtnValidations = []
+		forgotPasswordExtraValidation?.eachWithIndex{it,idx->
+			HashMap inst = forgotPasswordExtraValidation.getAt(idx)
+				rtnValidations[idx] = [:]
+					instance = this.getProperty(domain.findWhere((validationUserLookUpProperty): user),inst.prop)
+					rtnValidations[idx].valueTxt = params.get(inst.prop)
+					if (!instance || instance.size() == 0 || ! this.doesAnswerMatch(instance,params.get(inst.prop)?.toLowerCase())  ) {
+						rtnValidations[idx].errorMsg = messageSource.getMessage('spring.security.ui.securityQuestions.extraValidationString.notequal',null,'Not Equal',LocaleContextHolder.getLocale())
+						isvalid = false
+					}
+				idx++
+			}
+
+		[isvalid,rtnValidations]
+	}
+
+	@Transactional
+	def verifyRegistration(String token) {
+		def conf = SpringSecurityUtils.securityConfig
+		RegistrationCode registrationCode = token ? RegistrationCode.findByToken(token) : null
+		def registerPostRegisterUrl = conf.ui.register.postRegisterUrl ?: ''
+		def successHandlerDefaultTargetUrl = conf.successHandler.defaultTargetUrl ?: '/'
+
+		if (!registrationCode) {
+			return [flashType:'error',flashmsg:'spring.security.ui.register.badCode',redirectmsg:successHandlerDefaultTargetUrl]
+		}
+		def user = this.finishRegistration(registrationCode)
+		if (!user || user.hasErrors()) {
+			return [flashType:'error',flashmsg:'spring.security.ui.register.badCode',redirectmsg:successHandlerDefaultTargetUrl]
+		}
+		[flashType:'message', flashmsg:'spring.security.ui.register.complete',redirectmsg:registerPostRegisterUrl ?: successHandlerDefaultTargetUrl]
+	}
+
 	@Transactional
 	def finishRegistration(RegistrationCode registrationCode) {
 
@@ -205,10 +252,25 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	@Transactional
+	RegistrationCode sendForgotPasswordMail(String username) {
+		sendForgotPasswordMail(username, null, null,false)
+	}
+
+	@Transactional
+	RegistrationCode sendForgotPasswordMail(String username,  String emailAddress,  Boolean sendMail) {
+		sendForgotPasswordMail(username, emailAddress, null,sendMail)
+	}
+
+	@Transactional
 	RegistrationCode sendForgotPasswordMail(String username, String emailAddress, Closure emailBodyGenerator) {
+		sendForgotPasswordMail(username, emailAddress, emailBodyGenerator,true)
+	}
+
+	@Transactional
+	RegistrationCode sendForgotPasswordMail(String username, String emailAddress, Closure emailBodyGenerator, Boolean sendMail) {
 
 		RegistrationCode registrationCode = save(username: username, RegistrationCode, 'sendForgotPasswordMail', transactionStatus)
-		if (!registrationCode.hasErrors()) {
+		if (!registrationCode.hasErrors() && sendMail) {
 			uiMailStrategy.sendForgotPasswordMail(
 					to: emailAddress,
 					from: forgotPasswordEmailFrom,
@@ -320,8 +382,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 			return
 		}
 
-		UserRole.removeAll user
-		addRoles user, roleNames
+		updateUserRoles user, roleNames, transactionStatus
 		removeUserFromCache user
 	}
 
@@ -343,6 +404,49 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		catch (e) {
 			uiErrorsStrategy.handleException e, user, null, this, 'addRoles', transactionStatus
 		}
+	}
+
+	@Transactional
+	protected void addUserRoles(user, Set rolesToAdd) {
+		if (!user || !rolesToAdd) {
+			return
+		}
+		rolesToAdd.each { role ->
+			def instance = UserRole.newInstance()
+			instance.user = user
+			instance.role = role
+			instance.save(insert: true)
+			instance
+		}
+	}
+
+	protected void updateUserRoles(user, List<String> roleNames, TransactionStatus transactionStatus) {
+		String authorityNameField = uiPropertiesStrategy.paramNameToPropertyName('authority', 'role')
+
+		try {
+			String dynamicFinder = "findAllBy".concat(authorityNameField.capitalize()).concat("InList")
+			List selectedRoles = Role."${dynamicFinder}"(roleNames)
+			Set originalRoles = user.authorities
+			Set rolesToRemove = originalRoles - selectedRoles
+			Set rolesToAdd = selectedRoles - originalRoles
+
+			removeUserRoles(user, rolesToRemove)
+			addUserRoles(user, rolesToAdd)
+		}
+		catch (e) {
+			uiErrorsStrategy.handleException e, user, null, this, 'updateUserRoles', transactionStatus
+		}
+	}
+
+	protected void removeUserRoles(user, Set rolesToRemove) {
+		rolesToRemove.each { role ->
+			removeUserRole(user, role)
+		}
+	}
+
+	@Transactional
+	Number removeUserRole(def u, def r) {
+		UserRole.where { user == u && role == r }.deleteAll()
 	}
 
 	protected void removeUserFromCache(user) {

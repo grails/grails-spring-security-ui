@@ -28,4 +28,5 @@ abstract class SearchPage extends AbstractSecurityPage {
 		assertContentContains "Showing $start through $end out of ${total}."
 		true
 	}
+
 }

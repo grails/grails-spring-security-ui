@@ -2,11 +2,16 @@ package spec
 
 import com.dumbster.smtp.SimpleSmtpServer
 import com.dumbster.smtp.SmtpMessage
+import page.profile.ProfileEditPage
+import page.profile.ProfileListPage
 import page.register.ForgotPasswordPage
 import page.register.RegisterPage
+import page.register.SecurityQuestionsPage
+import page.profile.ProfileCreatePage
 import page.user.UserEditPage
 import page.user.UserSearchPage
 import spock.lang.IgnoreIf
+import page.register.ResetPasswordPage
 
 @IgnoreIf({
 	if (!System.getProperty('geb.env')) {
@@ -20,6 +25,7 @@ import spock.lang.IgnoreIf
 	}
 	false
 })
+
 class RegisterSpec extends AbstractSecuritySpec {
 
 	private SimpleSmtpServer server
@@ -64,6 +70,7 @@ class RegisterSpec extends AbstractSecuritySpec {
 
 		then:
 		assertContentContains 'Password must have at least one letter, number, and special character: !@#$%^&'
+
 	}
 
 	void testForgotPasswordValidation() {
@@ -86,38 +93,51 @@ class RegisterSpec extends AbstractSecuritySpec {
 
 		given:
 		String un = 'test_user_abcdef' + System.currentTimeMillis()
+		when:
+		go 'register/resetPassword?t=123'
+
+		then:
+		assertHtmlContains 'Sorry, we have no record of that request, or it has expired'
 
 		when:
 		to RegisterPage
+
+		then:
+		at RegisterPage
+
+		when:
 		username = un
 		email = un + '@abcdef.com'
 		$('#password') << 'aaaaaa1#'
 		$('#password2') << 'aaaaaa1#'
 		submit()
 
-		then:
-		assertContentContains 'Your account registration email was sent - check your mail!'
-		assert 1 == server.receivedEmailSize
-
-		when:
-		def email = currentEmail
-
-		then:
-		'New Account' == email.getHeaderValue('Subject')
-
-		when:
-		String body = email.body
-
-		then:
-		body.contains 'Hi ' + un
-
-		when:
-		String code = findCode(body, 'verifyRegistration')
-		go 'register/verifyRegistration?t=' + code
 
 		then:
 		assertHtmlContains 'Your registration is complete'
 		assertContentContains 'Logged in as ' + un
+
+
+		when:
+		to ProfileCreatePage
+		create(un)
+
+		then:
+		at ProfileListPage
+		assertHtmlContains 'created'
+
+		when:
+		$("a", text: "User(username:"+un+")").parent().parent().children().first().children('a').click()
+
+		then:
+		at ProfileEditPage
+
+		when:
+		updateProfile(un)
+
+		then:
+		at ProfileListPage
+		assertHtmlContains "updated"
 
 		when:
 		logout()
@@ -132,33 +152,16 @@ class RegisterSpec extends AbstractSecuritySpec {
 		submit()
 
 		then:
-		assertContentContains 'Your password reset email was sent - check your mail!'
-		2 == server.receivedEmailSize
+		at SecurityQuestionsPage
+
 
 		when:
-		email = currentEmail
+		question1 = '1234'
+		question2 = '12345'
+		submit()
 
 		then:
-		'Password Reset' == email.getHeaderValue('Subject')
-
-		when:
-		body = email.body
-
-		then:
-		body.contains('Hi ' + un)
-
-		when:
-		code = findCode(body, 'resetPassword')
-		go 'register/resetPassword?t=123'
-
-		then:
-		assertHtmlContains 'Sorry, we have no record of that request, or it has expired'
-
-		when:
-		go 'register/resetPassword?t=' + code
-
-		then:
-		assertContentContains 'Reset Password'
+		at ResetPasswordPage
 
 		when:
 		submit()
@@ -167,29 +170,20 @@ class RegisterSpec extends AbstractSecuritySpec {
 		assertContentContains 'Password is required'
 
 		when:
-		go 'register/resetPassword?t=' + code
-		$('#password') << 'abcdefghijk'
-		$('#password2') << 'mnopqrstuwzy'
-		submit()
+		enterNewPassword('abcdefghijk','mnopqrstuwzy')
 
 		then:
 		assertContentContains 'Password must have at least one letter, number, and special character: !@#$%^&'
 		assertContentContains 'Passwords do not match'
 
 		when:
-		go 'register/resetPassword?t=' + code
-		$('#password') << 'aaaaaaaa'
-		$('#password2') << 'aaaaaaaa'
-		submit()
+		enterNewPassword('aaaaaaaa','aaaaaaaa')
 
 		then:
 		assertContentContains 'Password must have at least one letter, number, and special character: !@#$%^&'
 
 		when:
-		go 'register/resetPassword?t=' + code
-		$('#password') << 'aaaaaa1#'
-		$('#password2') << 'aaaaaa1#'
-		submit()
+		enterNewPassword('aaaaaa1#','aaaaaa1#')
 
 		then:
 		assertHtmlContains 'Your password was successfully changed'
@@ -202,7 +196,24 @@ class RegisterSpec extends AbstractSecuritySpec {
 		then:
 		assertContentContains 'Log in'
 
-		// delete the user so it doesn't affect other tests
+		when:
+		to ProfileListPage
+
+		then:
+		at ProfileListPage
+
+		when:
+		$("a", text: "User(username:"+un+")").parent().parent().children().first().children('a').click()
+
+		then:
+		at ProfileEditPage
+
+		when:
+		deleteProfile()
+
+		then:
+		assertHtmlContains 'deleted'
+
 		when:
 		go 'user/edit?username=' + un
 

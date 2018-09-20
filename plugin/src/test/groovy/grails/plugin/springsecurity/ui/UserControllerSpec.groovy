@@ -27,7 +27,7 @@ class UserControllerSpec extends Specification implements ControllerUnitTest<Use
         where:
         rolesAssignedToUser                                | expectedResults
         [ADMIN_ROLE.authority, USER_ROLE.authority] as Set | [(ADMIN_ROLE): true, (SUPER_ADMIN_ROLE): false, (USER_ROLE): true]
-        [] as Set                                          | [:]
-        null                                               | [:]
+        [] as Set                                          | [(ADMIN_ROLE): false, (SUPER_ADMIN_ROLE): false, (USER_ROLE): false]
+        null                                               | [(ADMIN_ROLE): false, (SUPER_ADMIN_ROLE): false, (USER_ROLE): false]
     }
 }
