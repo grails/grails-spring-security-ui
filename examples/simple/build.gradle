@@ -56,6 +56,9 @@ dependencies {
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:$assetPipelineVersion"
     testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-web-testing-support"
+    testCompile("io.github.bonigarcia:webdrivermanager:2.2.4") {
+        exclude group: 'org.seleniumhq.selenium'
+    }
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
 
     testCompile("org.grails.plugins:geb") {
@@ -73,8 +76,8 @@ dependencies {
 }
 
 webdriverBinaries {
-    chromedriver '2.40'
-    geckodriver '0.21.0'
+    chromedriver "${chromeDriverVersion}"
+    geckodriver "${geckoDriverVersion}"
 }
 
 bootRun {
