@@ -49,8 +49,14 @@ dependencies {
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:$assetPipelineVersion"
     compile "org.grails.plugins:spring-security-core:$springSecurityCoreVersion"
     testCompile "org.grails:grails-gorm-testing-support"
-    testCompile "org.grails:grails-plugin-testing"
+    //testCompile "org.grails:grails-plugin-testing"
     testCompile "org.grails:grails-web-testing-support"
+    compile "org.springframework.security:spring-security-core:$springSecurityVersion", {
+        ['spring-aop', 'spring-beans', 'spring-context', 'spring-core', 'spring-expression'].each {
+            exclude module: it
+        }
+    }
+
 
 }
 
