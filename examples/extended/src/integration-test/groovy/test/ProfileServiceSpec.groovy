@@ -1,7 +1,10 @@
 package test
 
-import grails.test.mixin.integration.Integration
+
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.testing.services.ServiceUnitTest
+import org.spockframework.runtime.model.SpecInfo
 import spock.lang.Specification
 import org.hibernate.SessionFactory
 

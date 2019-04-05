@@ -186,7 +186,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	/*Abstracted so this method can be used in other applications and if we determine to use another matching stragery later we can update as needed
 	 */
 	boolean doesAnswerMatch(String val1, String val2) {
-		springSecurityService.passwordEncoder.isPasswordValid(val1,val2, null)
+		springSecurityService.passwordEncoder.matches(val2, val1)
 	}
 
 	@Transactional

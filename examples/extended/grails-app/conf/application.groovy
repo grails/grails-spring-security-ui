@@ -4,6 +4,8 @@
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'test.User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'test.UserRole'
 grails.plugin.springsecurity.authority.className = 'test.Role'
+grails.plugin.springsecurity.password.algorithm = 'bcrypt'
+grails.plugin.springsecurity.password.hash.iterations = 1
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	[pattern: '/',               access: ['permitAll']],
 	[pattern: '/error',          access: ['permitAll']],
