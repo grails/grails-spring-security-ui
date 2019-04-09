@@ -17,7 +17,7 @@ grailsPublish {
     }
     issueTrackerUrl = project.hasProperty('issueTrackerUrl') ? project.issueTrackerUrl : "https://github.com/grails-plugins/$project.name/issues"
     vcsUrl = project.hasProperty('vcsUrl') ? project.vcsUrl : "https://github.com/grails-plugins/$project.name"
-    title = 'Grails spring-security-core plugin'
+    title = 'Grails spring-security-ui plugin'
     desc = ''
     developers = [burtbeckwith:"Burt Beckwith"]
 }

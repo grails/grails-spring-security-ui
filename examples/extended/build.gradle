@@ -76,16 +76,10 @@ dependencies {
     compile "org.grails.plugins:mail:$mailVesion"
 
 
-    compile("org.grails.plugins:spring-security-acl:4.0.0.BUILD-SNAPSHOT") {
+    compile("org.grails.plugins:spring-security-acl:4.0.0.M1") {
         exclude group: 'org.grails.plugins', module: 'spring-security-core'
     }
-
-/*
-    compile("org.grails.plugins:spring-security-acl:3.1.2") {
-        exclude group: 'org.grails.plugins', module: 'spring-security-core'
-    }
-*/
-
+    
     compile project(":spring-security-ui")
 }
 
