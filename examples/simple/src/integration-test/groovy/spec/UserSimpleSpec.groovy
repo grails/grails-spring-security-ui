@@ -208,8 +208,8 @@ class UserSimpleSpec extends AbstractSecuritySpec {
 
     @Issue("https://github.com/grails-plugins/grails-spring-security-ui/issues/106")
     void testUserRoleAssociationsAreRemoved() {
-        when: "edit user 1"
-        go 'user/edit/1'
+        when: "edit user 2"
+        go 'user/edit/2'
 
         then:
         at UserEditPage
@@ -232,8 +232,8 @@ class UserSimpleSpec extends AbstractSecuritySpec {
         assert rolesTab.hasEnabledRoles(['ROLE_USER', 'ROLE_ADMIN'])
         assert rolesTab.totalRoles() == 12
 
-        when: "edit user 1"
-        go 'user/edit/1'
+        when: "edit user 2"
+        go 'user/edit/2'
 
         then:
         at UserEditPage
@@ -249,6 +249,12 @@ class UserSimpleSpec extends AbstractSecuritySpec {
         when: "ROLE_ADMIN is disabled and the changes are saved"
         rolesTab.disableRole "ROLE_ADMIN"
         submit()
+        go 'user/edit/2'
+
+        then:
+        at UserEditPage
+
+        when: "select Roles tab"
         rolesTab.select()
 
         then: "12 roles are listed and 1 is enabled"
