@@ -551,9 +551,22 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">dependencies {
    ...
-   compile 'org.grails.plugins:spring-security-ui:3.1.3.BUILD-SNAPSHOT'
+   compile 'org.grails.plugins:spring-security-ui:4.0.0.BUILD-SNAPSHOT'
    ...</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Master branch is for Grails 4, which uses Spring Security 5 and Spring 5
+See the spring-security-core plugin for details such as how password encodings have changed (salts).
+</td>
+</tr>
+</table>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -587,6 +600,16 @@ Version 3.1.x is only compatible with Grails 3.3.x or higher.
 <h3 id="release-history">1.2. Release History</h3>
 <div class="ulist">
 <ul>
+<li>
+<p>Apr 9, 2019</p>
+<div class="ulist">
+<ul>
+<li>
+<p>4.0.0.M1 release</p>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>Feb 14, 2018</p>
 <div class="ulist">
@@ -780,7 +803,7 @@ Version 3.1.x is only compatible with Grails 3.3.x or higher.
 <p>You can update any of the attributes or delete the User. You can see that there&#8217;s a "Login as user" button here - that is only shown if you&#8217;re authenticated with a User who is granted <code>ROLE_SWITCH_USER</code> (this role name can be configured in <code>application.groovy</code>):</p>
 </div>
 <div class="paragraph">
-<p>This allows you to temporarily assume the identity of another User (see <a href="https://grails-plugins.github.io/grails-spring-security-core/v3/index.html#switchUser">the Spring Security Core plugin documentation</a> for more information about switch-user). The "Logged in as &#8230;&#8203;" information in the top right of the screen will change to show that you&#8217;re running as another User and provide a link to switch back. The role name <code>ROLE_SWITCH_USER</code> is the default but you can change the value with the <code>grails.plugin.springsecurity.ui.switchUserRoleName</code> setting in application.groovy.</p>
+<p>This allows you to temporarily assume the identity of another User (see <a href="https://grails-plugins.github.io/grails-spring-security-core/@VERSION@/index.html#switchUser">the Spring Security Core plugin documentation</a> for more information about switch-user). The "Logged in as &#8230;&#8203;" information in the top right of the screen will change to show that you&#8217;re running as another User and provide a link to switch back. The role name <code>ROLE_SWITCH_USER</code> is the default but you can change the value with the <code>grails.plugin.springsecurity.ui.switchUserRoleName</code> setting in application.groovy.</p>
 </div>
 <div class="paragraph">
 <p>If you click the Roles tab you can see the roles granted to this User and can click through to its edit page:</p>
@@ -1548,7 +1571,7 @@ grails.plugin.springsecurity.ui.forgotPassword.emailSubject = '...'</code></pre>
 <h2 id="persistentCookie">9. Persistent Cookie Management</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Persistent cookies aren&#8217;t enabled by default - you must enable them by running the <code>s2-create-persistent-token</code> script. See <a href="https://grails-plugins.github.io/grails-spring-security-core/v3/index.html#rememberMeCookie">the Spring Security Core plugin documentation</a> for details about this feature.</p>
+<p>Persistent cookies aren&#8217;t enabled by default - you must enable them by running the <code>s2-create-persistent-token</code> script. See <a href="https://grails-plugins.github.io/grails-spring-security-core/@VERSION@/index.html#rememberMeCookie">the Spring Security Core plugin documentation</a> for details about this feature.</p>
 </div>
 <div class="paragraph">
 <p>The Persistent Logins menu is only shown if this feature is enabled.</p>
@@ -2477,7 +2500,7 @@ The second service is a listener service which ensures that anytime an answer is
 <div id="footer">
 <div id="footer-text">
 Version unspecified<br>
-Last updated 2018-09-20 09:33:16 +00:00
+Last updated 2019-04-18 16:06:27 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
