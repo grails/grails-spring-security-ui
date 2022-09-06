@@ -1,9 +1,11 @@
-include 'plugin'
 include 'docs'
 
-include 'examples/simple'
-include 'examples/extended'
+include 'examples-simple'
+project(":examples-simple").projectDir = new File(settingsDir, "examples/simple")
 
-rootProject.name = 'grails-spring-security-ui'
+include 'examples-extended'
+project (':examples-extended').projectDir = new File(settingsDir, "examples/extended")
 
+include 'plugin'
 findProject(':plugin').name = 'spring-security-ui'
+rootProject.name = 'grails-spring-security-ui'
