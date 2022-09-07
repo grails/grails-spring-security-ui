@@ -14,7 +14,7 @@
  */
 package grails.plugin.springsecurity.ui.strategy
 
-import grails.plugin.springsecurity.ui.ForgotPasswordCommand
+
 import grails.plugin.springsecurity.ui.RegisterCommand
 import grails.plugin.springsecurity.ui.RegistrationCode
 import grails.plugin.springsecurity.ui.ResetPasswordCommand
@@ -28,7 +28,7 @@ interface RegistrationCodeStrategy {
 
 	void deleteRegistrationCode(RegistrationCode registrationCode)
 
-	RegistrationCode register(user, String password, salt)
+	RegistrationCode register(user, String password)
 
 	def createUser(RegisterCommand command)
 
