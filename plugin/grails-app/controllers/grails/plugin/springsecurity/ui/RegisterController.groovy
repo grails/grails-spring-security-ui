@@ -17,14 +17,13 @@ package grails.plugin.springsecurity.ui
 import grails.config.Config
 import grails.core.support.GrailsConfigurationAware
 import grails.gsp.PageRenderer
-import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.ui.strategy.MailStrategy
 import grails.plugin.springsecurity.ui.strategy.PropertiesStrategy
 import grails.plugin.springsecurity.ui.strategy.RegistrationCodeStrategy
 import groovy.text.SimpleTemplateEngine
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.security.authentication.dao.SaltSource
+
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -33,8 +32,6 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 
 	static defaultAction = 'register'
 
-	/** Dependency injection for the 'saltSource' bean. */
-	SaltSource saltSource
 
 	/** Dependency injection for the 'uiMailStrategy' bean. */
 	MailStrategy uiMailStrategy
@@ -70,8 +67,8 @@ class RegisterController extends AbstractS2UiController implements GrailsConfigu
 		}
 
 		def user = uiRegistrationCodeStrategy.createUser(registerCommand)
-		String salt = saltSource instanceof NullSaltSource ? null : registerCommand.username
-		RegistrationCode registrationCode = uiRegistrationCodeStrategy.register(user, registerCommand.password, salt)
+
+		RegistrationCode registrationCode = uiRegistrationCodeStrategy.register(user, registerCommand.password)
 
 		if (registrationCode == null || registrationCode.hasErrors()) {
 			// null means problem creating the user

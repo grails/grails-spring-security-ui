@@ -22,6 +22,9 @@ dependencies {
    ...
 ----
 
+NOTE: Master branch is for Grails 4, which uses Spring Security 5 and Spring 5
+See the spring-security-core plugin for details such as how password encodings have changed (salts).
+
 NOTE: Version 3.1.x is only compatible with Grails 3.3.x or higher.
 
 For previous Grails 3 versions ( 3.0.x, 3.1.x and 3.2.x ) use:
@@ -40,6 +43,8 @@ Also be sure to update the versions when new releases are available.
 
 === Release History
 
+* Apr 9, 2019
+** 4.0.0.M1 release
 * Feb 14, 2018
 ** 3.1.2 release
 * Sep 27, 2017

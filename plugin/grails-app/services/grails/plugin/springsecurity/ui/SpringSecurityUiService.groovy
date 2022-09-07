@@ -17,7 +17,6 @@ package grails.plugin.springsecurity.ui
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.ui.strategy.AclStrategy
 import grails.plugin.springsecurity.ui.strategy.ErrorsStrategy
 import grails.plugin.springsecurity.ui.strategy.MailStrategy
@@ -32,7 +31,6 @@ import grails.util.GrailsNameUtils
 import groovy.util.logging.Slf4j
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.security.authentication.dao.SaltSource
 import org.springframework.security.core.userdetails.UserCache
 import org.springframework.transaction.TransactionStatus
 import org.springframework.util.ClassUtils
@@ -69,7 +67,6 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 
 	GrailsApplication grailsApplication
 	MessageSource messageSource
-	SaltSource saltSource
 	def springSecurityService
 	UserCache userCache
 
@@ -170,9 +167,9 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	@Transactional
-	RegistrationCode register(user, String password, salt) {
+	RegistrationCode register(user, String password) {
 
-		save password: encodePassword(password, salt), user, 'register', transactionStatus
+		save password: encodePassword(password), user, 'register', transactionStatus
 		if (user.hasErrors()) {
 			return
 		}
@@ -189,7 +186,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	/*Abstracted so this method can be used in other applications and if we determine to use another matching stragery later we can update as needed
 	 */
 	boolean doesAnswerMatch(String val1, String val2) {
-		springSecurityService.passwordEncoder.isPasswordValid(val1,val2, null)
+		springSecurityService.passwordEncoder.matches(val2, val1)
 	}
 
 	@Transactional
@@ -284,9 +281,9 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	@Transactional
 	def resetPassword(ResetPasswordCommand command, RegistrationCode registrationCode) {
 
-		String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
+
 		def user = findUserByUsername(registrationCode.username)
-		save password: encodePassword(command.password, salt), user, 'resetPassword', transactionStatus
+		save password: encodePassword(command.password), user, 'resetPassword', transactionStatus
 
 		if (!user.hasErrors()) {
 			delete registrationCode, 'resetPassword', transactionStatus
@@ -411,13 +408,14 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		if (!user || !rolesToAdd) {
 			return
 		}
+
+        List<String> roleNames = []
+
 		rolesToAdd.each { role ->
-			def instance = UserRole.newInstance()
-			instance.user = user
-			instance.role = role
-			instance.save(insert: true)
-			instance
-		}
+            roleNames << role.authority
+        }
+
+        addRoles(user, roleNames)
 	}
 
 	protected void updateUserRoles(user, List<String> roleNames, TransactionStatus transactionStatus) {
@@ -439,8 +437,17 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	protected void removeUserRoles(user, Set rolesToRemove) {
-		rolesToRemove.each { role ->
-			removeUserRole(user, role)
+		if (!user || !rolesToRemove) {
+			return
+		}
+
+		try {
+			for (role in rolesToRemove) {
+				UserRole.remove user, role
+			}
+		}
+		catch (e) {
+			uiErrorsStrategy.handleException e, user, null, this, 'removeUserRoles', transactionStatus
 		}
 	}
 
@@ -653,9 +660,9 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		transactionStatus.setRollbackOnly()
 	}
 
-	String encodePassword(String password, salt) {
+	String encodePassword(String password) {
 		if (encodePassword) {
-			password = springSecurityService.encodePassword(password, salt)
+			password = springSecurityService.encodePassword(password)
 		}
 		password
 	}
@@ -691,8 +698,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 	}
 
 	protected void updatePassword(user, String password, TransactionStatus transactionStatus) {
-		String salt = saltSource instanceof NullSaltSource ? null : uiPropertiesStrategy.getProperty(user, 'username')
-		uiPropertiesStrategy.setProperties password: encodePassword(password, salt), user, transactionStatus
+		uiPropertiesStrategy.setProperties password: encodePassword(password), user, transactionStatus
 	}
 
 	protected Class<?> unproxy(Class<?> clazz) {
