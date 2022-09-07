@@ -442,13 +442,18 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 		}
 
 		try {
-			for (role in rolesToRemove) {
-				UserRole.remove user, role
+			rolesToRemove.each { role ->
+			    removeUserRoleAndReturnBoolean(user, role)
 			}
 		}
 		catch (e) {
 			uiErrorsStrategy.handleException e, user, null, this, 'removeUserRoles', transactionStatus
 		}
+	}
+
+	@Transactional
+	boolean removeUserRoleAndReturnBoolean(def user, def role) {
+		UserRole.remove user, role
 	}
 
 	@Transactional
