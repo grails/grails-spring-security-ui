@@ -739,7 +739,7 @@ class SpringSecurityUiService implements AclStrategy, ErrorsStrategy, Persistent
 				callback instance
 			}
 
-			instance.save()
+			instance.save(flush: true)
 			if (instance.hasErrors()) {
 				uiErrorsStrategy.handleValidationErrors instance, this, methodName, transactionStatus
 			}
