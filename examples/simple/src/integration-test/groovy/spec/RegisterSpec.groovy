@@ -1,7 +1,6 @@
 package spec
 
 import grails.testing.mixin.integration.Integration
-import org.springframework.test.annotation.DirtiesContext
 import page.register.ForgotPasswordPage
 import page.register.RegisterPage
 import page.user.UserEditPage
@@ -11,7 +10,6 @@ import com.dumbster.smtp.SimpleSmtpServer
 import com.dumbster.smtp.SmtpMessage
 import spock.lang.PendingFeature
 
-@DirtiesContext(classMode=DirtiesContext.ClassMode.BEFORE_CLASS)
 @Integration
 class RegisterSpec extends AbstractSecuritySpec {
 
@@ -76,7 +74,6 @@ class RegisterSpec extends AbstractSecuritySpec {
 	}
 
 	// FIXME
-	@DirtiesContext
 	@PendingFeature(reason="test is failing at resetPassword stage")
 	void testRegisterAndForgotPassword() {
 

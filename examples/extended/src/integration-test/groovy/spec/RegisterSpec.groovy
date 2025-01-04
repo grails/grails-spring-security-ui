@@ -3,19 +3,16 @@ package spec
 import com.dumbster.smtp.SimpleSmtpServer
 import com.dumbster.smtp.SmtpMessage
 import grails.testing.mixin.integration.Integration
-import org.springframework.test.annotation.DirtiesContext
+import page.profile.ProfileCreatePage
 import page.profile.ProfileEditPage
 import page.profile.ProfileListPage
 import page.register.ForgotPasswordPage
 import page.register.RegisterPage
+import page.register.ResetPasswordPage
 import page.register.SecurityQuestionsPage
-import page.profile.ProfileCreatePage
 import page.user.UserEditPage
 import page.user.UserSearchPage
-import page.register.ResetPasswordPage
-import spock.lang.PendingFeature
 
-@DirtiesContext(classMode=DirtiesContext.ClassMode.BEFORE_CLASS)
 @Integration
 class RegisterSpec extends AbstractSecuritySpec {
 
