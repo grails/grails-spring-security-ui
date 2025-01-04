@@ -46,7 +46,9 @@ class UserSimpleSpec extends AbstractSecuritySpec {
         when:
         to UserSearchPage
 
-        enabled.checked = '-1'
+        // Temporary workaround for problem with Geb RadioButtons module
+        //enabled.checked = '-1'
+        $('input', type: 'radio', name: 'enabled', value: '-1').click()
         submit()
 
         then:
@@ -59,7 +61,9 @@ class UserSimpleSpec extends AbstractSecuritySpec {
         when:
         to UserSearchPage
 
-        accountExpired.checked = '1'
+        // Temporary workaround for problem with Geb RadioButtons module
+        //accountExpired.checked = '1'
+        $('input', type: 'radio', name: 'accountExpired', value: '1').click()
 
         submit()
 
@@ -75,7 +79,9 @@ class UserSimpleSpec extends AbstractSecuritySpec {
         when:
         to UserSearchPage
 
-        accountLocked.checked = '1'
+        // Temporary workaround for problem with Geb RadioButtons module
+        //accountLocked.checked = '1'
+        $('input', type: 'radio', name: 'accountLocked', value: '1').click()
 
         submit()
 
@@ -91,7 +97,9 @@ class UserSimpleSpec extends AbstractSecuritySpec {
         when:
         to UserSearchPage
 
-        passwordExpired.checked = '1'
+        // Temporary workaround for problem with Geb RadioButtons module
+        //passwordExpired.checked = '1'
+        $('input', type: 'radio', name: 'passwordExpired', value: '1').click()
 
         submit()
 

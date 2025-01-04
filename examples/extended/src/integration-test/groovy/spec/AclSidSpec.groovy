@@ -41,7 +41,9 @@ class AclSidSpec extends AbstractSecuritySpec {
 	void testFindByPrincipal() {
 		when:
 		to AclSidSearchPage
-		principal.checked = '1'
+		// Temporary workaround for problem with Geb RadioButtons module
+		//principal.checked = '1'
+		$('input', type: 'radio', name: 'principal', value: '1').click()
 		submit()
 
 		then:
