@@ -1,11 +1,8 @@
 package spec
 
 import geb.driver.CachingDriverFactory
-import geb.spock.GebReportingSpec
-import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.testing.mixin.integration.Integration
-import spock.lang.Stepwise
 import grails.plugin.geb.ContainerGebSpec
+import grails.plugin.springsecurity.SpringSecurityUtils
 
 abstract class AbstractSecuritySpec extends ContainerGebSpec {
 

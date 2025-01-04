@@ -72,8 +72,6 @@ class RegisterSpec extends AbstractSecuritySpec {
 		assertContentContains 'No user was found with that username'
 	}
 
-	// FIXME
-	@PendingFeature(reason="test is failing at resetPassword stage")
 	void testRegisterAndForgotPassword() {
 
 		given:
