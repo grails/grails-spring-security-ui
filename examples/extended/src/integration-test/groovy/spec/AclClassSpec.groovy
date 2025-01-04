@@ -4,9 +4,7 @@ import grails.testing.mixin.integration.Integration
 import page.aclClass.AclClassCreatePage
 import page.aclClass.AclClassEditPage
 import page.aclClass.AclClassSearchPage
-import spock.lang.Stepwise
 
-@Stepwise
 @Integration
 class AclClassSpec extends AbstractSecuritySpec {
 

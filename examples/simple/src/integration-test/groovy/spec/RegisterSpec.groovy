@@ -10,10 +10,8 @@ import page.user.UserSearchPage
 import com.dumbster.smtp.SimpleSmtpServer
 import com.dumbster.smtp.SmtpMessage
 import spock.lang.PendingFeature
-import spock.lang.Stepwise
 
 @DirtiesContext(classMode=DirtiesContext.ClassMode.BEFORE_CLASS)
-@Stepwise
 @Integration
 class RegisterSpec extends AbstractSecuritySpec {
 

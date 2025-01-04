@@ -4,10 +4,8 @@ import grails.testing.mixin.integration.Integration
 import page.role.RoleCreatePage
 import page.role.RoleEditPage
 import page.role.RoleSearchPage
-import spock.lang.Stepwise
 
 @Integration
-@Stepwise
 class RoleSpec extends AbstractSecuritySpec {
 
 	void testFindAll() {

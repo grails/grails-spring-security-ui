@@ -5,9 +5,7 @@ import page.user.UserCreatePage
 import page.user.UserEditPage
 import page.user.UserSearchPage
 import spock.lang.Issue
-import spock.lang.Stepwise
 
-@Stepwise
 @Integration
 class UserSimpleSpec extends AbstractSecuritySpec {
 

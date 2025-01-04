@@ -4,9 +4,7 @@ import grails.testing.mixin.integration.Integration
 import page.aclObjectIdentity.AclObjectIdentityCreatePage
 import page.aclObjectIdentity.AclObjectIdentityEditPage
 import page.aclObjectIdentity.AclObjectIdentitySearchPage
-import spock.lang.Stepwise
 
-@Stepwise
 @Integration
 class AclObjectIdentitySpec extends AbstractSecuritySpec {
 

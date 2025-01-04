@@ -2,9 +2,7 @@ package spec
 
 import grails.testing.mixin.integration.Integration
 import page.persistentLogin.PersistentLoginSearchPage
-import spock.lang.Stepwise
 
-@Stepwise
 @Integration
 class PersistentLoginSpec extends AbstractSecuritySpec {
 
