@@ -7,7 +7,7 @@ class ExtendedMenuSpec extends AbstractSecuritySpec {
 
 	void testIndex() {
 		when:
-		go ''
+		browser.go('')
 		String html = pageSource
 
 		then:
