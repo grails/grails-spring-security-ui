@@ -83,4 +83,5 @@ tasks.register('removeGspFromTemplates', Delete) {
 assets.packagePlugin = true
 compileAstJava.dependsOn('copyGspIntoTemplates')
 
-apply from: "${rootProject.projectDir}/gradle/testVerbose.gradle"
+apply from: rootProject.layout.projectDirectory.file('gradle/java-config.gradle')
+apply from: rootProject.layout.projectDirectory.file('gradle/test-config.gradle')

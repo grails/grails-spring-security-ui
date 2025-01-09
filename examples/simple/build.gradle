@@ -48,6 +48,5 @@ dependencies {
 
 }
 
-compileJava.options.release = javaVersion.toInteger()
-
-apply from: rootProject.layout.projectDirectory.file('gradle/integrationTestVerbose.gradle')
+apply from: rootProject.layout.projectDirectory.file('gradle/java-config.gradle')
+apply from: rootProject.layout.projectDirectory.file('gradle/test-config.gradle')
