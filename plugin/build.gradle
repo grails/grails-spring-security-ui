@@ -5,7 +5,6 @@ buildscript {
     dependencies {
         classpath platform("org.grails:grails-bom:$grailsVersion")
         classpath 'com.bertramlabs.plugins:asset-pipeline-gradle'
-        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
     }
 }
 
@@ -14,11 +13,8 @@ group = 'org.grails.plugins'
 
 apply plugin: 'com.bertramlabs.asset-pipeline'
 apply plugin: 'java-library'
-apply plugin: 'maven-publish'
 apply plugin: 'org.grails.grails-gsp'
 apply plugin: 'org.grails.grails-plugin'
-apply plugin: 'org.grails.grails-publish'
-apply plugin: 'signing'
 
 repositories {
     maven { url = 'https://repo.grails.org/grails/core' }
@@ -49,7 +45,8 @@ grailsPublish {
 
 dependencies {
 
-    // Needed to compile subclasses of AbstractS2UiDomainController in consuming applications
+    // Must be on the compileClasspath of consuming applications to
+    // enable compilation of AbstractS2UiDomainController subclasses.
     compileOnlyApi 'org.grails.plugins:converters'
 
     implementation 'org.grails:grails-plugin-controllers'
