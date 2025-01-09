@@ -3,7 +3,7 @@ buildscript {
         maven { url = 'https://repo.grails.org/grails/core' }
     }
     dependencies {
-        classpath "org.grails:grails-bom:$grailsVersion"
+        classpath platform("org.grails:grails-bom:$grailsVersion")
         classpath 'com.bertramlabs.plugins:asset-pipeline-gradle'
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
     }
