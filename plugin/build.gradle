@@ -31,18 +31,6 @@ repositories {
     }
 }
 
-compileJava.options.release = javaVersion.toInteger()
-
-grailsPublish {
-    githubSlug = 'grails/grails-spring-security-ui'
-    license {
-        name = 'Apache-2.0'
-    }
-    title = 'Grails Spring Security UI'
-    desc = 'The Spring Security UI plugin provides CRUD screens and other user management workflows.'
-    developers = [burtbeckwith: 'Burt Beckwith']
-}
-
 dependencies {
 
     // Must be on the compileClasspath of consuming applications to
