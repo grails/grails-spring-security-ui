@@ -20,7 +20,7 @@ repositories {
     maven { url = 'https://repo.grails.org/grails/core' }
     mavenCentral()
     if (System.getenv('GITHUB_MAVEN_PASSWORD') && !grailsVersion.endsWith('-SNAPSHOT')) {
-        logger.lifecycle('Adding Grails Core Milestone Repo for project {}', project.name)
+        logger.lifecycle('Adding Grails Core Staging Repo for project {}', project.name)
         maven {
             url = 'https://maven.pkg.github.com/grails/grails-core'
             credentials {
